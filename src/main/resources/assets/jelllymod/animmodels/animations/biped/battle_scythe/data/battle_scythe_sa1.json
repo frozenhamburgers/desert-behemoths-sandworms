@@ -1,0 +1,39 @@
+{
+    "trail_effects": [
+        {
+            "start_time": 0.1,
+            "end_time":  25,
+            "lifetime": 8,
+            "joint": "Tool_R",
+            "item_skin_hand": "main_hand"
+        },
+        {
+            "start_time": 0.4333,
+            "end_time": 0.4833,
+            "lifetime": 6,
+            "joint": "Tool_R",
+            "item_skin_hand": "main_hand"
+        },
+        {
+            "start_time": 0.58,
+            "end_time": 0.6667,
+            "lifetime": 6,
+            "joint": "Tool_R",
+            "item_skin_hand": "main_hand"
+        },
+        {
+            "start_time": 0.7666,
+            "end_time": 1.05,
+            "lifetime": 8,
+            "joint": "Tool_R",
+            "item_skin_hand": "main_hand"
+        },
+        {
+            "start_time": 1.6500,
+            "end_time": 1.7666,
+            "lifetime": 6,
+            "joint": "Tool_R",
+            "item_skin_hand": "main_hand"
+        }
+    ]
+}
