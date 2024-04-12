@@ -75,9 +75,32 @@ public class WormChainEntity extends KinematicChainEntity {
                     );
                 }
             }
+
+            // if a segment is null or the segments array is lost
+            // regenerate the worm
+            if(segments.size() == 0) segmentCount = 0;
+            else {
+                for(int j=0; j<this.segments.size(); j++) {
+                    if (segments.get(j) == null) {
+                        System.out.println("regenerating");
+                        for (int i = 0; i < segments.size(); i++) if (segments.get(i) != null) segments.get(i).discard();
+                        segments = new ArrayList<>();
+                        segmentCount = 0;
+                        break;
+                    }
+                }
+            }
+
+            // init spawn segments
+            if(segmentCount == 0) {
+                // addTailSegment(0.35f*5, new Vec3(0,1,0));
+                for(int i=0; i<10; i++) addWormSegment(0.35f*5, new Vec3(0,1,0), new Vec3(7.5*((i+2)/11f),7.5*((i+2)/11f),5));
+                for(int i=0; i<80; i++) addWormSegment(0.35f*5, new Vec3(0,1,0), new Vec3(7.5,7.5,5));
+                addHeadSegment(0.35f*5, new Vec3(0,1,0), new Vec3(7.5,7.5,5));
+            }
+
             // keep position on root
             // update upVector for every
-            // if null segment, try to recover by reinitializing worm
             if (!segments.isEmpty()) {
                 setPos(segments.get(0).position());
                 Vec3 rootToEnd = (segments.get(segmentCount-1).position().subtract(segments.get(0).position())).cross(new Vec3(0,0,1));
@@ -85,22 +108,7 @@ public class WormChainEntity extends KinematicChainEntity {
                     if(segments.get(i) != null) {
                         segments.get(i).setUpVector(rootToEnd);
                     }
-//                    else {
-//                        // if a segment is found as null remove the segments & the worm
-//                        for(int j=0; j<this.segmentCount; j++) {
-//                            if(segments.get(j) != null) segments.get(i).discard();
-//                        }
-//                        this.discard();
-//                        return;
-//                    }
                 }
-        }
-
-            if(segmentCount == 0) {
-                // addTailSegment(0.35f*5, new Vec3(0,1,0));
-                for(int i=0; i<10; i++) addWormSegment(0.35f*5, new Vec3(0,1,0), new Vec3(7.5*((i+2)/11f),7.5*((i+2)/11f),5));
-                for(int i=0; i<80; i++) addWormSegment(0.35f*5, new Vec3(0,1,0), new Vec3(7.5,7.5,5));
-                addHeadSegment(0.35f*5, new Vec3(0,1,0), new Vec3(7.5,7.5,5));
             }
 
             // AI
@@ -278,5 +286,14 @@ public class WormChainEntity extends KinematicChainEntity {
     public void applyAcceleration(Vec3 accel) {
         super.applyAcceleration(accel);
         if(targetV.length() > SPEED_SCALE) targetV = targetV.normalize().scale(SPEED_SCALE);
+    }
+
+    @Override
+    public void remove(RemovalReason pReason) {
+        if(!level().isClientSide()) {
+            System.out.println(pReason);
+            for(int i=0; i<segments.size(); i++) if(segments.get(i) != null) segments.get(i).discard();
+        }
+        super.remove(pReason);
     }
 }

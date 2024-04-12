@@ -4,8 +4,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.architectury.registry.ReloadListenerRegistry;
 import mod.chloeprime.aaaparticles.client.loader.EffekAssetLoader;
 import net.jelly.jelllymod.JellyMod;
-import net.jelly.jelllymod.entity.IK.worm.WorldEventTypes;
-import net.jelly.jelllymod.entity.IK.worm.WormBreachRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -53,22 +51,6 @@ public class ClientEvents {
 
                 event.getPoseStack().popPose();
             }
-//            event.getEntity().getCapability(MagicCircleTrackedProvider.MAGIC_CIRCLE).ifPresent(magicCircleTracked -> {
-//                if(magicCircleTracked.getMagicCircleType() == 1) {
-//                    float height = 0.0f;
-//                    float width = 1.5f;
-//                    VertexConsumer textureConsumer = RenderHandler.DELAYED_RENDER.getBuffer(LodestoneRenderTypeRegistry.ADDITIVE_TEXTURE.applyAndCache(MAGIC_CIRCLE));
-//                    Vector3f[] positions = new Vector3f[]{new Vector3f(-width, height, width), new Vector3f(width, height, width), new Vector3f(width, height, -width), new Vector3f(-width, height, -width)};
-//                    VFXBuilders.WorldVFXBuilder builder = VFXBuilders.createWorld().setPosColorTexLightmapDefaultFormat();
-//
-//                    event.getPoseStack().pushPose();
-//                    event.getPoseStack().translate(0,0.0001f, 0);
-//                    builder.renderQuad(textureConsumer, event.getPoseStack(), positions, 4.0f);
-//                    builder.setPosColorLightmapDefaultFormat();
-//
-//                    event.getPoseStack().popPose();
-//                }
-//            });
         }
     }
 
@@ -87,12 +69,6 @@ public class ClientEvents {
             // register shaders
             // PostProcessHandler.addInstance(TestShader.INSTANCE);
             ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, new EffekAssetLoader(), new ResourceLocation(JellyMod.MODID, "effeks"));
-        }
-
-        @SubscribeEvent
-        public static void registerRenderers(FMLClientSetupEvent event) {
-            // register world event renderers
-            LodestoneWorldEventRendererRegistry.registerRenderer(WorldEventTypes.WORM_BREACH, new WormBreachRenderer());
         }
 
     }
