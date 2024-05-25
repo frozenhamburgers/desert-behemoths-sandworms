@@ -30,11 +30,13 @@ public class ModEntities {
     public static final RegistryObject<EntityType<WormSegment>> WORM_SEGMENT = ENTITY_TYPES.register("worm_segment", () ->
             EntityType.Builder.of(WormSegment::new, MobCategory.MISC)
                     .sized(7.5f,7.5f)
+                    .clientTrackingRange(400)
                     .build("worm_segment")
     );
     public static final RegistryObject<EntityType<WormHeadSegment>> WORM_HEAD_SEGMENT = ENTITY_TYPES.register("worm_head_segment", () ->
             EntityType.Builder.of(WormHeadSegment::new, MobCategory.MISC)
                     .sized(7.5f,7.5f)
+                    .clientTrackingRange(400)
                     .build("worm_head_segment")
     );
     public static final RegistryObject<EntityType<WormChainEntity>> WORM_CHAIN = ENTITY_TYPES.register("worm_chain", () ->

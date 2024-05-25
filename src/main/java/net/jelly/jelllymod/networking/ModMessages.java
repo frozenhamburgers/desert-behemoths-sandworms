@@ -2,6 +2,7 @@ package net.jelly.jelllymod.networking;
 
 import net.jelly.jelllymod.JellyMod;
 import net.jelly.jelllymod.networking.packet.ExampleC2SPacket;
+import net.jelly.jelllymod.networking.packet.ExampleS2CPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -33,6 +34,12 @@ public class ModMessages {
                 .consumerMainThread(ExampleC2SPacket::handle)
                 .add();
 
+        net.messageBuilder(ExampleS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(ExampleS2CPacket::new)
+                .encoder(ExampleS2CPacket::toBytes)
+                .consumerMainThread(ExampleS2CPacket::handle)
+                .add();
+
 //        net.messageBuilder(DrinkWaterC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
 //                .decoder(DrinkWaterC2SPacket::new)
 //                .encoder(DrinkWaterC2SPacket::toBytes)
@@ -40,11 +47,11 @@ public class ModMessages {
 //                .add();
     }
 
-    public static <MSG> void sendToServer(MSG message) {
+    public static void sendToServer(Object message) {
         INSTANCE.sendToServer(message);
     }
 
-    public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
+    public static void sendToPlayer(Object message, ServerPlayer player) {
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), message);
     }
 }

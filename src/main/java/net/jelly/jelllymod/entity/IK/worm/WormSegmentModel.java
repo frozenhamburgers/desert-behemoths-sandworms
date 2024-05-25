@@ -4,6 +4,7 @@ package net.jelly.jelllymod.entity.IK.worm;// Made with Blockbench 4.9.4
 
 
 import net.jelly.jelllymod.JellyMod;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.model.GeoModel;
 
@@ -22,4 +23,5 @@ public class WormSegmentModel extends GeoModel<WormSegment> {
 	public ResourceLocation getAnimationResource(WormSegment wormSegment) {
 		return new ResourceLocation(JellyMod.MODID, "animations/sapphire_armor.animation.json");
 	}
+
 }

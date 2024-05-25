@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import team.lodestar.lodestone.handlers.RenderHandler;
 import team.lodestar.lodestone.registry.client.LodestoneRenderTypeRegistry;
@@ -27,11 +28,6 @@ public class WormSegmentRenderer extends GeoEntityRenderer<WormSegment> {
 
     protected static final ResourceLocation LIGHT_TRAIL = new ResourceLocation(JellyMod.MODID, "textures/vfx/light_trail.png");
     protected static final RenderType LIGHT_TYPE = LodestoneRenderTypeRegistry.ADDITIVE_TEXTURE.apply(LIGHT_TRAIL);
-
-    @Override
-    public boolean shouldRender(WormSegment pLivingEntity, Frustum pCamera, double pCamX, double pCamY, double pCamZ) {
-        return true;
-    }
 
 
     @Override
@@ -68,4 +64,5 @@ public class WormSegmentRenderer extends GeoEntityRenderer<WormSegment> {
 //
 //        poseStack.popPose();
     }
+
 }

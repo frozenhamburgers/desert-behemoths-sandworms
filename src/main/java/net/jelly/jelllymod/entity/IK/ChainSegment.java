@@ -15,6 +15,7 @@ import team.lodestar.lodestone.systems.particle.data.GenericParticleData;
 import team.lodestar.lodestone.systems.particle.data.color.ColorParticleData;
 
 import java.awt.*;
+import java.util.UUID;
 
 public class ChainSegment extends Entity {
     // note position() is used as the end position (head) of the chain segment
@@ -40,7 +41,6 @@ public class ChainSegment extends Entity {
     @Override
     public void tick() {
         super.tick();
-        Vector3f dir_vec = this.entityData.get(DIR_VEC);
     }
 
     public float getLength() { return entityData.get(LENGTH);}
@@ -69,6 +69,7 @@ public class ChainSegment extends Entity {
         this.entityData.set(VISUAL_SCALE, new Vector3f(pCompound.getFloat("scale_vec_x"),
                 pCompound.getFloat("scale_vec_y"),
                 pCompound.getFloat("scale_vec_z")));
+
     }
 
     @Override
