@@ -171,13 +171,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    implementation fg.deobf("curse.maven:epic-fight-mod-405076:5064418")
-    implementation fg.deobf("curse.maven:weapons-of-miracles-epicfight-918614:5057198")
-    implementation fg.deobf("curse.maven:mob-battle-mod-268746:4748521")
     implementation fg.deobf("curse.maven:geckolib-388172:5060416")
-    implementation fg.deobf("curse.maven:epic-fight-indestructible-915201:5043273")
-    implementation fg.deobf("curse.maven:epic-fight-guandao-moveset-900642:4960987")
-    implementation fg.deobf("curse.maven:ef-bs-933502:4979891")
     runtimeOnly fg.deobf("curse.maven:lodestone-616457:5078837")
     implementation fg.deobf("curse.maven:lodestone-616457:5078837")
     implementation fg.deobf("curse.maven:architectury-api-419699:5137938")

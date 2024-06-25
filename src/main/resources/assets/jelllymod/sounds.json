@@ -1,0 +1,10 @@
+{
+  "worm_warning_1": {
+    "subtitle": "sounds.jelllymod.worm_warning_1",
+    "sounds": ["jelllymod:worm_warning_1"]
+  },
+  "worm_warning_2": {
+    "subtitle": "sounds.jelllymod.worm_warning_2",
+    "sounds": ["jelllymod:worm_warning_2"]
+  }
+}

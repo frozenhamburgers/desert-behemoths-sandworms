@@ -9,6 +9,7 @@ import net.jelly.jelllymod.entity.ModEntities;
 import net.jelly.jelllymod.item.ModCreativeModeTabs;
 import net.jelly.jelllymod.item.ModItems;
 import net.jelly.jelllymod.networking.ModMessages;
+import net.jelly.jelllymod.sound.ModSounds;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
@@ -52,6 +53,9 @@ public class JellyMod
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
+
+        // register sounds
+        ModSounds.register(modEventBus);
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         // ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);

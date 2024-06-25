@@ -7,6 +7,7 @@ public class WormSign {
     private int lastJumpTime;
     private int thisJumpTime;
     private double multiplier = 1;
+    private int playSignTimer = 0;
 
     // WS
     public int getWS() {
@@ -19,6 +20,7 @@ public class WormSign {
         if(this.wormSign-sub > 0) this.wormSign -= sub;
         else this.wormSign = 0;
     }
+    public void setWS(int ws) {this.wormSign = ws;}
 
     // multiplier
     public void addMultiplier(double mult) {
@@ -46,6 +48,9 @@ public class WormSign {
         this.thisJumpTime += add;
     }
     public void setThisJumpTime(int val) { this.thisJumpTime = val; }
+    public void decrementSignTimer() { if(playSignTimer > 0) playSignTimer--; }
+    public void setSignTimer() { playSignTimer = 1100; }
+    public int getSignTimer() { return playSignTimer; }
 
     public void saveNBTData(CompoundTag nbt) {
         nbt.putInt("worm_sign", wormSign);
