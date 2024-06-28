@@ -26,9 +26,6 @@ public class WormSegmentRenderer extends GeoEntityRenderer<WormSegment> {
         super(renderManager, new WormSegmentModel());
     }
 
-    protected static final ResourceLocation LIGHT_TRAIL = new ResourceLocation(JellyMod.MODID, "textures/vfx/light_trail.png");
-    protected static final RenderType LIGHT_TYPE = LodestoneRenderTypeRegistry.ADDITIVE_TEXTURE.apply(LIGHT_TRAIL);
-
 
     @Override
     public void render(WormSegment entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {

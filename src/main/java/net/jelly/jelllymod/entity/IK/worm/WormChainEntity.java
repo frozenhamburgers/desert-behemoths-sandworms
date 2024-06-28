@@ -6,8 +6,8 @@ import net.jelly.jelllymod.JellyMod;
 import net.jelly.jelllymod.entity.IK.ChainSegment;
 import net.jelly.jelllymod.entity.IK.KinematicChainEntity;
 import net.jelly.jelllymod.entity.ModEntities;
-import net.jelly.jelllymod.networking.ModMessages;
-import net.jelly.jelllymod.networking.packet.ExampleS2CPacket;
+import net.jelly.jelllymod.sound.ModSounds;
+import net.jelly.jelllymod.worldevents.WormBreachWorldEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -21,6 +21,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
+import team.lodestar.lodestone.handlers.WorldEventHandler;
 import team.lodestar.lodestone.network.screenshake.PositionedScreenshakePacket;
 import team.lodestar.lodestone.registry.common.LodestonePacketRegistry;
 import team.lodestar.lodestone.registry.common.particle.LodestoneParticleRegistry;
@@ -31,7 +32,6 @@ import team.lodestar.lodestone.systems.particle.data.color.ColorParticleData;
 import team.lodestar.lodestone.systems.particle.data.spin.SpinParticleData;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,6 +40,7 @@ public class WormChainEntity extends KinematicChainEntity {
     private boolean breaching = false;
     private int soundFrequencyCount = 0;
     private static final ParticleEmitterInfo SAND_IMPACT = new ParticleEmitterInfo(new ResourceLocation(JellyMod.MODID, "sandimpact"));
+    private static final ParticleEmitterInfo SLOWER_SAND_IMPACT = new ParticleEmitterInfo(new ResourceLocation(JellyMod.MODID, "slowersandimpact"));
     private static final ParticleEmitterInfo SAND_SMOKE = new ParticleEmitterInfo(new ResourceLocation(JellyMod.MODID, "sandsmoke"));
     public LivingEntity aggroTargetEntity;
     public boolean removed = false;
@@ -72,26 +73,6 @@ public class WormChainEntity extends KinematicChainEntity {
             }
 
 
-            // if a segment is null or the segments array is lost
-            // regenerate the worm
-            // if(this.level().getNearestPlayer(this, 100) == null) this.discard();
-            // check if worm is fully loaded
-//            boolean wormFullyLoaded = true;
-//            for (int j = 0; j < this.segments.size(); j++) {
-//                if (segments.get(j) != null) {
-//                    ChainSegment thisSegment = segments.get(j);
-////                    if(thisSegment.level().hasChunksAt(thisSegment.blockPosition().getX()-80, thisSegment.blockPosition().getZ()-80,
-////                                                       thisSegment.blockPosition().getX()+80, thisSegment.blockPosition().getX()+80))
-////                    {
-////                        wormFullyLoaded = false;
-////                        break;
-////                    }
-//                }
-//            }
-            // if its not fully loaded, wait
-//            if (!wormFullyLoaded) return;
-            // if it is fully loaded and null segments are still discovered, discard
-//            else {
             for (int j = 0; j < this.segments.size(); j++) {
                 if (segments.get(j) == null) {
                     if(discardTimer < 100) discardTimer++;
@@ -171,7 +152,7 @@ public class WormChainEntity extends KinematicChainEntity {
 
                     // if not chasing, assign goal accordingly
                     if(!isChasing) {
-                        if (!(stage == 0 && head.distanceTo(aggroTargetEntity) < 15 * SPEED_SCALE))
+                        if (!(stage == 0 && head.distanceTo(aggroTargetEntity) < 20 * SPEED_SCALE))
                             goal = aggroTargetEntity.position();
                         else if (goal == null) goal = aggroTargetEntity.position();
                     }
@@ -214,7 +195,7 @@ public class WormChainEntity extends KinematicChainEntity {
                             if (moveTowardVec.y < 0) moveTowardVec = new Vec3(moveTowardVec.x, 0, moveTowardVec.z);
                             if (goal.y - head.position().y < 20) applyAcceleration(moveTowardVec.scale(0.01));
                         }
-                        // otherwise, must be 16 blocks away & at least 10 blocks deeper than target to retarget
+                        // otherwise, must be 16 blocks away & at least 10 blocks deeper than target to lock back onto target entity
                         else if (head.position().distanceTo(goal) > 4 * SPEED_SCALE && (goal.y - head.position().y >= 20 * SPEED_SCALE))
                             stage = 0;
                         else applyAcceleration(new Vec3(0, -0.02 * SPEED_SCALE, 0));
@@ -253,6 +234,7 @@ public class WormChainEntity extends KinematicChainEntity {
                         float intensity = (float) Math.pow((1f + Math.pow(1.1f, dist - 17.5f)), -1) + 0.2f;
                         if (soundFrequencyCount >= 10 - (intensity * 10)) {
                             level().playSound(null, head, SoundEvents.SAND_BREAK, SoundSource.HOSTILE, 80f * intensity, intensity);
+                            head.playSound(ModSounds.WORM_BURROW.get(), 80f * intensity, intensity);
                             soundFrequencyCount = 0;
                         } else soundFrequencyCount++;
                     }
@@ -263,14 +245,18 @@ public class WormChainEntity extends KinematicChainEntity {
                     // System.out.println("breached");
                     breaching = true;
                     Vec3 particlePos = head.position().add(head.getDirectionVector().scale(8));
-                    AAALevel.addParticle(this.level(), true, SAND_IMPACT.clone().scale(2.0f).position(particlePos));
-                    AAALevel.addParticle(this.level(), true, SAND_SMOKE.clone().position(particlePos.add(0,2,0)));
+                    AAALevel.addParticle(this.level(), true, SLOWER_SAND_IMPACT.clone().scale(1.25f).position(particlePos));
+                    smokeParticles(this.level(), particlePos.add(0,-9,0));
+                    this.playSound(ModSounds.WORM_BREACH.get(), 10f, 1f);
+                    //AAALevel.addParticle(this.level(), true, SAND_SMOKE.clone().position(particlePos.add(0,2,0)));
                 }
                 else if(breaching && !predictBreach(this.level(), head)) {
                     breaching = false;
                     Vec3 particlePos = head.position().add(head.getDirectionVector().scale(8));
-                    AAALevel.addParticle(this.level(), true, SAND_IMPACT.clone().scale(2.0f).position(particlePos));
-                    AAALevel.addParticle(this.level(), true, SAND_SMOKE.clone().position(particlePos.add(0,2,0)));
+                    AAALevel.addParticle(this.level(), true, SLOWER_SAND_IMPACT.clone().scale(1.25f).position(particlePos));
+                    smokeParticles(this.level(), particlePos.add(0,-9,0));
+                    this.playSound(ModSounds.WORM_LAND.get(), 10f, 1f);
+                    //AAALevel.addParticle(this.level(), true, SAND_SMOKE.clone().position(particlePos.add(0,2,0)));
                 }
             }
         }
@@ -376,6 +362,10 @@ public class WormChainEntity extends KinematicChainEntity {
         if(targetV.length() > SPEED_SCALE) targetV = targetV.normalize().scale(SPEED_SCALE);
     }
 
+    public void blastHit() {
+        targetV = new Vec3(targetV.x*0.075, targetV.y+0.8, targetV.z*0.075);
+    }
+
     public void setAggroTargetEntity(LivingEntity target) {
         this.aggroTargetEntity = target;
     }
@@ -386,6 +376,13 @@ public class WormChainEntity extends KinematicChainEntity {
             for(int i=0; i<segments.size(); i++) if(segments.get(i) != null) segments.get(i).discard();
         }
         super.remove(pReason);
+    }
+
+    private void smokeParticles(Level level, Vec3 pos) {
+        WormBreachWorldEvent breachEvent = new WormBreachWorldEvent().setPosition(pos);
+        breachEvent.start(level);
+        breachEvent.setDirty();
+        WorldEventHandler.addWorldEvent(level, breachEvent);
     }
 
     @Override

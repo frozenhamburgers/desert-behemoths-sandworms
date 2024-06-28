@@ -19,9 +19,6 @@ public class WormHeadSegmentRenderer extends GeoEntityRenderer<WormHeadSegment> 
         super(renderManager, new WormHeadSegmentModel());
     }
 
-    protected static final ResourceLocation LIGHT_TRAIL = new ResourceLocation(JellyMod.MODID, "textures/vfx/light_trail.png");
-    protected static final RenderType LIGHT_TYPE = LodestoneRenderTypeRegistry.ADDITIVE_TEXTURE.apply(LIGHT_TRAIL);
-
     @Override
     public boolean shouldRender(WormHeadSegment pLivingEntity, Frustum pCamera, double pCamX, double pCamY, double pCamZ) {
         return true;

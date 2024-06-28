@@ -51,16 +51,7 @@ public class WormSegment extends ChainSegment implements GeoEntity {
 
         if(!this.level().isClientSide()) {
             // check for owner
-            List<WormChainEntity> nearbyChainEntities = this.level().getEntitiesOfClass(
-                    WormChainEntity.class,
-                    new AABB(this.position().add(200, 200, 200), this.position().add(-200, -200, -200))
-            );
-            if (
-                    nearbyChainEntities.stream()
-                    .filter(obj -> obj.getStringUUID().equals(ownerEntityUUID.toString()))
-                    .findFirst()
-                    .orElse(null)
-                == null) {
+            if(getOwner() == null) {
                 if(this.discardTimer < 120) discardTimer++;
                 else this.discard();
             }
@@ -118,6 +109,17 @@ public class WormSegment extends ChainSegment implements GeoEntity {
 
     public void setOwnerEntityUUID(UUID uuid) {
         this.ownerEntityUUID = uuid;
+    }
+    public WormChainEntity getOwner() {
+        List<WormChainEntity> nearbyChainEntities = this.level().getEntitiesOfClass(
+                WormChainEntity.class,
+                new AABB(this.position().add(200, 200, 200), this.position().add(-200, -200, -200))
+        );
+        return
+                nearbyChainEntities.stream()
+                        .filter(obj -> obj.getStringUUID().equals(ownerEntityUUID.toString()))
+                        .findFirst()
+                        .orElse(null);
     }
 
     @Override

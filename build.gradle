@@ -172,8 +172,8 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
     implementation fg.deobf("curse.maven:geckolib-388172:5060416")
-    runtimeOnly fg.deobf("curse.maven:lodestone-616457:5078837")
-    implementation fg.deobf("curse.maven:lodestone-616457:5078837")
+    runtimeOnly fg.deobf("curse.maven:lodestone-616457:5460471")
+    implementation fg.deobf("curse.maven:lodestone-616457:5460471")
     implementation fg.deobf("curse.maven:architectury-api-419699:5137938")
     implementation fg.deobf("curse.maven:aaa-particles-979809:5152797")
 }

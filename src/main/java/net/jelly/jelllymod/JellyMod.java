@@ -9,7 +9,10 @@ import net.jelly.jelllymod.entity.ModEntities;
 import net.jelly.jelllymod.item.ModCreativeModeTabs;
 import net.jelly.jelllymod.item.ModItems;
 import net.jelly.jelllymod.networking.ModMessages;
+import net.jelly.jelllymod.registry.common.WorldEventRegistry;
 import net.jelly.jelllymod.sound.ModSounds;
+import net.jelly.jelllymod.registry.client.ParticleRegistry;
+import net.jelly.jelllymod.worldevents.WormBreachRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
@@ -23,6 +26,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
+
+import static team.lodestar.lodestone.registry.client.LodestoneWorldEventRendererRegistry.registerRenderer;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(JellyMod.MODID)
@@ -56,6 +61,9 @@ public class JellyMod
 
         // register sounds
         ModSounds.register(modEventBus);
+
+        // register particles
+        ParticleRegistry.register(modEventBus);
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         // ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
