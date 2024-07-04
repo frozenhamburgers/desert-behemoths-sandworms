@@ -2,9 +2,11 @@ package net.jelly.jelllymod.worldevents;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.jelly.jelllymod.registry.client.ParticleRegistry;
+import net.jelly.jelllymod.vfx.SinkholePostProcessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.RandomSource;
+import team.lodestar.lodestone.handlers.RenderHandler;
 import team.lodestar.lodestone.systems.easing.Easing;
 import team.lodestar.lodestone.systems.particle.SimpleParticleOptions;
 import team.lodestar.lodestone.systems.particle.builder.WorldParticleBuilder;
@@ -56,8 +58,8 @@ public class WormBreachRenderer extends WorldEventRenderer<WormBreachWorldEvent>
                     .setRandomMotion(0.085f, 0.03f, 0.085f)
                     .setRandomOffset(20,2,20)
                     .setScaleData(GenericParticleData.create(8f,8f).build())
-                    .setDiscardFunction(SimpleParticleOptions.ParticleDiscardFunctionType.ENDING_CURVE_INVISIBLE)
-                    .spawn(Minecraft.getInstance().level, instance.position.x, instance.position.y, instance.position.z);
+                    .setDiscardFunction(SimpleParticleOptions.ParticleDiscardFunctionType.ENDING_CURVE_INVISIBLE);
+                    //.spawn(Minecraft.getInstance().level, instance.position.x, instance.position.y, instance.position.z);
             for(int i=0; i<36; i++)
             WorldParticleBuilder.create(ParticleRegistry.CRINGE_PARTICLE)
                     .enableNoClip()
@@ -72,8 +74,8 @@ public class WormBreachRenderer extends WorldEventRenderer<WormBreachWorldEvent>
                     .setRandomMotion(0.085f, 0.04f, 0.085f)
                     .setRandomOffset(12,2,12)
                     .setScaleData(GenericParticleData.create(3f,10f).build())
-                    .setDiscardFunction(SimpleParticleOptions.ParticleDiscardFunctionType.ENDING_CURVE_INVISIBLE)
-                    .spawn(Minecraft.getInstance().level, instance.position.x, instance.position.y, instance.position.z);
+                    .setDiscardFunction(SimpleParticleOptions.ParticleDiscardFunctionType.ENDING_CURVE_INVISIBLE);
+                    //.spawn(Minecraft.getInstance().level, instance.position.x, instance.position.y, instance.position.z);
             instance.spawnedParticles = true;
         }
     }

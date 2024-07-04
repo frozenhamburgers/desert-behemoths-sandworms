@@ -19,6 +19,9 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
+    // ATs
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
     // The mappings can be changed at any time and must be in the following format.
     // Channel:   Version:
     // official   MCVersion             Official field/method names from Mojang mapping files
@@ -156,6 +159,9 @@ dependencies {
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
+    // Apply Mixin AP
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-common-api:${jei_version}")
@@ -171,11 +177,29 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
+
     implementation fg.deobf("curse.maven:geckolib-388172:5060416")
     runtimeOnly fg.deobf("curse.maven:lodestone-616457:5460471")
     implementation fg.deobf("curse.maven:lodestone-616457:5460471")
     implementation fg.deobf("curse.maven:architectury-api-419699:5137938")
     implementation fg.deobf("curse.maven:aaa-particles-979809:5152797")
+}
+
+// mixin closure
+mixin {
+    // Refmaps for each SourceSet
+    add sourceSets.main, 'mixins.mymod.refmap.json'
+
+    // Configs to add to runs and jars
+    config 'mixins.sandworm.json'
+
+    // Specify options for dev run configs
+    debug.verbose = true
+    debug.export = true
+    dumpTargetOnFailure = true
+
+    // Options for the Annotation Processor
+    quiet
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

@@ -8,6 +8,7 @@ import net.jelly.jelllymod.entity.IK.KinematicChainEntity;
 import net.jelly.jelllymod.entity.ModEntities;
 import net.jelly.jelllymod.sound.ModSounds;
 import net.jelly.jelllymod.worldevents.WormBreachWorldEvent;
+import net.jelly.jelllymod.worldevents.WormRippleWorldEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -152,9 +153,11 @@ public class WormChainEntity extends KinematicChainEntity {
 
                     // if not chasing, assign goal accordingly
                     if(!isChasing) {
+                        // assign goal to aggro entity until close enough
                         if (!(stage == 0 && head.distanceTo(aggroTargetEntity) < 20 * SPEED_SCALE))
                             goal = aggroTargetEntity.position();
                         else if (goal == null) goal = aggroTargetEntity.position();
+                        else sinkHole(this.level(), goal);
                     }
 
                     if (this.goal != null) {
@@ -380,6 +383,14 @@ public class WormChainEntity extends KinematicChainEntity {
 
     private void smokeParticles(Level level, Vec3 pos) {
         WormBreachWorldEvent breachEvent = new WormBreachWorldEvent().setPosition(pos);
+        breachEvent.start(level);
+        breachEvent.setDirty();
+        WorldEventHandler.addWorldEvent(level, breachEvent);
+    }
+
+    private void sinkHole(Level level, Vec3 pos) {
+        System.out.println("sinkhole" + pos);
+        WormRippleWorldEvent breachEvent = new WormRippleWorldEvent().spawnRipple(pos);
         breachEvent.start(level);
         breachEvent.setDirty();
         WorldEventHandler.addWorldEvent(level, breachEvent);
