@@ -154,10 +154,10 @@ public class WormChainEntity extends KinematicChainEntity {
                     // if not chasing, assign goal accordingly
                     if(!isChasing) {
                         // assign goal to aggro entity until close enough
-                        if (!(stage == 0 && head.distanceTo(aggroTargetEntity) < 20 * SPEED_SCALE))
+                        if (!(stage == 0 && head.distanceTo(aggroTargetEntity) < 22 * SPEED_SCALE))
                             goal = aggroTargetEntity.position();
                         else if (goal == null) goal = aggroTargetEntity.position();
-                        else sinkHole(this.level(), goal);
+                        else if (stage == 0) sinkHole(this.level(), goal);
                     }
 
                     if (this.goal != null) {

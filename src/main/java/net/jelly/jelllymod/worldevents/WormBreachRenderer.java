@@ -58,8 +58,8 @@ public class WormBreachRenderer extends WorldEventRenderer<WormBreachWorldEvent>
                     .setRandomMotion(0.085f, 0.03f, 0.085f)
                     .setRandomOffset(20,2,20)
                     .setScaleData(GenericParticleData.create(8f,8f).build())
-                    .setDiscardFunction(SimpleParticleOptions.ParticleDiscardFunctionType.ENDING_CURVE_INVISIBLE);
-                    //.spawn(Minecraft.getInstance().level, instance.position.x, instance.position.y, instance.position.z);
+                    .setDiscardFunction(SimpleParticleOptions.ParticleDiscardFunctionType.ENDING_CURVE_INVISIBLE)
+                    .spawn(Minecraft.getInstance().level, instance.position.x, instance.position.y, instance.position.z);
             for(int i=0; i<36; i++)
             WorldParticleBuilder.create(ParticleRegistry.CRINGE_PARTICLE)
                     .enableNoClip()
@@ -74,8 +74,8 @@ public class WormBreachRenderer extends WorldEventRenderer<WormBreachWorldEvent>
                     .setRandomMotion(0.085f, 0.04f, 0.085f)
                     .setRandomOffset(12,2,12)
                     .setScaleData(GenericParticleData.create(3f,10f).build())
-                    .setDiscardFunction(SimpleParticleOptions.ParticleDiscardFunctionType.ENDING_CURVE_INVISIBLE);
-                    //.spawn(Minecraft.getInstance().level, instance.position.x, instance.position.y, instance.position.z);
+                    .setDiscardFunction(SimpleParticleOptions.ParticleDiscardFunctionType.ENDING_CURVE_INVISIBLE)
+                    .spawn(Minecraft.getInstance().level, instance.position.x, instance.position.y, instance.position.z);
             instance.spawnedParticles = true;
         }
     }
