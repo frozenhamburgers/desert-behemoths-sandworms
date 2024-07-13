@@ -5,12 +5,17 @@ import mod.chloeprime.aaaparticles.api.common.ParticleEmitterInfo;
 import net.jelly.jelllymod.JellyMod;
 import net.jelly.jelllymod.entity.IK.ChainSegment;
 import net.jelly.jelllymod.entity.IK.KinematicChainEntity;
+import net.jelly.jelllymod.registry.common.DamageTypesRegistry;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageSources;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -39,6 +44,8 @@ public class WormSegment extends ChainSegment implements GeoEntity {
     private AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private UUID ownerEntityUUID;
     private int discardTimer = 0;
+    private DamageSource dmgSource =
+            new DamageSource(this.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypesRegistry.WORM));
 
     public WormSegment(EntityType<?> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -64,7 +71,7 @@ public class WormSegment extends ChainSegment implements GeoEntity {
                     LivingEntity target = (LivingEntity) (collidingEntities.get(i));
                     if(target.hurtTime == 0) {
                         Vec3 vec3 = (target.position().subtract(this.position())).normalize();
-                        target.hurt(this.damageSources().explosion(this, target), getDamage());
+                        target.hurt(dmgSource, getDamage());
                         Vec3 knockback = getKB();
                         target.addDeltaMovement(new Vec3(vec3.x*knockback.x, vec3.y*knockback.y, vec3.z*knockback.z));
                     }

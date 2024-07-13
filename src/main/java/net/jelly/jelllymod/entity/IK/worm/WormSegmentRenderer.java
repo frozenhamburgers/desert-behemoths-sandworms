@@ -62,4 +62,8 @@ public class WormSegmentRenderer extends GeoEntityRenderer<WormSegment> {
 //        poseStack.popPose();
     }
 
+    @Override
+    public boolean shouldRender(WormSegment pLivingEntity, Frustum pCamera, double pCamX, double pCamY, double pCamZ) {
+        return true;
+    }
 }

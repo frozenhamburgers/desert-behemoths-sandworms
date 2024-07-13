@@ -64,7 +64,6 @@ public class ForgeEventHandler {
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if(event.side == LogicalSide.SERVER) {
             Player player = event.player;
-            //System.out.println("Is desert: " + isDesertBiome(player.getServer().getLevel(player.level().dimension()), player.blockPosition()));
             // if in worm spawnable biome
             if (isDesertBiome(player.getServer().getLevel(player.level().dimension()), player.blockPosition())) {
                 // if no worm already present
@@ -115,8 +114,8 @@ public class ForgeEventHandler {
                             float similarity = 1 - percentDiff;
                             ws.addMultiplier(similarity * 0.7);
                             incrementWormSign((int) (40 * ws.getMultiplier()), player, ws);
-                            System.out.println("add:" + (int) (40 * ws.getMultiplier()));
-                            System.out.println("multiplier:" + ws.getMultiplier());
+//                            System.out.println("add:" + (int) (40 * ws.getMultiplier()));
+//                            System.out.println("multiplier:" + ws.getMultiplier());
                             ws.setLastJumpTime(ws.getThisJumpTime());
                             ws.setThisJumpTime(0);
                         }
@@ -154,16 +153,19 @@ public class ForgeEventHandler {
     private static void spawnWorm(Player player) {
         WormChainEntity sandWorm = new WormChainEntity(ModEntities.WORM_CHAIN.get(), player.level());
         Vec3 sandWormSpawnPos = player.position().add(spawnPosOffset());
+        int spawnChecks = 0;
+        while(!isDesertBiome(player.getServer().getLevel(player.level().dimension()).getLevel(), new BlockPos((int)sandWormSpawnPos.x, (int)sandWormSpawnPos.y, (int)sandWormSpawnPos.z))) {
+            sandWormSpawnPos = player.position().add(spawnPosOffset());
+            spawnChecks++;
+            if(spawnChecks > 100) break;
+        }
         sandWorm.moveTo(sandWormSpawnPos);
         sandWorm.setAggroTargetEntity(player);
         player.level().addFreshEntity(sandWorm);
-        //player.getServer().getLevel(player.level().dimension()).playSeededSound(null, sandWormSpawnPos.x, sandWormSpawnPos.y, sandWormSpawnPos.z, ModSounds.WORM_SPAWN.get(), SoundSource.MASTER, 50f,1f,0);
-        //player.getServer().getLevel(player.level().dimension()).playSound(null, sandWorm, ModSounds.WORM_SPAWN.get(), SoundSource.HOSTILE, 80f, 1f);
-        sandWorm.playSound(ModSounds.WORM_SPAWN.get(), 19, 1);
+        sandWorm.playSound(ModSounds.WORM_SPAWN.get(), 100, 1);
     }
 
     private static void warningScreenshake(Player thisPlayer, double strength, SoundEvent sound) {
-        System.out.println("screenshaking");
         thisPlayer.level().playSeededSound(null, thisPlayer.getX(), thisPlayer.getY(), thisPlayer.getZ(), sound, SoundSource.MASTER, 0.75f,1,0);
         LodestonePacketRegistry.LODESTONE_CHANNEL.send((PacketDistributor.PLAYER.with(() -> (ServerPlayer) thisPlayer)),
                 new ScreenshakePacket(410).setEasing(Easing.SINE_IN_OUT).setIntensity((float)strength));
@@ -174,11 +176,9 @@ public class ForgeEventHandler {
     @SubscribeEvent
     public static void onExplosion(ExplosionEvent.Detonate event) {
         if(!event.getLevel().isClientSide()) {
-            System.out.println("BOOM: " + event.getExplosion().getPosition());
             Vec3 pos = event.getExplosion().getPosition();
             List<WormHeadSegment> hitHeads = event.getLevel().getEntitiesOfClass(WormHeadSegment.class, new AABB(pos.x + 5, pos.y + 5, pos.z + 5, pos.x - 5, pos.y - 5, pos.z - 5));
             if (!hitHeads.isEmpty()) hitHeads.forEach(head -> {
-                System.out.println("HEAD HIT:" + head);
                 head.playSound(ModSounds.WORM_ROAR.get(), 10f, 1f);
                 WormChainEntity wormChain = head.getOwner();
                 if(wormChain != null) wormChain.blastHit();

@@ -80,14 +80,6 @@ void main() {
 
                 // Mix the original and distorted colors based on the distortion factor
                 fragColor = distortedColor;
-
-                // hole
-                float distance = length(worldPos - center);
-                float falloff = 1.0 - clamp(distance / effectRadius * 3, 0.0, 1.0);
-                vec3 holeColor = vec3(clamp(pow(2.0, (color.x * falloff + 1.0) - 0.1), 0.0, 10.0),
-                                      clamp(pow(2.0, (color.y * falloff + 1.0) - 0.1), 0.0, 10.0),
-                                      clamp(pow(2.0, (color.z * falloff + 1.0) - 0.1), 0.0, 10.0));
-                fragColor.rgb /= (10 * color * falloff + 1.0);
             } else {
                 // Outside the effect radius, render without distortion
                 fragColor = texture(DiffuseSampler, texCoord);

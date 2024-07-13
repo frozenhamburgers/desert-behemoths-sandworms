@@ -1,18 +1,4 @@
 {
-  "item.jelllymod.jelly": "Jelly",
-  "item.jelllymod.cube_jelly": "Cube Jelly",
-  "item.jelllymod.sapphire_helmet": "SH",
-  "item.jelllymod.sapphire_chestplate": "SC",
-  "item.jelllymod.sapphire_leggings": "SL",
-  "item.jelllymod.jingliu_helmet": "Jingliu Helmet",
-  "item.jelllymod.jingliu_chestplate": "Jingliu Chestplate",
-  "item.jelllymod.jingliu_leggings": "Jingliu Leggings",
-  "item.jelllymod.xing_helmet": "Xing Helmet",
-  "item.jelllymod.xing_chestplate": "Xing Chestplate",
-  "item.jelllymod.xing_leggings": "Gura Leggings",
-  "item.jelllymod.gura_helmet": "Gura Helmet",
-  "item.jelllymod.gura_chestplate": "Gura Chestplate",
-  "item.jelllymod.gura_leggings": "Gura Leggings",
-
+  "death.attack.worm": "%1$s was swallowed whole",
   "creativetab.jelly_tab": "Jelly"
 }

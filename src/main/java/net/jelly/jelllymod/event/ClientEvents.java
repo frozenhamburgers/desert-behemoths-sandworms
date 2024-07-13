@@ -6,6 +6,7 @@ import net.jelly.jelllymod.JellyMod;
 import net.jelly.jelllymod.registry.client.ParticleRegistry;
 import net.jelly.jelllymod.registry.common.WorldEventRegistry;
 import net.jelly.jelllymod.vfx.SinkholePostProcessor;
+import net.jelly.jelllymod.vfx.SonicBoomPostProcessor;
 import net.jelly.jelllymod.worldevents.WormBreachRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -39,6 +40,7 @@ public class ClientEvents {
         public static void onClientSetup(FMLClientSetupEvent event) {
             // register shaders
             PostProcessHandler.addInstance(SinkholePostProcessor.INSTANCE);
+            PostProcessHandler.addInstance(SonicBoomPostProcessor.INSTANCE);
             ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, new EffekAssetLoader(), new ResourceLocation(JellyMod.MODID, "effeks"));
         }
 

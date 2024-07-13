@@ -9,6 +9,9 @@ import net.jelly.jelllymod.JellyMod;
 import net.jelly.jelllymod.registry.client.ParticleRegistry;
 import net.jelly.jelllymod.vfx.SinkholeFx;
 import net.jelly.jelllymod.vfx.SinkholePostProcessor;
+import net.jelly.jelllymod.vfx.SonicBoomFx;
+import net.jelly.jelllymod.vfx.SonicBoomPostProcessor;
+import net.jelly.jelllymod.worldevents.SonicBoomWorldEvent;
 import net.jelly.jelllymod.worldevents.WormBreachWorldEvent;
 import net.jelly.jelllymod.worldevents.WormRippleWorldEvent;
 import net.minecraft.commands.CommandSourceStack;
@@ -41,16 +44,22 @@ public class WormBreachCommand extends CommandEvent {
     private static int execute(CommandContext<CommandSourceStack> command){
         Level level = command.getSource().getLevel();
         Vec3 pos = command.getSource().getPosition();
-
-        WormRippleWorldEvent breachEvent = new WormRippleWorldEvent().spawnRipple(pos);
-        breachEvent.start(command.getSource().getUnsidedLevel());
-        breachEvent.setDirty();
-        WorldEventHandler.addWorldEvent(level, breachEvent);
 //
-//        WormBreachWorldEvent breachEvent2 = new WormBreachWorldEvent().setPosition(pos);
-//        breachEvent2.start(command.getSource().getUnsidedLevel());
-//        breachEvent2.setDirty();
-//        WorldEventHandler.addWorldEvent(level, breachEvent2);
+//        SonicBoomWorldEvent breachEvent = new SonicBoomWorldEvent().spawnRipple(pos);
+//        breachEvent.start(command.getSource().getUnsidedLevel());
+//        breachEvent.setDirty();
+//        WorldEventHandler.addWorldEvent(level, breachEvent);
+
+//        Vector3f center = new Vector3f(0, 0, 0);
+//        Vector3f color = new Vector3f(1, 0, 1);
+//        SonicBoomPostProcessor.INSTANCE.addFxInstance(new SonicBoomFx(center, color));
+
+
+
+        WormBreachWorldEvent breachEvent2 = new WormBreachWorldEvent().setPosition(pos);
+        breachEvent2.start(command.getSource().getUnsidedLevel());
+        breachEvent2.setDirty();
+        WorldEventHandler.addWorldEvent(level, breachEvent2);
 
 //        BlockPos blockPos = BlockPos.containing(pos.x, pos.y-1, pos.z);
 //        BlockState blockState = level.getBlockState(blockPos);

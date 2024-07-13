@@ -16,7 +16,7 @@ public abstract class TestMixin {
      */
     @Overwrite
     private void touch(Entity entity) {
-        System.out.println("touch!");
+        // System.out.println("touch!");
         entity.playerTouch((Player)(Object)this);
     }
 

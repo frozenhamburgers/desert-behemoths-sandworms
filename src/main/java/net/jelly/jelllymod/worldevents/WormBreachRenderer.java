@@ -2,11 +2,9 @@ package net.jelly.jelllymod.worldevents;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.jelly.jelllymod.registry.client.ParticleRegistry;
-import net.jelly.jelllymod.vfx.SinkholePostProcessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.RandomSource;
-import team.lodestar.lodestone.handlers.RenderHandler;
 import team.lodestar.lodestone.systems.easing.Easing;
 import team.lodestar.lodestone.systems.particle.SimpleParticleOptions;
 import team.lodestar.lodestone.systems.particle.builder.WorldParticleBuilder;
@@ -36,7 +34,7 @@ public class WormBreachRenderer extends WorldEventRenderer<WormBreachWorldEvent>
                     .setRenderType(LodestoneWorldParticleRenderType.TRANSPARENT.withDepthFade())
                     .setSpritePicker(SimpleParticleOptions.ParticleSpritePicker.RANDOM_SPRITE)
                     .setColorData(ColorParticleData.create(new Color(171, 128, 97), new Color(171, 128, 97)).build())
-                    .setTransparencyData(GenericParticleData.create(0.25f, 0.25f, 0).setEasing(Easing.EXPO_IN_OUT).build())
+                    .setTransparencyData(GenericParticleData.create(0.15f, 0.15f, 0).setEasing(Easing.EXPO_IN_OUT).build())
                     .setLifetime(480)
                     .setSpinData(SpinParticleData.createRandomDirection(RandomSource.create(), 0.005f).build())
                     .setRandomMotion(0.075f, 0.03f, 0.075f)
@@ -52,7 +50,7 @@ public class WormBreachRenderer extends WorldEventRenderer<WormBreachWorldEvent>
                     .setRenderType(LodestoneWorldParticleRenderType.TRANSPARENT.withDepthFade())
                     .setSpritePicker(SimpleParticleOptions.ParticleSpritePicker.RANDOM_SPRITE)
                     .setColorData(ColorParticleData.create(new Color(157, 136, 108), new Color(157, 136, 108)).build())
-                    .setTransparencyData(GenericParticleData.create(0.25f, 0.25f, 0).setEasing(Easing.EXPO_IN_OUT).build())
+                    .setTransparencyData(GenericParticleData.create(0.15f, 0.15f, 0).setEasing(Easing.EXPO_IN_OUT).build())
                     .setLifetime(450)
                     .setSpinData(SpinParticleData.createRandomDirection(RandomSource.create(), 0.005f).build())
                     .setRandomMotion(0.085f, 0.03f, 0.085f)
@@ -68,7 +66,7 @@ public class WormBreachRenderer extends WorldEventRenderer<WormBreachWorldEvent>
                     .setRenderType(LodestoneWorldParticleRenderType.TRANSPARENT.withDepthFade())
                     .setSpritePicker(SimpleParticleOptions.ParticleSpritePicker.RANDOM_SPRITE)
                     .setColorData(ColorParticleData.create(new Color(215, 194, 173), new Color(188, 155, 130)).build())
-                    .setTransparencyData(GenericParticleData.create(0.05f, 0.25f, 0).setEasing(Easing.EXPO_IN_OUT).build())
+                    .setTransparencyData(GenericParticleData.create(0.04f, 0.15f, 0).setEasing(Easing.EXPO_IN_OUT).build())
                     .setLifetime(450)
                     .setSpinData(SpinParticleData.createRandomDirection(RandomSource.create(), 0.005f).build())
                     .setRandomMotion(0.085f, 0.04f, 0.085f)
