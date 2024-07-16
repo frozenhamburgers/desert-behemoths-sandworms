@@ -1,0 +1,30 @@
+{
+  "worm_warning_1": {
+    "subtitle": "sounds.sandworm_mod.worm_warning_1",
+    "sounds": ["sandworm_mod:worm_warning_1"]
+  },
+  "worm_warning_2": {
+    "subtitle": "sounds.sandworm_mod.worm_warning_2",
+    "sounds": ["sandworm_mod:worm_warning_2"]
+  },
+  "worm_spawn": {
+    "subtitle": "sounds.sandworm_mod.worm_spawn",
+    "sounds": ["sandworm_mod:worm_spawn"]
+  },
+  "worm_breach": {
+    "subtitle": "sounds.sandworm_mod.worm_breach",
+    "sounds": ["sandworm_mod:worm_breach"]
+  },
+  "worm_land": {
+    "subtitle": "sounds.sandworm_mod.worm_land",
+    "sounds": ["sandworm_mod:worm_land1", "sandworm_mod:worm_land2"]
+  },
+  "worm_burrow": {
+    "subtitle": "sounds.sandworm_mod.worm_burrow",
+    "sounds": ["sandworm_mod:worm_burrow1","sandworm_mod:worm_burrow2","sandworm_mod:worm_burrow3","sandworm_mod:worm_burrow4","sandworm_mod:worm_burrow5"]
+  },
+  "worm_roar": {
+    "subtitle": "sounds.sandworm_mod.worm_roar",
+    "sounds": ["sandworm_mod:worm_roar1", "sandworm_mod:worm_roar2"]
+  }
+}
