@@ -1,12 +1,12 @@
 package net.jelly.jelllymod;
 
 import com.mojang.logging.LogUtils;
+import net.jelly.jelllymod.brewing.WormToothBrewing;
 import net.jelly.jelllymod.entity.IK.ChainSegmentRenderer;
 import net.jelly.jelllymod.entity.IK.KinematicChainRenderer;
 import net.jelly.jelllymod.entity.IK.worm.WormHeadSegmentRenderer;
 import net.jelly.jelllymod.entity.IK.worm.WormSegmentRenderer;
 import net.jelly.jelllymod.entity.ModEntities;
-import net.jelly.jelllymod.item.ModCreativeModeTabs;
 import net.jelly.jelllymod.item.ModItems;
 import net.jelly.jelllymod.networking.ModMessages;
 import net.jelly.jelllymod.registry.common.WorldEventRegistry;
@@ -15,8 +15,10 @@ import net.jelly.jelllymod.registry.client.ParticleRegistry;
 import net.jelly.jelllymod.worldevents.WormBreachRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -27,6 +29,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
+import static net.minecraftforge.common.brewing.BrewingRecipeRegistry.addRecipe;
 import static team.lodestar.lodestone.registry.client.LodestoneWorldEventRendererRegistry.registerRenderer;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -45,7 +48,7 @@ public class JellyMod
         // registers items
         ModItems.register(modEventBus);
         // registers creative mode tabs
-        ModCreativeModeTabs.register(modEventBus);
+        // ModCreativeModeTabs.register(modEventBus);
 
         //registers mobs
         ModEntities.register(modEventBus);
@@ -55,9 +58,6 @@ public class JellyMod
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
-
-        // Register the item to a creative tab
-        modEventBus.addListener(this::addCreative);
 
         // register sounds
         ModSounds.register(modEventBus);
@@ -69,21 +69,13 @@ public class JellyMod
         // ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
-    // networking
+    // common setup
     private void commonSetup(final FMLCommonSetupEvent event)
     {
         event.enqueueWork(() -> {
-            ModMessages.register(); // HAS TO BE FIRST LINE HERE
+            ModMessages.register(); // networking: HAS TO BE FIRST LINE HERE
+            BrewingRecipeRegistry.addRecipe(new WormToothBrewing());
         });
-    }
-
-    // Add the example block item to the building blocks tab
-    private void addCreative(BuildCreativeModeTabContentsEvent event)
-    {
-        if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
-//            event.accept(ModItems.JELLY);
-//            event.accept(ModItems.CUBEJELLY);
-        }
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call

@@ -6,6 +6,7 @@ import net.jelly.jelllymod.JellyMod;
 import net.jelly.jelllymod.entity.IK.ChainSegment;
 import net.jelly.jelllymod.entity.IK.KinematicChainEntity;
 import net.jelly.jelllymod.entity.ModEntities;
+import net.jelly.jelllymod.item.ModItems;
 import net.jelly.jelllymod.sound.ModSounds;
 import net.jelly.jelllymod.worldevents.SonicBoomWorldEvent;
 import net.jelly.jelllymod.worldevents.WormBreachWorldEvent;
@@ -21,7 +22,10 @@ import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Blocks;
@@ -402,7 +406,11 @@ public class WormChainEntity extends KinematicChainEntity {
         targetV = new Vec3(targetV.x*0.075, targetV.y+1.2, targetV.z*0.075);
         sonicBoom();
         explodedTimes++;
-        if(explodedTimes == 3) escaping = true;
+        if(explodedTimes == 3) {
+            ItemEntity toothItem = new ItemEntity(this.level(), head.getX(), head.getY(), head.getZ(), new ItemStack(ModItems.WORM_TOOTH.get(), 1));
+            this.level().addFreshEntity(toothItem);
+            escaping = true;
+        }
     }
 
     public void setAggroTargetEntity(LivingEntity target) {

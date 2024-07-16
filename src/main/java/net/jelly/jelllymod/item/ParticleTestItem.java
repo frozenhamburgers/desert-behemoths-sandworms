@@ -1,6 +1,5 @@
 package net.jelly.jelllymod.item;
 
-import dev.architectury.registry.ReloadListenerRegistry;
 import mod.chloeprime.aaaparticles.api.common.AAALevel;
 import mod.chloeprime.aaaparticles.api.common.ParticleEmitterInfo;
 import net.jelly.jelllymod.JellyMod;

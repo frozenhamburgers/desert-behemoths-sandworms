@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "jelllymod:item/cube_jelly"
+    "layer0": "jelllymod:item/sandworm_tooth"
   }
 }

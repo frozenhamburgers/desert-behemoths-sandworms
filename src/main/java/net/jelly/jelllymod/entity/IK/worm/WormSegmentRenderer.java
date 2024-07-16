@@ -44,22 +44,6 @@ public class WormSegmentRenderer extends GeoEntityRenderer<WormSegment> {
 
         super.render(entity, entityYaw, partialTick, poseStack, bufferSource, 15728640);
         poseStack.popPose();
-
-//        VFXBuilders.WorldVFXBuilder builder = VFXBuilders.createWorld().setPosColorTexLightmapDefaultFormat();
-//        builder.setColor(new Color(255, 0, 0));
-//
-//        VertexConsumer textureConsumer = RenderHandler.DELAYED_RENDER.getBuffer(LIGHT_TYPE);
-//        poseStack.pushPose();
-//        Vec3 position = entity.getPosition(partialTick);
-//        poseStack.translate(-position.x, -position.y, -position.z);
-//
-//        Vec3 startPosition = position.add(entity.getDirectionVector().normalize().scale(5));
-//        Vec3 startPositionUp = position.add(upVec.normalize().scale(5));
-//
-//        builder.renderBeam(textureConsumer, poseStack.last().pose(), startPosition, position, 0.1f);
-//        builder.renderBeam(textureConsumer, poseStack.last().pose(), startPositionUp, position, 0.1f);
-//
-//        poseStack.popPose();
     }
 
     @Override
