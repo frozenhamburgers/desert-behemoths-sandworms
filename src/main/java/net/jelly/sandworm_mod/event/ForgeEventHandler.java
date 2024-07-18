@@ -60,7 +60,7 @@ public class ForgeEventHandler {
 
 
     // WORMSIGN
-    private static int spawnWorm = 2000;
+    private static int spawnWorm = 4000;
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if(event.side == LogicalSide.SERVER) {
@@ -79,11 +79,11 @@ public class ForgeEventHandler {
                             }
                             ws.addThisJumpTime(1);
                             ws.addMultiplier(-0.01);
-                            if (ws.getSignTimer() == 0) ws.subWS(1);
+                            if (ws.getSignTimer() == 0) decrementWormSign(1, ws);;
 
                             // spawn sandworm
                             if (ws.getWS() >= spawnWorm) {
-                                ws.subWS(4000);
+                                ws.subWS(2*spawnWorm);
                                 spawnWorm(player);
                             }
                         }
@@ -92,12 +92,14 @@ public class ForgeEventHandler {
                 } else {
                     player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
                         //System.out.println(ws.getWS());
-                        ws.subWS(20);
+                        ws.setStage(0);
+                        ws.setStageTimer(0);
+                        ws.subWS(2*spawnWorm);
                         ws.setMultiplier(0);
                     });
                 }
             } else player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
-                ws.subWS(1);
+                decrementWormSign(1, ws);
             });
         }
     }
@@ -145,12 +147,35 @@ public class ForgeEventHandler {
     private static void incrementWormSign(int add, Player player, WormSign ws) {
         if (ws.getWS() < spawnWorm / 2 && (ws.getWS() + add) >= spawnWorm / 2) {
             warningScreenshake(player, 0.5, ModSounds.WORM_WARNING_1.get());
+            ws.setStage(1);
+            ws.setStageTimer(600);
             ws.setSignTimer();
         } else if (ws.getWS() < spawnWorm * 0.8 && (ws.getWS() + add) >= spawnWorm * 0.8) {
             warningScreenshake(player, 0.6, ModSounds.WORM_WARNING_2.get());
+            ws.setStage(2);
+            ws.setStageTimer(600);
             ws.setSignTimer();
         }
         ws.addWS(add);
+    }
+
+    private static void decrementWormSign(int decrement, WormSign ws) {
+        if(ws.getStage() == 0) {
+            ws.subWS(decrement);
+            ws.setStageTimer(0);
+        }
+        else if (ws.getStage() == 1) {
+            if(ws.getWS() - decrement >= spawnWorm / 2) ws.subWS(decrement);
+            else ws.setWS(spawnWorm/2);
+            ws.decrementStageTimer();
+            if(ws.dropStage()) ws.setStage(0);
+        }
+        else if (ws.getStage() == 2) {
+            if(ws.getWS() - decrement >= spawnWorm * 0.8) ws.subWS(decrement);
+            else ws.setWS((int)(spawnWorm * 0.8));
+            ws.decrementStageTimer();
+            if(ws.dropStage()) ws.setStage(1);
+        }
     }
 
 
