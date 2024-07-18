@@ -8,7 +8,6 @@ import net.jelly.sandworm_mod.entity.IK.worm.WormHeadSegmentRenderer;
 import net.jelly.sandworm_mod.entity.IK.worm.WormSegmentRenderer;
 import net.jelly.sandworm_mod.entity.ModEntities;
 import net.jelly.sandworm_mod.item.ModItems;
-import net.jelly.sandworm_mod.networking.ModMessages;
 import net.jelly.sandworm_mod.sound.ModSounds;
 import net.jelly.sandworm_mod.registry.client.ParticleRegistry;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -67,7 +66,7 @@ public class SandwormMod
     private void commonSetup(final FMLCommonSetupEvent event)
     {
         event.enqueueWork(() -> {
-            ModMessages.register(); // networking: HAS TO BE FIRST LINE HERE
+            // ModMessages.register(); // networking: HAS TO BE FIRST LINE HERE
             BrewingRecipeRegistry.addRecipe(new WormToothBrewing());
         });
     }

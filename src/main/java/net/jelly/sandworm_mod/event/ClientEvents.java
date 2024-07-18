@@ -5,7 +5,6 @@ import mod.chloeprime.aaaparticles.client.loader.EffekAssetLoader;
 import net.jelly.sandworm_mod.SandwormMod;
 import net.jelly.sandworm_mod.registry.client.ParticleRegistry;
 import net.jelly.sandworm_mod.registry.common.WorldEventRegistry;
-import net.jelly.sandworm_mod.vfx.SinkholePostProcessor;
 import net.jelly.sandworm_mod.vfx.SonicBoomPostProcessor;
 import net.jelly.sandworm_mod.worldevents.WormBreachRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -39,7 +38,6 @@ public class ClientEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
             // register shaders
-            PostProcessHandler.addInstance(SinkholePostProcessor.INSTANCE);
             PostProcessHandler.addInstance(SonicBoomPostProcessor.INSTANCE);
             ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, new EffekAssetLoader(), new ResourceLocation(SandwormMod.MODID, "effeks"));
         }

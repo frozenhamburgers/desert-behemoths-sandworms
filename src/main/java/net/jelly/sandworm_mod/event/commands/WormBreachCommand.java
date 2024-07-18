@@ -17,6 +17,7 @@ import team.lodestar.lodestone.handlers.WorldEventHandler;
 
 public class WormBreachCommand extends CommandEvent {
 
+    // TESTING PURPOSES ONLY
     public WormBreachCommand(ParseResults<CommandSourceStack> parse) {
         super(parse);
     }

@@ -67,7 +67,7 @@ public class WormChainEntity extends KinematicChainEntity {
                 retarget(30);
             }
             if(aggroTargetEntity != null) {
-                System.out.println("initial head direction vector:" + aggroTargetEntity.position().subtract(this.position()).normalize());
+//                System.out.println("initial head direction vector:" + aggroTargetEntity.position().subtract(this.position()).normalize());
                 Vec3 lookAtAggroEntity = aggroTargetEntity.position().subtract(this.position()).normalize();
                 for(int i=0; i<this.segmentCount; i++) {
                     segments.get(i).setDirectionVector(lookAtAggroEntity);
@@ -134,14 +134,14 @@ public class WormChainEntity extends KinematicChainEntity {
             Vec3 towardTarget = (aggroTargetEntity.position().subtract(head.position())).normalize().multiply(20,0,20);
             goal = head.position().add(towardTarget.x, 0, towardTarget.z);
             goal = new Vec3(goal.x, aggroTargetEntity.getY(), goal.z);
-            System.out.println("chasing:" + goal);
+//            System.out.println("chasing:" + goal);
             isChasing = true;
         }
         else if(head.position().subtract(goal).horizontalDistance() <= 10) {
             Vec3 towardTarget = (aggroTargetEntity.position().subtract(head.position())).normalize().multiply(20,0,20);
             goal = head.position().add(towardTarget.x, 0, towardTarget.z);
             goal = new Vec3(goal.x, aggroTargetEntity.getY(), goal.z);
-            System.out.println("re chasing:" + goal);
+//            System.out.println("re chasing:" + goal);
         }
     }
 
@@ -379,7 +379,7 @@ public class WormChainEntity extends KinematicChainEntity {
                 segments.add(chainSegment);
                 segmentsUUIDs.add(chainSegment.getUUID());
                 level().addFreshEntity(chainSegment);
-                System.out.println("spawning head segment");
+//                System.out.println("spawning head segment");
             }
         }
         segmentCount++;
@@ -425,7 +425,7 @@ public class WormChainEntity extends KinematicChainEntity {
 
     private int smokeCount = 0;
     private void smokeParticles(Level level, Vec3 pos) {
-        System.out.println("spawning smoke #" + smokeCount + ": " + pos + ", in: " + level);
+//        System.out.println("spawning smoke #" + smokeCount + ": " + pos + ", in: " + level);
         smokeCount++;
         WormBreachWorldEvent breachEvent = new WormBreachWorldEvent().setPosition(pos);
         breachEvent.start(level);

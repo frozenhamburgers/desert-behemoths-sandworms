@@ -72,7 +72,7 @@ public class KinematicChainEntity extends Entity {
         float distToTarget = (float)(target.subtract(position()).length());
         for(int i=0; i<segmentCount; i++) totalLength += segments.get(i).getLength();
         if(distToTarget > totalLength) {
-            System.out.println("target too far:" + distToTarget + " > " + totalLength);
+//            System.out.println("target too far:" + distToTarget + " > " + totalLength);
             Vec3 rootToTarget = target.subtract(position()).normalize();
             for(int i=0; i<segmentCount; i++) {
                 ChainSegment currentSegment = segments.get(i);
@@ -155,7 +155,7 @@ public class KinematicChainEntity extends Entity {
                 segments.add(chainSegment);
                 segmentsUUIDs.add(chainSegment.getUUID());
                 level().addFreshEntity(chainSegment);
-                System.out.println("spawning first segment");
+//                System.out.println("spawning first segment");
             } else {
                 ChainSegment chainSegment = new ChainSegment(ModEntities.CHAIN_SEGMENT.get(), level());
                 chainSegment.setLength(length);
@@ -165,7 +165,7 @@ public class KinematicChainEntity extends Entity {
                 segments.add(chainSegment);
                 segmentsUUIDs.add(chainSegment.getUUID());
                 level().addFreshEntity(chainSegment);
-                System.out.println("spawning next segment");
+//                System.out.println("spawning next segment");
             }
         }
         segmentCount++;

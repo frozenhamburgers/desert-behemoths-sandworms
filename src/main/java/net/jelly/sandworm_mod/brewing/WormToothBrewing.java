@@ -4,7 +4,6 @@ import net.jelly.sandworm_mod.item.ModItems;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -37,7 +36,6 @@ public class WormToothBrewing implements IBrewingRecipe {
         ItemStack result = input.copy();
         if(newEffects == null || newEffects.isEmpty()) return input;
         setEffects(result, newEffects);
-        System.out.println("returning new effect");
         return result;
     }
 

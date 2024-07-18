@@ -9,6 +9,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraftforge.event.CommandEvent;
 
+// TESTING PURPOSES ONLY
 public class FabrikForwardCommand extends CommandEvent {
 
     public FabrikForwardCommand(ParseResults<CommandSourceStack> parse) {
