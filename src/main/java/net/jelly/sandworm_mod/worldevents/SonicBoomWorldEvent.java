@@ -35,6 +35,7 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
 
     @Override
     public void tick(Level level) {
+        if(this.level == null) return;
         if(followEntity != null) fx.center = followEntity.position().toVector3f();
         if(lifetime <= in) {
             fx.radius = lerp(0, maxRadius, (float) lifetime / in);

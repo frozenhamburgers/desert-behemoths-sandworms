@@ -42,6 +42,7 @@ public class WormRippleWorldEvent extends WorldEventInstance {
 //            fx.magnitude = lerp(0.2f, 0, (float) (lifetime-in) / out);
 //            // fx.frequency = lerp(4, 0, (float) (lifetime-in) / out);
 //        }
+        if(this.level == null) return;
 
         if(lifetime <= 0) {
             this.end(level);
