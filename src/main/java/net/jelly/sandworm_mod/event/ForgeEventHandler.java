@@ -37,6 +37,8 @@ import team.lodestar.lodestone.systems.easing.Easing;
 import java.util.List;
 import java.util.Random;
 
+import static net.jelly.sandworm_mod.helper.HelperFunctions.isDesertBiome;
+
 @Mod.EventBusSubscriber(modid = SandwormMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ForgeEventHandler {
     // COMMANDS
@@ -139,10 +141,6 @@ public class ForgeEventHandler {
         if (random.nextBoolean()) zOffset *= -1;
         float yOffset = -5;
         return new Vec3(xOffset,yOffset,zOffset);
-    }
-
-    private static boolean isDesertBiome(ServerLevel level, BlockPos blockPos) {
-        return level.getBiomeManager().getBiome(blockPos).is(BiomeTags.SPAWNS_GOLD_RABBITS);
     }
 
     private static void incrementWormSign(int add, Player player, WormSign ws) {

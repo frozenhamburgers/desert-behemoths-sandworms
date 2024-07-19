@@ -39,6 +39,8 @@ import team.lodestar.lodestone.systems.easing.Easing;
 import java.util.List;
 import java.util.UUID;
 
+import static net.jelly.sandworm_mod.helper.HelperFunctions.isDesertBiome;
+
 public class WormChainEntity extends KinematicChainEntity {
     private static float SPEED_SCALE = 1.3f;
     private boolean breaching = false;
@@ -456,10 +458,6 @@ public class WormChainEntity extends KinematicChainEntity {
                         new PositionedScreenshakePacket(80, head.position(), 200, 100).setEasing(Easing.CUBIC_OUT).setIntensity(0.85f));
             }
         });
-    }
-
-    private static boolean isDesertBiome(Entity entity) {
-        return entity.level().getBiomeManager().getBiome(entity.blockPosition()).is(BiomeTags.SPAWNS_GOLD_RABBITS);
     }
 
     @Override
