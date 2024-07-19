@@ -3,6 +3,7 @@ package net.jelly.sandworm_mod.entity.IK.worm;
 import mod.chloeprime.aaaparticles.api.common.AAALevel;
 import mod.chloeprime.aaaparticles.api.common.ParticleEmitterInfo;
 import net.jelly.sandworm_mod.SandwormMod;
+import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.ChainSegment;
 import net.jelly.sandworm_mod.entity.IK.KinematicChainEntity;
 import net.jelly.sandworm_mod.entity.ModEntities;
@@ -404,7 +405,7 @@ public class WormChainEntity extends KinematicChainEntity {
         targetV = new Vec3(targetV.x*0.075, targetV.y+1.2, targetV.z*0.075);
         sonicBoom();
         explodedTimes++;
-        if(explodedTimes == 3) {
+        if(explodedTimes == CommonConfigs.HEALTH.get()) {
             ItemEntity toothItem = new ItemEntity(this.level(), head.getX(), head.getY(), head.getZ(), new ItemStack(ModItems.WORM_TOOTH.get(), 1));
             this.level().addFreshEntity(toothItem);
             escaping = true;

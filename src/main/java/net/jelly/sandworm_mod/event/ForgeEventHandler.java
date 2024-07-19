@@ -3,6 +3,7 @@ package net.jelly.sandworm_mod.event;
 import net.jelly.sandworm_mod.SandwormMod;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSign;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSignProvider;
+import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.entity.IK.worm.WormHeadSegment;
 import net.jelly.sandworm_mod.entity.ModEntities;
@@ -60,9 +61,9 @@ public class ForgeEventHandler {
 
 
     // WORMSIGN
-    private static int spawnWorm = 4000;
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        int spawnWorm = CommonConfigs.SPAWNWORM_WORMSIGN.get();
         if(event.side == LogicalSide.SERVER) {
             Player player = event.player;
             int softBoots = player.getItemBySlot(EquipmentSlot.FEET).getEnchantmentLevel(Enchantments.FALL_PROTECTION);
@@ -72,7 +73,7 @@ public class ForgeEventHandler {
                 if (player.level().getEntitiesOfClass(WormChainEntity.class,
                         new AABB(player.position().add(400, 200, 400), player.position().subtract(400, 200, 400))).isEmpty()) {
                     player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
-//                         System.out.println(ws.getWS());
+                         System.out.println(ws.getWS());
                         if (ws.getSignTimer() < 200) {
                             if (player.isSprinting()) {
                                 incrementWormSign((4-softBoots), player, ws);
@@ -145,6 +146,7 @@ public class ForgeEventHandler {
     }
 
     private static void incrementWormSign(int add, Player player, WormSign ws) {
+        int spawnWorm = CommonConfigs.SPAWNWORM_WORMSIGN.get();
         if (ws.getWS() < spawnWorm / 2 && (ws.getWS() + add) >= spawnWorm / 2) {
             warningScreenshake(player, 0.5, ModSounds.WORM_WARNING_1.get());
             ws.setStage(1);
@@ -160,6 +162,7 @@ public class ForgeEventHandler {
     }
 
     private static void decrementWormSign(int decrement, WormSign ws) {
+        int spawnWorm = CommonConfigs.SPAWNWORM_WORMSIGN.get();
         if(ws.getStage() == 0) {
             ws.subWS(decrement);
             ws.setStageTimer(0);

@@ -2,6 +2,7 @@ package net.jelly.sandworm_mod.entity.IK.worm;
 
 import mod.chloeprime.aaaparticles.api.common.ParticleEmitterInfo;
 import net.jelly.sandworm_mod.SandwormMod;
+import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
@@ -22,7 +23,7 @@ public class WormHeadSegment extends WormSegment implements GeoEntity {
     }
 
     @Override
-    protected float getDamage() { return 20.0f; }
+    protected double getDamage() { return super.getDamage()* CommonConfigs.HEAD_MULTIPLIER.get(); }
     @Override
     protected Vec3 getKB() {return new Vec3(5,2,5); }
 }

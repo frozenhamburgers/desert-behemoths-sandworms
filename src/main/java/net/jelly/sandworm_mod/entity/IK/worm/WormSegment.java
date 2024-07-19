@@ -1,5 +1,6 @@
 package net.jelly.sandworm_mod.entity.IK.worm;
 
+import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.ChainSegment;
 import net.jelly.sandworm_mod.registry.common.DamageTypesRegistry;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
@@ -58,7 +59,7 @@ public class WormSegment extends ChainSegment implements GeoEntity {
                     LivingEntity target = (LivingEntity) (collidingEntities.get(i));
                     if(target.hurtTime == 0) {
                         Vec3 vec3 = (target.position().subtract(this.position())).normalize();
-                        target.hurt(dmgSource, getDamage());
+                        target.hurt(dmgSource, (float)getDamage());
                         Vec3 knockback = getKB();
                         target.addDeltaMovement(new Vec3(vec3.x*knockback.x, vec3.y*knockback.y, vec3.z*knockback.z));
                     }
@@ -68,7 +69,7 @@ public class WormSegment extends ChainSegment implements GeoEntity {
 
     }
 
-    protected float getDamage() { return 10.0f; }
+    protected double getDamage() { return (10.0f * CommonConfigs.DAMAGE_SCALE.get()); }
     protected Vec3 getKB() {return new Vec3(3,2,3); }
 
     @Override

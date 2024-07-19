@@ -2,6 +2,7 @@ package net.jelly.sandworm_mod;
 
 import com.mojang.logging.LogUtils;
 import net.jelly.sandworm_mod.brewing.WormToothBrewing;
+import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.ChainSegmentRenderer;
 import net.jelly.sandworm_mod.entity.IK.KinematicChainRenderer;
 import net.jelly.sandworm_mod.entity.IK.worm.WormHeadSegmentRenderer;
@@ -17,7 +18,9 @@ import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -49,9 +52,6 @@ public class SandwormMod
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
 
-        // Register ourselves for server and other game events we are interested in
-        MinecraftForge.EVENT_BUS.register(this);
-
         // register sounds
         ModSounds.register(modEventBus);
 
@@ -59,7 +59,10 @@ public class SandwormMod
         ParticleRegistry.register(modEventBus);
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
-        // ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfigs.SPEC, "sandwormmod-common.toml");
+
+        // Register ourselves for server and other game events we are interested in
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     // common setup
