@@ -76,4 +76,9 @@ public class ChainSegment extends Entity {
         pCompound.putFloat("scale_vec_y", scale_vec.get(1));
         pCompound.putFloat("scale_vec_z", scale_vec.get(2));
     }
+
+    @Override
+    public boolean fireImmune() {
+        return true;
+    }
 }

@@ -10,6 +10,7 @@ public class WormSign {
     private int playSignTimer = 0;
     private int stage = 0;
     private int stageTimer = 0;
+    private int respawnTimer = 0;
 
     // WS
     public int getWS() {
@@ -57,6 +58,9 @@ public class WormSign {
     public void setStage(int stage) {this.stage = stage;}
     public void setStageTimer(int timer) {this.stageTimer = timer;}
     public void decrementStageTimer() {if(this.stageTimer > 0) this.stageTimer--;}
+    public boolean canRespawn() {return respawnTimer <= 0; }
+    public void setRespawnTimer(int respawnTimer) {this.respawnTimer = respawnTimer; }
+    public void decrementRespawnTimer() {this.respawnTimer--; }
 
     public boolean dropStage() {return stageTimer <= 0;}
 

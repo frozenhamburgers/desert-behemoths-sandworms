@@ -9,7 +9,7 @@ import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.biome.Biome;
 
-public class HelperFunctions {
+public class BiomeHelper {
 
     public static boolean isDesertBiome(ServerLevel level, BlockPos blockPos) {
         Holder<Biome> thisBiome = level.getBiomeManager().getBiome(blockPos);

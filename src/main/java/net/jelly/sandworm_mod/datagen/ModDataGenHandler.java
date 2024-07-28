@@ -23,5 +23,7 @@ public class ModDataGenHandler {
         PackOutput packOutput = dataGenerator.getPackOutput();
         dataGenerator.addProvider(event.includeServer(), new DatapackBuiltinEntriesProvider(
                 packOutput, event.getLookupProvider(), BUILDER, Set.of(SandwormMod.MODID)));
+
+        dataGenerator.addProvider(event.includeServer(), BlockDrops.create(packOutput));
     }
 }

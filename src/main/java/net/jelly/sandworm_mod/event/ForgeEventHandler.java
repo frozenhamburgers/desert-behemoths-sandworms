@@ -10,11 +10,9 @@ import net.jelly.sandworm_mod.entity.ModEntities;
 import net.jelly.sandworm_mod.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
@@ -37,7 +35,7 @@ import team.lodestar.lodestone.systems.easing.Easing;
 import java.util.List;
 import java.util.Random;
 
-import static net.jelly.sandworm_mod.helper.HelperFunctions.isDesertBiome;
+import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 
 @Mod.EventBusSubscriber(modid = SandwormMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ForgeEventHandler {
@@ -60,149 +58,6 @@ public class ForgeEventHandler {
             }
         }
     }
-
-
-    // WORMSIGN
-    @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        int spawnWorm = CommonConfigs.SPAWNWORM_WORMSIGN.get();
-        if(event.side == LogicalSide.SERVER) {
-            Player player = event.player;
-            int softBoots = player.getItemBySlot(EquipmentSlot.FEET).getEnchantmentLevel(Enchantments.FALL_PROTECTION);
-            // if in worm spawnable biome
-            if (isDesertBiome(player.getServer().getLevel(player.level().dimension()), player.blockPosition())) {
-                // if no worm already present
-                if (player.level().getEntitiesOfClass(WormChainEntity.class,
-                        new AABB(player.position().add(400, 200, 400), player.position().subtract(400, 200, 400))).isEmpty()) {
-                    player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
-                         System.out.println(ws.getWS());
-                        if (ws.getSignTimer() < 200) {
-                            if (player.isSprinting()) {
-                                incrementWormSign((4-softBoots), player, ws);
-                            }
-                            ws.addThisJumpTime(1);
-                            ws.addMultiplier(-0.01);
-                            if (ws.getSignTimer() == 0) decrementWormSign(1, ws);;
-
-                            // spawn sandworm
-                            if (ws.getWS() >= spawnWorm) {
-                                ws.subWS(2*spawnWorm);
-                                spawnWorm(player);
-                            }
-                        }
-                        ws.decrementSignTimer();
-                    });
-                } else {
-                    player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
-                        //System.out.println(ws.getWS());
-                        ws.setStage(0);
-                        ws.setStageTimer(0);
-                        ws.subWS(2*spawnWorm);
-                        ws.setMultiplier(0);
-                    });
-                }
-            } else player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
-                decrementWormSign(1, ws);
-            });
-        }
-    }
-
-    @SubscribeEvent
-    public static void onPlayerJump(LivingEvent.LivingJumpEvent event) {
-        if(!event.getEntity().level().isClientSide()) {
-            if (event.getEntity() instanceof Player) {
-                Player player = (Player) event.getEntity();
-                int softBoots = player.getItemBySlot(EquipmentSlot.FEET).getEnchantmentLevel(Enchantments.FALL_PROTECTION);
-                if (isDesertBiome(player.getServer().getLevel(player.level().dimension()), player.blockPosition())) {
-                    player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
-                        if (ws.getSignTimer() < 200) {
-                            float lastJump = ws.getLastJumpTime();
-                            float thisJump = ws.getThisJumpTime();
-                            float percentDiff = (Math.abs(lastJump - thisJump)) / ((lastJump + thisJump) / 2f);
-                            float similarity = 1 - percentDiff;
-                            ws.addMultiplier(similarity * 0.7);
-                            incrementWormSign((int) (80 * ws.getMultiplier() * (1-softBoots/16.0)), player, ws);
-//                            System.out.println("add:" + (int) (40 * ws.getMultiplier()));
-//                            System.out.println("multiplier:" + ws.getMultiplier());
-                            ws.setLastJumpTime(ws.getThisJumpTime());
-                            ws.setThisJumpTime(0);
-                        }
-                    });
-                }
-            }
-        }
-    }
-
-    private static Vec3 spawnPosOffset() {
-        Random random = new Random();
-        float xOffset = random.nextInt(100) + 100;
-        if (random.nextBoolean()) xOffset *= -1;
-        float zOffset = random.nextInt(100) + 100;
-        if (random.nextBoolean()) zOffset *= -1;
-        float yOffset = -5;
-        return new Vec3(xOffset,yOffset,zOffset);
-    }
-
-    private static void incrementWormSign(int add, Player player, WormSign ws) {
-        int spawnWorm = CommonConfigs.SPAWNWORM_WORMSIGN.get();
-        if (ws.getWS() < spawnWorm / 2 && (ws.getWS() + add) >= spawnWorm / 2) {
-            warningScreenshake(player, 0.5, ModSounds.WORM_WARNING_1.get());
-            ws.setStage(1);
-            ws.setStageTimer(600);
-            ws.setSignTimer();
-        } else if (ws.getWS() < spawnWorm * 0.8 && (ws.getWS() + add) >= spawnWorm * 0.8) {
-            warningScreenshake(player, 0.6, ModSounds.WORM_WARNING_2.get());
-            ws.setStage(2);
-            ws.setStageTimer(600);
-            ws.setSignTimer();
-        }
-        ws.addWS(add);
-    }
-
-    private static void decrementWormSign(int decrement, WormSign ws) {
-        int spawnWorm = CommonConfigs.SPAWNWORM_WORMSIGN.get();
-        if(ws.getStage() == 0) {
-            ws.subWS(decrement);
-            ws.setStageTimer(0);
-        }
-        else if (ws.getStage() == 1) {
-            if(ws.getWS() - decrement >= spawnWorm / 2) ws.subWS(decrement);
-            else ws.setWS(spawnWorm/2);
-            ws.decrementStageTimer();
-            if(ws.dropStage()) ws.setStage(0);
-        }
-        else if (ws.getStage() == 2) {
-            if(ws.getWS() - decrement >= spawnWorm * 0.8) ws.subWS(decrement);
-            else ws.setWS((int)(spawnWorm * 0.8));
-            ws.decrementStageTimer();
-            if(ws.dropStage()) ws.setStage(1);
-        }
-    }
-
-
-    // WORM SPAWNING
-
-    private static void spawnWorm(Player player) {
-        WormChainEntity sandWorm = new WormChainEntity(ModEntities.WORM_CHAIN.get(), player.level());
-        Vec3 sandWormSpawnPos = player.position().add(spawnPosOffset());
-        int spawnChecks = 0;
-        while(!isDesertBiome(player.getServer().getLevel(player.level().dimension()).getLevel(), new BlockPos((int)sandWormSpawnPos.x, (int)sandWormSpawnPos.y, (int)sandWormSpawnPos.z))) {
-            sandWormSpawnPos = player.position().add(spawnPosOffset());
-            spawnChecks++;
-            if(spawnChecks > 100) break;
-        }
-        sandWorm.moveTo(sandWormSpawnPos);
-        sandWorm.setAggroTargetEntity(player);
-        player.level().addFreshEntity(sandWorm);
-        sandWorm.playSound(ModSounds.WORM_SPAWN.get(), 100, 1);
-    }
-
-    private static void warningScreenshake(Player thisPlayer, double strength, SoundEvent sound) {
-        thisPlayer.level().playSeededSound(null, thisPlayer.getX(), thisPlayer.getY(), thisPlayer.getZ(), sound, SoundSource.MASTER, 0.75f,1,0);
-        LodestonePacketRegistry.LODESTONE_CHANNEL.send((PacketDistributor.PLAYER.with(() -> (ServerPlayer) thisPlayer)),
-                new ScreenshakePacket(410).setEasing(Easing.SINE_IN_OUT).setIntensity((float)strength));
-    }
-
 
     // EXPLOSIONS
     @SubscribeEvent

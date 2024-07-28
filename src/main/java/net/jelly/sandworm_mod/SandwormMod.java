@@ -1,6 +1,9 @@
 package net.jelly.sandworm_mod;
 
 import com.mojang.logging.LogUtils;
+import net.jelly.sandworm_mod.block.ModBlockEntities;
+import net.jelly.sandworm_mod.block.ModBlocks;
+import net.jelly.sandworm_mod.block.thumper.ThumperRenderer;
 import net.jelly.sandworm_mod.brewing.WormToothBrewing;
 import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.ChainSegmentRenderer;
@@ -11,6 +14,7 @@ import net.jelly.sandworm_mod.entity.ModEntities;
 import net.jelly.sandworm_mod.item.ModItems;
 import net.jelly.sandworm_mod.sound.ModSounds;
 import net.jelly.sandworm_mod.registry.client.ParticleRegistry;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -41,8 +45,10 @@ public class SandwormMod
     {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        // registers items
+        // register
         ModItems.register(modEventBus);
+        ModBlocks.register(modEventBus);
+        ModBlockEntities.register(modEventBus);
         // registers creative mode tabs
         // ModCreativeModeTabs.register(modEventBus);
 
@@ -93,6 +99,7 @@ public class SandwormMod
             EntityRenderers.register(ModEntities.WORM_SEGMENT.get(), WormSegmentRenderer::new);
             EntityRenderers.register(ModEntities.WORM_HEAD_SEGMENT.get(), WormHeadSegmentRenderer::new);
             EntityRenderers.register(ModEntities.WORM_CHAIN.get(), KinematicChainRenderer::new);
+            BlockEntityRenderers.register(ModBlockEntities.THUMPER_ENTITY.get(), ThumperRenderer::new);
         }
     }
 }

@@ -22,7 +22,10 @@ public class WormBreachWorldEvent extends WorldEventInstance {
 
     @Override
     public void tick(Level level) {
-        if(this.level == null) return;
+        if(this.level == null) {
+            this.discarded = true;
+            return;
+        }
         lifetime++;
         if(lifetime >= 480) {
             this.discarded = true;

@@ -46,4 +46,6 @@ public class ChainSegmentRenderer extends EntityRenderer<ChainSegment> {
 
         pPoseStack.popPose();
     }
+
+
 }

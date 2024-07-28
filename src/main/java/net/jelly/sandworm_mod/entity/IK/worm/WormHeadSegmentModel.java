@@ -20,6 +20,6 @@ public class WormHeadSegmentModel extends GeoModel<WormHeadSegment> {
 
 	@Override
 	public ResourceLocation getAnimationResource(WormHeadSegment wormHeadSegment) {
-		return new ResourceLocation(SandwormMod.MODID, "animations/sapphire_armor.animation.json");
+		return new ResourceLocation(SandwormMod.MODID, "animations/no_animation.json");
 	}
 }

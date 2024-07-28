@@ -18,8 +18,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.BiomeTags;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -39,7 +37,7 @@ import team.lodestar.lodestone.systems.easing.Easing;
 import java.util.List;
 import java.util.UUID;
 
-import static net.jelly.sandworm_mod.helper.HelperFunctions.isDesertBiome;
+import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 
 public class WormChainEntity extends KinematicChainEntity {
     private static float SPEED_SCALE = 1.3f;
