@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "sandworm_mod:block/thumper" }
+  }
+}

@@ -2,7 +2,7 @@
   "credit": "Made with Blockbench",
   "parent": "builtin/entity",
   "textures": {
-    "particle": "minecraft:block/smooth_stone"
+    "particle": "minecraft:block/lever"
   },
   "texture_size": [
     64,

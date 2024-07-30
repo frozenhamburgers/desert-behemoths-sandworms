@@ -2,7 +2,10 @@ package net.jelly.sandworm_mod.block;
 
 import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
+import net.jelly.sandworm_mod.sound.ModSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -14,14 +17,16 @@ import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInst
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 
-import static net.jelly.sandworm_mod.helper.WarningSpawnHelper.spawnWorm;
-import static net.jelly.sandworm_mod.helper.WarningSpawnHelper.thumperWarning;
+import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
+import static net.jelly.sandworm_mod.helper.WarningSpawnHelper.*;
 
 public class ThumperBlockEntity extends BlockEntity implements GeoBlockEntity {
     private AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private boolean thumping = false;
     private int wormSign = 0;
     private int pauseTicks = 0;
+    private int soundTimer = 50;
+    private boolean startAnimation = false;
 
     public ThumperBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.THUMPER_ENTITY.get(), pPos, pBlockState);
@@ -33,7 +38,9 @@ public class ThumperBlockEntity extends BlockEntity implements GeoBlockEntity {
     }
 
     private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> tAnimationState) {
-        if(thumping) tAnimationState.getController().setAnimation(RawAnimation.begin().thenLoop("idle"));
+//        if(thumping) tAnimationState.getController().setAnimation(RawAnimation.begin().thenLoop("thump"));
+//        else tAnimationState.getController().setAnimation(RawAnimation.begin().thenWait(2));
+        if(startAnimation) tAnimationState.getController().setAnimation(RawAnimation.begin().thenPlay("thump"));
         else tAnimationState.getController().setAnimation(RawAnimation.begin().thenWait(2));
         return PlayState.CONTINUE;
     }
@@ -46,15 +53,34 @@ public class ThumperBlockEntity extends BlockEntity implements GeoBlockEntity {
 
     public static void tick(Level level, BlockPos blockPos, BlockState blockState, ThumperBlockEntity e) {
         e.thumping = blockState.getValue(ThumperBlock.THUMPING);
-        if(level.isClientSide()) return;
-        System.out.println(e.wormSign);
 
+        // thumping sounds
+        if(e.thumping) {
+            if(e.soundTimer == 40) {
+                e.startAnimation = false;
+            }
+            else if(e.soundTimer == 52) {
+                level.playSound(null, blockPos, ModSounds.THUMPER.get(), SoundSource.BLOCKS, 7.0f, 1);
+            }
+            if(e.soundTimer >= 55) {
+                e.startAnimation = true;
+                System.out.println("animation started");
+                e.soundTimer = 0;
+            }
+            else e.soundTimer++;
+        }
+        else e.soundTimer = 39;
+        System.out.println(e.soundTimer);
+
+        // below all serverside
+        if(level.isClientSide()) return;
+        if(!level.getBlockState(blockPos.below()).isSolid()) level.destroyBlock(blockPos, true);
+
+        // if warning is playing
         if(e.pauseTicks > 0) {
             e.pauseTicks--;
             return;
         }
-
-        System.out.println(e.wormSign);
 
         // if worm present
         if (!level.getEntitiesOfClass(WormChainEntity.class,
@@ -63,20 +89,21 @@ public class ThumperBlockEntity extends BlockEntity implements GeoBlockEntity {
             return;
         }
 
-        if(e.thumping) e.wormSign++;
+        // wormsign incrementation & warning/spawn handling
+        if(e.thumping && isDesertBiome((ServerLevel)level, blockPos)) e.wormSign++;
         else {
-            e.wormSign--;
+            if(e.wormSign > 0) e.wormSign--;
             return;
         }
 
-        if(e.wormSign == CommonConfigs.SPAWNWORM_WORMSIGN.get()/10) {
+        if(e.thumping && e.wormSign == CommonConfigs.SPAWNWORM_WORMSIGN.get()/20) {
             // send warning & put on cooldown
-            e.pauseTicks = 600;
+            e.pauseTicks = 500;
             e.wormSign++;
             thumperWarning(level, blockPos.getCenter());
         }
-        else if(e.wormSign >= CommonConfigs.SPAWNWORM_WORMSIGN.get()/5) {
-            // spawnWorm();
+        else if(e.wormSign >= CommonConfigs.SPAWNWORM_WORMSIGN.get()/10) {
+            spawnWormThumper(level, blockPos);
         }
     }
 }

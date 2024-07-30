@@ -2,11 +2,16 @@ package net.jelly.sandworm_mod.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.BannerBlock;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -21,7 +26,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class ThumperBlock extends BaseEntityBlock {
-    public static final VoxelShape SHAPE = Block.box(0,0,0,16,12,16);
+    public static final VoxelShape SHAPE = Block.box(5,0,5,11,17,11);
     public static final BooleanProperty THUMPING = BooleanProperty.create("thumping");
 
     public ThumperBlock(Properties pProperties) {
@@ -60,6 +65,11 @@ public class ThumperBlock extends BaseEntityBlock {
     @Override
     public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
         return true;
+    }
+
+    @Override
+    public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+        return pLevel.getBlockState(pPos.below()).isSolid();
     }
 
     @Nullable

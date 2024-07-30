@@ -32,6 +32,9 @@ public class ModEventBusEvents {
         if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.WORM_TOOTH);
         }
+        else if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS || event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
+            event.accept(ModItems.THUMPER_ITEM);
+        }
     }
 
 

@@ -69,6 +69,7 @@ public class ForgeEventHandler {
                 head.playSound(ModSounds.WORM_ROAR.get(), 10f, 1f);
                 WormChainEntity wormChain = head.getOwner();
                 if(wormChain != null) wormChain.blastHit();
+                Entity sourcePlayer = event.getExplosion().getExploder();
             });
         }
     }

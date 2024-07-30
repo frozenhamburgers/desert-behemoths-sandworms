@@ -19,6 +19,7 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> WORM_LAND = registerSoundEvents("worm_land");
     public static final RegistryObject<SoundEvent> WORM_BURROW = registerSoundEvents("worm_burrow");
     public static final RegistryObject<SoundEvent> WORM_ROAR = registerSoundEvents("worm_roar");
+    public static final RegistryObject<SoundEvent> THUMPER = registerSoundEvents("thumper");
 
     private static RegistryObject<SoundEvent> registerSoundEvents(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(SandwormMod.MODID, name)));

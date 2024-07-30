@@ -11,6 +11,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
@@ -80,6 +81,23 @@ public class WarningSpawnHelper {
         sandWorm.setAggroTargetEntity(player);
         player.level().addFreshEntity(sandWorm);
         sandWorm.playSound(ModSounds.WORM_SPAWN.get(), 100, 1);
+    }
+
+    public static WormChainEntity spawnWormThumper(Level level, BlockPos bPos) {
+        Vec3 pos = bPos.getCenter();
+        WormChainEntity sandWorm = new WormChainEntity(ModEntities.WORM_CHAIN.get(), level);
+        Vec3 sandWormSpawnPos = pos.add(spawnPosOffset());
+        int spawnChecks = 0;
+        while(!isDesertBiome(level.getServer().getLevel(level.dimension()), new BlockPos((int)sandWormSpawnPos.x, (int)sandWormSpawnPos.y, (int)sandWormSpawnPos.z))) {
+            sandWormSpawnPos = pos.add(spawnPosOffset());
+            spawnChecks++;
+            if(spawnChecks > 100) break;
+        }
+        sandWorm.moveTo(sandWormSpawnPos);
+        sandWorm.thumperTarget = pos;
+        level.addFreshEntity(sandWorm);
+        sandWorm.playSound(ModSounds.WORM_SPAWN.get(), 100, 1);
+        return sandWorm;
     }
 
 }

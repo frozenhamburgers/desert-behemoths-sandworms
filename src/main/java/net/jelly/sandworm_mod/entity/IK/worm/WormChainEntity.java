@@ -3,6 +3,7 @@ package net.jelly.sandworm_mod.entity.IK.worm;
 import mod.chloeprime.aaaparticles.api.common.AAALevel;
 import mod.chloeprime.aaaparticles.api.common.ParticleEmitterInfo;
 import net.jelly.sandworm_mod.SandwormMod;
+import net.jelly.sandworm_mod.block.ModBlockEntities;
 import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.ChainSegment;
 import net.jelly.sandworm_mod.entity.IK.KinematicChainEntity;
@@ -20,12 +21,14 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
@@ -55,6 +58,8 @@ public class WormChainEntity extends KinematicChainEntity {
     private boolean isChasing = false;
     private int explodedTimes = 0;
     private WormHeadSegment head;
+    public Vec3 thumperTarget = null;
+
     public WormChainEntity(EntityType<?> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
@@ -64,12 +69,13 @@ public class WormChainEntity extends KinematicChainEntity {
             for(int i=0; i<10; i++) addWormSegment(0.35f*5, new Vec3(1,0,0), new Vec3(7.5*((i+2)/11f),7.5*((i+2)/11f),5));
             for(int i=0; i<80; i++) addWormSegment(0.35f*5, new Vec3(1,0,0), new Vec3(7.5,7.5,5));
             addHeadSegment(0.35f*5, new Vec3(1,0,0), new Vec3(7.5,7.5,5));
-            if(aggroTargetEntity == null) {
+            if(aggroTargetEntity == null && thumperTarget == null) {
                 retarget(30);
             }
-            if(aggroTargetEntity != null) {
+            Vec3 targetedObjectPos = getTargetedObjectPos();
+            if(targetedObjectPos != null) {
 //                System.out.println("initial head direction vector:" + aggroTargetEntity.position().subtract(this.position()).normalize());
-                Vec3 lookAtAggroEntity = aggroTargetEntity.position().subtract(this.position()).normalize();
+                Vec3 lookAtAggroEntity = targetedObjectPos.subtract(this.position()).normalize();
                 for(int i=0; i<this.segmentCount; i++) {
                     segments.get(i).setDirectionVector(lookAtAggroEntity);
                 }
@@ -131,17 +137,18 @@ public class WormChainEntity extends KinematicChainEntity {
     }
 
     private void dolphinBehavior() {
+        Vec3 targetedObjectPos = getTargetedObjectPos();
         if(!isChasing) {
-            Vec3 towardTarget = (aggroTargetEntity.position().subtract(head.position())).normalize().multiply(20,0,20);
+            Vec3 towardTarget = (targetedObjectPos.subtract(head.position())).normalize().multiply(20,0,20);
             goal = head.position().add(towardTarget.x, 0, towardTarget.z);
-            goal = new Vec3(goal.x, aggroTargetEntity.getY(), goal.z);
+            goal = new Vec3(goal.x, targetedObjectPos.y, goal.z);
 //            System.out.println("chasing:" + goal);
             isChasing = true;
         }
         else if(head.position().subtract(goal).horizontalDistance() <= 10) {
-            Vec3 towardTarget = (aggroTargetEntity.position().subtract(head.position())).normalize().multiply(20,0,20);
+            Vec3 towardTarget = (targetedObjectPos.subtract(head.position())).normalize().multiply(20,0,20);
             goal = head.position().add(towardTarget.x, 0, towardTarget.z);
-            goal = new Vec3(goal.x, aggroTargetEntity.getY(), goal.z);
+            goal = new Vec3(goal.x, targetedObjectPos.y, goal.z);
 //            System.out.println("re chasing:" + goal);
         }
     }
@@ -167,8 +174,9 @@ public class WormChainEntity extends KinematicChainEntity {
                 }
             }
             // burrowing sounds (serverside)
-            if(aggroTargetEntity != null) {
-                float dist = aggroTargetEntity.distanceTo(head);
+            Vec3 targetedObjectPos = getTargetedObjectPos();
+            if(targetedObjectPos != null) {
+                double dist = targetedObjectPos.distanceTo(head.position());
                 float intensity = (float) Math.pow((1f + Math.pow(1.1f, dist - 17.5f)), -1) + 0.2f;
                 if (soundFrequencyCount >= 10 - (intensity * 10)) {
                     level().playSound(null, head, SoundEvents.SAND_BREAK, SoundSource.HOSTILE, 80f * intensity, intensity);
@@ -200,13 +208,18 @@ public class WormChainEntity extends KinematicChainEntity {
     // returns
     private void wormAIBehavior() {
         // retarget if target entity is gone
-        if(aggroTargetEntity == null || aggroTargetEntity.isRemoved() || aggroTargetEntity.isDeadOrDying() || !isDesertBiome(aggroTargetEntity)) {
+        if(thumperTarget == null && (aggroTargetEntity == null || aggroTargetEntity.isRemoved() || aggroTargetEntity.isDeadOrDying() || !isDesertBiome(aggroTargetEntity))) {
             retarget(30);
             if(noTargetEscapeTimer >= 20) escaping = true;
         }
         else if (!escaping) {
             // if too far, chase by dolphining
-            if (head.position().subtract(aggroTargetEntity.position()).horizontalDistance() > 50) {
+            Vec3 targetedObjectPos = getTargetedObjectPos();
+            if(targetedObjectPos == null) {
+                target = head.position().add(targetV);
+                return;
+            }
+            if (head.position().subtract(targetedObjectPos).horizontalDistance() > 50) {
                 dolphinBehavior();
             }
             else isChasing = false;
@@ -214,9 +227,9 @@ public class WormChainEntity extends KinematicChainEntity {
             // if not chasing, assign goal accordingly
             if(!isChasing) {
                 // assign goal to aggro entity until close enough
-                if (!(stage == 0 && head.distanceTo(aggroTargetEntity) < 22 * SPEED_SCALE))
-                    goal = aggroTargetEntity.position();
-                else if (goal == null) goal = aggroTargetEntity.position();
+                if (!(stage == 0 && targetedObjectPos.distanceTo(head.position()) < 22 * SPEED_SCALE))
+                    goal = targetedObjectPos;
+                else if (goal == null) goal = targetedObjectPos;
                 else if (stage == 0) sinkHole(this.level(), goal);
             }
 
@@ -236,7 +249,7 @@ public class WormChainEntity extends KinematicChainEntity {
             if (stage == 1) {
                 // if in the air
                 if (!(this.level().collidesWithSuffocatingBlock(null, head.getBoundingBox()))) {
-                    if(aggroTargetEntity.position().y - head.position().y > 30) retarget(30);
+                    if(targetedObjectPos.y - head.position().y > 30) retarget(30);
                     // gravity
                     applyAcceleration(new Vec3(0, -0.0375, 0));
                     // small
@@ -279,6 +292,12 @@ public class WormChainEntity extends KinematicChainEntity {
                 if(head == null) {
                     if(segments.get(segmentCount - 1).getClass() == WormHeadSegment.class) head = (WormHeadSegment)segments.get(segmentCount - 1);
                 }
+                if(thumperTarget != null) {
+                    BlockPos thumperBPos = BlockPos.containing(thumperTarget.x, thumperTarget.y, thumperTarget.z);
+                    if (this.head.isColliding(thumperBPos, this.level().getBlockState(thumperBPos))) {
+                        this.level().destroyBlock(thumperBPos, false);
+                    }
+                }
                 wormAIBehavior();
                 VFXSFXBehavior();
                 fabrik();
@@ -287,27 +306,30 @@ public class WormChainEntity extends KinematicChainEntity {
     }
 
     // retarget to an entity in this priority:
-    // 1. closest entity at least 20 horizontal blocks away
-    // 2. farthest entity within a 20 block range
+    // 1. non-creative player at least 20 horizontal blocks away within 300 blocks
+    // 2. farthest non-creative player within 20 horizontal block range
+    // 3. mob (or creative player) at least 20 horizontal blocks away within 300 blocks
+    // 4. farthest mob (or creative player) within a 20 block range
     private void retarget(float yRange) {
-        Vec3 headPos = segments.get(segmentCount - 1).position();
+        Vec3 headPos = segments.get(segmentCount - 1).position();;
         List<LivingEntity> nearbyEntities = this.level().getEntitiesOfClass(LivingEntity.class,
+                new AABB(headPos.x+150, headPos.y+150, headPos.z+150, headPos.x-150, headPos.y-150, headPos.z-150));
+        List<Player> nearbyPlayers = this.level().getNearbyPlayers(TargetingConditions.forNonCombat(), null,
                 new AABB(headPos.x+150, headPos.y+150, headPos.z+150, headPos.x-150, headPos.y-150, headPos.z-150));
         LivingEntity closestEntity = null;
         double closestDistanceSq = Double.MAX_VALUE;
         LivingEntity farthestTooCloseEntity = null;
         double fartestTooCloseDistanceSq = 0;
 
-
-        for (LivingEntity entity : nearbyEntities) {
+        for (Player entity : nearbyPlayers) {
             // do not retarget onto mobs outside the desert or underground
-            if(!isDesertBiome(entity) || this.level().getBrightness(LightLayer.SKY, entity.blockPosition()) <= 0) continue;
+            if(!isDesertBiome(entity) || this.level().getBrightness(LightLayer.SKY, entity.blockPosition()) <= 0 || entity.isSpectator() || entity.isCreative()) continue;
             double deltaX = entity.getX() - headPos.x;
             double deltaZ = entity.getZ() - headPos.z;
             double distanceSq = deltaX * deltaX + deltaZ * deltaZ;
             double deltaY = entity.getY() - headPos.y;
 
-            if (distanceSq >= 400 && deltaY <= yRange) { // 20 blocks away (20 * 20 = 400)
+            if (distanceSq >= 400 && deltaY <= yRange) { // 20 blocks away (20^2 = 400)
                 if (distanceSq < closestDistanceSq) {
                     closestDistanceSq = distanceSq;
                     closestEntity = entity;
@@ -320,6 +342,32 @@ public class WormChainEntity extends KinematicChainEntity {
                 }
             }
         }
+
+        if(closestEntity == null & farthestTooCloseEntity == null) {
+            closestDistanceSq = Double.MAX_VALUE;
+            fartestTooCloseDistanceSq = 0;
+            for (LivingEntity entity : nearbyEntities) {
+                // do not retarget onto mobs outside the desert or underground
+                if (!isDesertBiome(entity) || this.level().getBrightness(LightLayer.SKY, entity.blockPosition()) <= 0)
+                    continue;
+                double deltaX = entity.getX() - headPos.x;
+                double deltaZ = entity.getZ() - headPos.z;
+                double distanceSq = deltaX * deltaX + deltaZ * deltaZ;
+                double deltaY = entity.getY() - headPos.y;
+
+                if (distanceSq >= 400 && deltaY <= yRange) { // 20 blocks away (20 * 20 = 400)
+                    if (distanceSq < closestDistanceSq) {
+                        closestDistanceSq = distanceSq;
+                        closestEntity = entity;
+                    }
+                } else if (deltaY <= yRange) {
+                    if (distanceSq > fartestTooCloseDistanceSq) {
+                        fartestTooCloseDistanceSq = distanceSq;
+                        farthestTooCloseEntity = entity;
+                    }
+                }
+            }
+        }
         if(closestEntity == null) closestEntity = farthestTooCloseEntity;
         aggroTargetEntity = closestEntity;
         if(closestEntity == null) noTargetEscapeTimer++;
@@ -327,7 +375,8 @@ public class WormChainEntity extends KinematicChainEntity {
     }
 
     private boolean predictBreach(Level level, WormSegment head) {
-        if(aggroTargetEntity != null && aggroTargetEntity.getY() - head.getY() > 20) return false;
+        Vec3 targetedObjectPos = getTargetedObjectPos();
+        if(targetedObjectPos != null && targetedObjectPos.y - head.getY() > 20) return false;
         Vec3 futurePos = head.position().add(head.getDirectionVector().scale(10));
         BlockPos futureBPos = new BlockPos((int)futurePos.x,(int)futurePos.y,(int)futurePos.z);
         return (!level.getBlockState(futureBPos).isSuffocating(level, futureBPos) && !level.getBlockState(futureBPos).is(Blocks.CAVE_AIR));
@@ -456,6 +505,16 @@ public class WormChainEntity extends KinematicChainEntity {
                         new PositionedScreenshakePacket(80, head.position(), 200, 100).setEasing(Easing.CUBIC_OUT).setIntensity(0.85f));
             }
         });
+    }
+
+    private Vec3 getTargetedObjectPos() {
+        if(thumperTarget != null) {
+            BlockEntity thumper = this.level().getExistingBlockEntity(BlockPos.containing(thumperTarget.x, thumperTarget.y, thumperTarget.z));
+            if(thumper == null || thumper.getType() != ModBlockEntities.THUMPER_ENTITY.get()) thumperTarget = null;
+            return thumperTarget;
+        }
+        if(aggroTargetEntity != null) return aggroTargetEntity.position();
+        return null;
     }
 
     @Override

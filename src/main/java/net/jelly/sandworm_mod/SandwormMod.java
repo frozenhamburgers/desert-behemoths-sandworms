@@ -94,8 +94,8 @@ public class SandwormMod
         public static void onClientSetup(FMLClientSetupEvent event)
         {
             // register entity renderers
-            EntityRenderers.register(ModEntities.KINEMATIC_CHAIN.get(), KinematicChainRenderer::new);
-            EntityRenderers.register(ModEntities.CHAIN_SEGMENT.get(), ChainSegmentRenderer::new);
+//            EntityRenderers.register(ModEntities.KINEMATIC_CHAIN.get(), KinematicChainRenderer::new);
+//            EntityRenderers.register(ModEntities.CHAIN_SEGMENT.get(), ChainSegmentRenderer::new);
             EntityRenderers.register(ModEntities.WORM_SEGMENT.get(), WormSegmentRenderer::new);
             EntityRenderers.register(ModEntities.WORM_HEAD_SEGMENT.get(), WormHeadSegmentRenderer::new);
             EntityRenderers.register(ModEntities.WORM_CHAIN.get(), KinematicChainRenderer::new);

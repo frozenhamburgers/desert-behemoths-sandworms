@@ -1,4 +1,5 @@
 {
   "death.attack.worm": "%1$s was swallowed whole",
-  "item.sandworm_mod.sandworm_tooth": "Sandworm Tooth"
+  "item.sandworm_mod.sandworm_tooth": "Sandworm Tooth",
+  "block.sandworm_mod.thumper": "Thumper"
 }

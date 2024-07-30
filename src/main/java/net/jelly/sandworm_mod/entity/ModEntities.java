@@ -17,16 +17,16 @@ public class ModEntities {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
             DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, SandwormMod.MODID);
 
-    public static final RegistryObject<EntityType<KinematicChainEntity>> KINEMATIC_CHAIN = ENTITY_TYPES.register("kinematic_chain", () ->
-            EntityType.Builder.of(KinematicChainEntity::new, MobCategory.MISC)
-                    .sized(1f,1f)
-                    .build("kinematic_chain")
-    );
-    public static final RegistryObject<EntityType<ChainSegment>> CHAIN_SEGMENT = ENTITY_TYPES.register("chain_segment", () ->
-            EntityType.Builder.of(ChainSegment::new, MobCategory.MISC)
-                    .sized(0.5f,0.5f)
-                    .build("chain_segment")
-    );
+//    public static final RegistryObject<EntityType<KinematicChainEntity>> KINEMATIC_CHAIN = ENTITY_TYPES.register("kinematic_chain", () ->
+//            EntityType.Builder.of(KinematicChainEntity::new, MobCategory.MISC)
+//                    .sized(1f,1f)
+//                    .build("kinematic_chain")
+//    );
+//    public static final RegistryObject<EntityType<ChainSegment>> CHAIN_SEGMENT = ENTITY_TYPES.register("chain_segment", () ->
+//            EntityType.Builder.of(ChainSegment::new, MobCategory.MISC)
+//                    .sized(0.5f,0.5f)
+//                    .build("chain_segment")
+//    );
     public static final RegistryObject<EntityType<WormSegment>> WORM_SEGMENT = ENTITY_TYPES.register("worm_segment", () ->
             EntityType.Builder.of(WormSegment::new, MobCategory.MISC)
                     .sized(7.5f,7.5f)

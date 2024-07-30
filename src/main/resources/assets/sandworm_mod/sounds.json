@@ -1,30 +1,34 @@
 {
   "worm_warning_1": {
-    "subtitle": "sounds.sandworm_mod.worm_warning_1",
+    "subtitle": "Desert sands shift",
     "sounds": ["sandworm_mod:worm_warning_1"]
   },
   "worm_warning_2": {
-    "subtitle": "sounds.sandworm_mod.worm_warning_2",
+    "subtitle": "Desert sands tremble",
     "sounds": ["sandworm_mod:worm_warning_2"]
   },
   "worm_spawn": {
-    "subtitle": "sounds.sandworm_mod.worm_spawn",
+    "subtitle": "Sandworm emerges",
     "sounds": ["sandworm_mod:worm_spawn"]
   },
   "worm_breach": {
-    "subtitle": "sounds.sandworm_mod.worm_breach",
+    "subtitle": "Sandworm breaches",
     "sounds": ["sandworm_mod:worm_breach"]
   },
   "worm_land": {
-    "subtitle": "sounds.sandworm_mod.worm_land",
+    "subtitle": "Sandworm lands",
     "sounds": ["sandworm_mod:worm_land1", "sandworm_mod:worm_land2"]
   },
   "worm_burrow": {
-    "subtitle": "sounds.sandworm_mod.worm_burrow",
+    "subtitle": "Sandworm burrows",
     "sounds": ["sandworm_mod:worm_burrow1","sandworm_mod:worm_burrow2","sandworm_mod:worm_burrow3","sandworm_mod:worm_burrow4","sandworm_mod:worm_burrow5"]
   },
   "worm_roar": {
-    "subtitle": "sounds.sandworm_mod.worm_roar",
+    "subtitle": "Sandworm roars",
     "sounds": ["sandworm_mod:worm_roar1", "sandworm_mod:worm_roar2"]
+  },
+  "thumper": {
+    "subtitle": "Thumper thumps",
+    "sounds": ["sandworm_mod:thumper1","sandworm_mod:thumper2","sandworm_mod:thumper3","sandworm_mod:thumper4","sandworm_mod:thumper5","sandworm_mod:thumper6"]
   }
 }

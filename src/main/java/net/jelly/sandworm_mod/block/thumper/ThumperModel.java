@@ -15,7 +15,7 @@ public class ThumperModel extends GeoModel<ThumperBlockEntity> {
 
     @Override
     public ResourceLocation getTextureResource(ThumperBlockEntity thumperBlockEntity) {
-        return new ResourceLocation(SandwormMod.MODID, "textures/block/thumper.png");
+        return new ResourceLocation("minecraft", "textures/block/piston_side.png");
     }
 
     @Override

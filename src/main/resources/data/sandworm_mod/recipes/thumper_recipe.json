@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P",
+    "R"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:piston"
+    },
+    "R": {
+      "item": "minecraft:repeater"
+    }
+  },
+  "result": {
+    "item": "sandworm_mod:thumper"
+  }
+}

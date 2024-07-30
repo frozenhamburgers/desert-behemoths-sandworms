@@ -145,30 +145,30 @@ public class KinematicChainEntity extends Entity {
     }
 
     private void addSegment(float length, Vec3 dirVec) {
-        if(!this.level().isClientSide()) {
-            if (segments.isEmpty()) {
-                ChainSegment chainSegment = new ChainSegment(ModEntities.CHAIN_SEGMENT.get(), level());
-                chainSegment.setLength(length);
-                chainSegment.setDirectionVector(dirVec);
-                Vec3 pos = position().add(dirVec.normalize().scale(length));
-                chainSegment.moveTo(pos);
-                segments.add(chainSegment);
-                segmentsUUIDs.add(chainSegment.getUUID());
-                level().addFreshEntity(chainSegment);
-//                System.out.println("spawning first segment");
-            } else {
-                ChainSegment chainSegment = new ChainSegment(ModEntities.CHAIN_SEGMENT.get(), level());
-                chainSegment.setLength(length);
-                chainSegment.setDirectionVector(dirVec);
-                Vec3 pos = segments.get(segments.size() - 1).position().add(dirVec.normalize().scale(length));
-                chainSegment.moveTo(pos);
-                segments.add(chainSegment);
-                segmentsUUIDs.add(chainSegment.getUUID());
-                level().addFreshEntity(chainSegment);
-//                System.out.println("spawning next segment");
-            }
-        }
-        segmentCount++;
+//        if(!this.level().isClientSide()) {
+//            if (segments.isEmpty()) {
+//                ChainSegment chainSegment = new ChainSegment(ModEntities.CHAIN_SEGMENT.get(), level());
+//                chainSegment.setLength(length);
+//                chainSegment.setDirectionVector(dirVec);
+//                Vec3 pos = position().add(dirVec.normalize().scale(length));
+//                chainSegment.moveTo(pos);
+//                segments.add(chainSegment);
+//                segmentsUUIDs.add(chainSegment.getUUID());
+//                level().addFreshEntity(chainSegment);
+////                System.out.println("spawning first segment");
+//            } else {
+//                ChainSegment chainSegment = new ChainSegment(ModEntities.CHAIN_SEGMENT.get(), level());
+//                chainSegment.setLength(length);
+//                chainSegment.setDirectionVector(dirVec);
+//                Vec3 pos = segments.get(segments.size() - 1).position().add(dirVec.normalize().scale(length));
+//                chainSegment.moveTo(pos);
+//                segments.add(chainSegment);
+//                segmentsUUIDs.add(chainSegment.getUUID());
+//                level().addFreshEntity(chainSegment);
+////                System.out.println("spawning next segment");
+//            }
+//        }
+//        segmentCount++;
     }
 
     public void applyAcceleration(Vec3 accel) {
