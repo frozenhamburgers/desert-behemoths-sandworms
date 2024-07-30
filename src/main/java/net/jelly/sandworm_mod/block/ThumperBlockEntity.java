@@ -1,11 +1,14 @@
 package net.jelly.sandworm_mod.block;
 
+import net.jelly.sandworm_mod.advancements.AdvancementTriggerRegistry;
 import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -64,13 +67,11 @@ public class ThumperBlockEntity extends BlockEntity implements GeoBlockEntity {
             }
             if(e.soundTimer >= 55) {
                 e.startAnimation = true;
-                System.out.println("animation started");
                 e.soundTimer = 0;
             }
             else e.soundTimer++;
         }
         else e.soundTimer = 39;
-        System.out.println(e.soundTimer);
 
         // below all serverside
         if(level.isClientSide()) return;
@@ -104,6 +105,10 @@ public class ThumperBlockEntity extends BlockEntity implements GeoBlockEntity {
         }
         else if(e.wormSign >= CommonConfigs.SPAWNWORM_WORMSIGN.get()/10) {
             spawnWormThumper(level, blockPos);
+            level.getNearbyPlayers(TargetingConditions.forNonCombat(), null,
+                    new AABB(blockPos.offset(50, 200, 50), blockPos.offset(-50, -200, -50))).forEach(player -> {
+                AdvancementTriggerRegistry.THUMPER.trigger((ServerPlayer)player);
+            });
         }
     }
 }

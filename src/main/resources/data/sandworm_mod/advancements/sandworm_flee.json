@@ -1,0 +1,19 @@
+{
+  "display": {
+    "icon": {
+      "item": "sandworm_mod:sandworm_tooth"
+    },
+    "title": "Tooth and Tail",
+    "description": "Successfully drive away a sandworm and dislodge one of its fangs",
+    "show_toast": true,
+    "frame": "challenge",
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "sandworm_mod:sandworm_first_blast",
+  "criteria": {
+    "requirement": {
+      "trigger": "sandworm_mod:sandworm_flee"
+    }
+  }
+}

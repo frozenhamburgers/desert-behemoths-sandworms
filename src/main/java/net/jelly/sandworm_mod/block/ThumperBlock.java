@@ -1,8 +1,12 @@
 package net.jelly.sandworm_mod.block;
 
+import net.jelly.sandworm_mod.advancements.AdvancementTriggerRegistry;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -24,6 +28,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+
+import static net.jelly.sandworm_mod.helper.AdvancementHelper.grantAdvancement;
 
 public class ThumperBlock extends BaseEntityBlock {
     public static final VoxelShape SHAPE = Block.box(5,0,5,11,17,11);

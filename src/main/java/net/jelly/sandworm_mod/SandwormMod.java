@@ -1,6 +1,7 @@
 package net.jelly.sandworm_mod;
 
 import com.mojang.logging.LogUtils;
+import net.jelly.sandworm_mod.advancements.AdvancementTriggerRegistry;
 import net.jelly.sandworm_mod.block.ModBlockEntities;
 import net.jelly.sandworm_mod.block.ModBlocks;
 import net.jelly.sandworm_mod.block.thumper.ThumperRenderer;
@@ -77,6 +78,7 @@ public class SandwormMod
         event.enqueueWork(() -> {
             // ModMessages.register(); // networking: HAS TO BE FIRST LINE HERE
             BrewingRecipeRegistry.addRecipe(new WormToothBrewing());
+            AdvancementTriggerRegistry.init();
         });
     }
 

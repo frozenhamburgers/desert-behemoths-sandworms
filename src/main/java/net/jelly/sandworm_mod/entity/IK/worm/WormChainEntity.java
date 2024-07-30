@@ -56,9 +56,10 @@ public class WormChainEntity extends KinematicChainEntity {
     private boolean escaping = false;
     private int noPlayerDiscardTimer = 0;
     private boolean isChasing = false;
-    private int explodedTimes = 0;
+    public int explodedTimes = 0;
     private WormHeadSegment head;
     public Vec3 thumperTarget = null;
+    private int despawnTimer = 0;
 
     public WormChainEntity(EntityType<?> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -287,6 +288,15 @@ public class WormChainEntity extends KinematicChainEntity {
             // forward inverse kinematics for worm
             fikBehavior();
 
+            // flee if targeting on non survival player for more than x minutes
+            if(aggroTargetEntity != null) {
+                System.out.println(despawnTimer);
+                if(!(aggroTargetEntity instanceof Player)) despawnTimer++;
+                else if (((Player) aggroTargetEntity).isCreative()) despawnTimer++;
+                else despawnTimer = 0;
+                if(despawnTimer >= CommonConfigs.DESPAWN_TIMER.get()*20) escaping = true;
+            }
+
             if(!segments.isEmpty()) {
                 // update/assign head if necessary
                 if(head == null) {
@@ -454,7 +464,7 @@ public class WormChainEntity extends KinematicChainEntity {
         targetV = new Vec3(targetV.x*0.075, targetV.y+1.2, targetV.z*0.075);
         sonicBoom();
         explodedTimes++;
-        if(explodedTimes == CommonConfigs.HEALTH.get()) {
+        if(explodedTimes >= CommonConfigs.HEALTH.get()) {
             ItemEntity toothItem = new ItemEntity(this.level(), head.getX(), head.getY(), head.getZ(), new ItemStack(ModItems.WORM_TOOTH.get(), 1));
             this.level().addFreshEntity(toothItem);
             escaping = true;
@@ -491,6 +501,7 @@ public class WormChainEntity extends KinematicChainEntity {
     }
 
     private void sonicBoom() {
+        if(head == null) return;
         SonicBoomWorldEvent breachEvent = new SonicBoomWorldEvent().spawnRipple(this.head);
         breachEvent.start(this.level());
         breachEvent.setDirty();

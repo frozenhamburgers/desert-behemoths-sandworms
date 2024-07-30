@@ -14,10 +14,11 @@ public class CommonConfigs {
 
     public static final ForgeConfigSpec.ConfigValue<Integer> SPAWNWORM_WORMSIGN;
     public static final ForgeConfigSpec.ConfigValue<Integer> HEALTH;
+    public static final ForgeConfigSpec.ConfigValue<Integer> RESPAWN_DURATION;
+    public static final ForgeConfigSpec.ConfigValue<Integer> DESPAWN_TIMER;
     public static final ForgeConfigSpec.ConfigValue<Double> DAMAGE_SCALE;
     public static final ForgeConfigSpec.ConfigValue<Double> HEAD_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Boolean> DEFAULT_SPAWNING;
-    public static final ForgeConfigSpec.ConfigValue<Integer> RESPAWN_DURATION;
 
     static {
         BUILDER.push("Desert Behemoths: Sandworms! Config");
@@ -27,6 +28,9 @@ public class CommonConfigs {
 
         RESPAWN_DURATION = BUILDER.comment("Seconds after leaving a worm's range until another one can spawn. Default 120.")
                 .defineInRange("Respawn Duration", 120, 10, 216000);
+
+        DESPAWN_TIMER = BUILDER.comment("Time til despawn in seconds when not targeting a survival player. Default 3 minutes.")
+                .defineInRange("Despawn Duration", 180, 30, 216000);
 
         HEALTH = BUILDER.comment("Number of explosions the worm's head can handle before dropping a tooth and running away. Default 3")
                 .defineInRange("Health", 3, 1, 100);

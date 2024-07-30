@@ -1,0 +1,19 @@
+{
+  "display": {
+    "icon": {
+      "item": "sandworm_mod:thumper"
+    },
+    "title": "Stirring the Sands",
+    "description": "Summon a sandworm with a thumper",
+    "show_toast": true,
+    "frame": "task",
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "sandworm_mod:root",
+  "criteria": {
+    "requirement": {
+      "trigger": "sandworm_mod:thumper"
+    }
+  }
+}

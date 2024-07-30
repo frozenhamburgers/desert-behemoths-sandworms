@@ -27,6 +27,10 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
 
     public SonicBoomWorldEvent spawnRipple(Entity followEntity) {
         this.followEntity = followEntity;
+        if(followEntity == null) {
+            this.discarded = true;
+            return this;
+        }
         fx = new SonicBoomFx(followEntity.position().toVector3f(), 0, 0, 0,0);
         SonicBoomPostProcessor.INSTANCE.addFxInstance(fx);
         SonicBoomPostProcessor.INSTANCE.setActive(true);
