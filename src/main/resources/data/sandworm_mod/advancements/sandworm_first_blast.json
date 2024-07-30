@@ -1,0 +1,19 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:tnt"
+    },
+    "title": "Cracking the Carapace",
+    "description": "Successfully land an explosion on a sandworm's head",
+    "show_toast": true,
+    "frame": "task",
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "sandworm_mod:spawn_sandworm",
+  "criteria": {
+    "requirement": {
+      "trigger": "sandworm_mod:first_blast"
+    }
+  }
+}

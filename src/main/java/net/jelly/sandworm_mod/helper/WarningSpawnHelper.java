@@ -1,5 +1,6 @@
 package net.jelly.sandworm_mod.helper;
 
+import net.jelly.sandworm_mod.advancements.AdvancementTriggerRegistry;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSignProvider;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.entity.ModEntities;
@@ -69,6 +70,7 @@ public class WarningSpawnHelper {
     // WORM SPAWNING
 
     public static void spawnWorm(Player player) {
+        if(player.level().isClientSide()) return;
         WormChainEntity sandWorm = new WormChainEntity(ModEntities.WORM_CHAIN.get(), player.level());
         Vec3 sandWormSpawnPos = player.position().add(spawnPosOffset());
         int spawnChecks = 0;
@@ -81,9 +83,11 @@ public class WarningSpawnHelper {
         sandWorm.setAggroTargetEntity(player);
         player.level().addFreshEntity(sandWorm);
         sandWorm.playSound(ModSounds.WORM_SPAWN.get(), 100, 1);
+        AdvancementTriggerRegistry.SHAI_HULUD.trigger((ServerPlayer) player);
     }
 
     public static WormChainEntity spawnWormThumper(Level level, BlockPos bPos) {
+        if(level.isClientSide()) return null;
         Vec3 pos = bPos.getCenter();
         WormChainEntity sandWorm = new WormChainEntity(ModEntities.WORM_CHAIN.get(), level);
         Vec3 sandWormSpawnPos = pos.add(spawnPosOffset());

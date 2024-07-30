@@ -17,7 +17,7 @@ import java.util.Collection;
 public class WormToothBrewing implements IBrewingRecipe {
     @Override
     public boolean isInput(ItemStack input) {
-        return (PotionUtils.getMobEffects(input) != null && !(PotionUtils.getMobEffects(input).isEmpty()));
+        return (PotionUtils.getMobEffects(input) != null && !(PotionUtils.getMobEffects(input).isEmpty() && !input.getTag().getBoolean("duneElixir")));
     }
 
     @Override
@@ -47,6 +47,7 @@ public class WormToothBrewing implements IBrewingRecipe {
             CompoundTag compoundtag = pStack.getOrCreateTag();
             int color = PotionUtils.getColor(pStack);
             Component name = pStack.getHoverName().plainCopy();
+            compoundtag.putBoolean("duneElixir", true);
             compoundtag.remove("Potion");
             compoundtag.remove("display");
             compoundtag.remove("CustomPotionEffects");

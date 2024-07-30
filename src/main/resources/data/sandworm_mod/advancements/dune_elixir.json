@@ -1,0 +1,19 @@
+{
+  "display": {
+    "icon": {
+      "item": "sandworm_mod:sandworm_tooth"
+    },
+    "title": "Elixir of the Dune",
+    "description": "Use a sandworm tooth to brew powerful upgraded potions",
+    "show_toast": true,
+    "frame": "goal",
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "sandworm_mod:sandworm_flee",
+  "criteria": {
+    "requirement": {
+      "trigger": "sandworm_mod:dune_elixir"
+    }
+  }
+}
