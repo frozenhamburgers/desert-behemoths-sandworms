@@ -290,7 +290,7 @@ public class WormChainEntity extends KinematicChainEntity {
 
             // flee if targeting on non survival player for more than x minutes
             if(aggroTargetEntity != null) {
-                System.out.println(despawnTimer);
+                // System.out.println(despawnTimer);
                 if(!(aggroTargetEntity instanceof Player)) despawnTimer++;
                 else if (((Player) aggroTargetEntity).isCreative()) despawnTimer++;
                 else despawnTimer = 0;

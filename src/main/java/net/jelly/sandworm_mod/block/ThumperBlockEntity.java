@@ -104,6 +104,8 @@ public class ThumperBlockEntity extends BlockEntity implements GeoBlockEntity {
             thumperWarning(level, blockPos.getCenter());
         }
         else if(e.wormSign >= CommonConfigs.SPAWNWORM_WORMSIGN.get()/10) {
+            e.wormSign = 0;
+            e.pauseTicks = 500;
             spawnWormThumper(level, blockPos);
             level.getNearbyPlayers(TargetingConditions.forNonCombat(), null,
                     new AABB(blockPos.offset(50, 200, 50), blockPos.offset(-50, -200, -50))).forEach(player -> {
