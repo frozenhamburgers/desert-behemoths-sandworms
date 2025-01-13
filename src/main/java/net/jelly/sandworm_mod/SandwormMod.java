@@ -7,8 +7,7 @@ import net.jelly.sandworm_mod.block.ModBlocks;
 import net.jelly.sandworm_mod.block.thumper.ThumperRenderer;
 import net.jelly.sandworm_mod.brewing.WormToothBrewing;
 import net.jelly.sandworm_mod.config.CommonConfigs;
-import net.jelly.sandworm_mod.entity.IK.ChainSegmentRenderer;
-import net.jelly.sandworm_mod.entity.IK.KinematicChainRenderer;
+import net.jelly.sandworm_mod.entity.IK.worm.WormControllerRenderer;
 import net.jelly.sandworm_mod.entity.IK.worm.WormHeadSegmentRenderer;
 import net.jelly.sandworm_mod.entity.IK.worm.WormSegmentRenderer;
 import net.jelly.sandworm_mod.entity.ModEntities;
@@ -96,11 +95,9 @@ public class SandwormMod
         public static void onClientSetup(FMLClientSetupEvent event)
         {
             // register entity renderers
-//            EntityRenderers.register(ModEntities.KINEMATIC_CHAIN.get(), KinematicChainRenderer::new);
-//            EntityRenderers.register(ModEntities.CHAIN_SEGMENT.get(), ChainSegmentRenderer::new);
             EntityRenderers.register(ModEntities.WORM_SEGMENT.get(), WormSegmentRenderer::new);
+            EntityRenderers.register(ModEntities.WORM_CHAIN.get(), WormControllerRenderer::new);
             EntityRenderers.register(ModEntities.WORM_HEAD_SEGMENT.get(), WormHeadSegmentRenderer::new);
-            EntityRenderers.register(ModEntities.WORM_CHAIN.get(), KinematicChainRenderer::new);
             BlockEntityRenderers.register(ModBlockEntities.THUMPER_ENTITY.get(), ThumperRenderer::new);
         }
     }

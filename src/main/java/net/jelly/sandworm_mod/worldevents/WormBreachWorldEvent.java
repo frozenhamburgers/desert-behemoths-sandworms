@@ -52,8 +52,8 @@ public class WormBreachWorldEvent extends WorldEventInstance {
         return super.deserializeNBT(tag);
     }
 
-    @Override
-    public boolean isClientSynced() {
-        return true;
-    }
+//    @Override
+//    public boolean isClientSynced() {
+//        return true;
+//    }
 }

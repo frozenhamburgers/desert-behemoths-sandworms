@@ -60,7 +60,6 @@ public class WormSignHandler {
         //normal wormsign handling
         int softBoots = player.getItemBySlot(EquipmentSlot.FEET).getEnchantmentLevel(Enchantments.FALL_PROTECTION);
         player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
-            System.out.println(ws.getWS());
             if(!ws.canRespawn()) {
                 ws.decrementRespawnTimer();
                 return;

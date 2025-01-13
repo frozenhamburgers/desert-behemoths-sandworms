@@ -1,11 +1,9 @@
 package net.jelly.sandworm_mod.entity;
 
 import net.jelly.sandworm_mod.SandwormMod;
-import net.jelly.sandworm_mod.entity.IK.ChainSegment;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.entity.IK.worm.WormHeadSegment;
 import net.jelly.sandworm_mod.entity.IK.worm.WormSegment;
-import net.jelly.sandworm_mod.entity.IK.KinematicChainEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.eventbus.api.IEventBus;

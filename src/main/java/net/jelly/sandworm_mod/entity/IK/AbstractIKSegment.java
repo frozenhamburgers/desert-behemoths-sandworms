@@ -4,19 +4,24 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
-public class ChainSegment extends Entity {
+public abstract class AbstractIKSegment extends Entity {
     // note position() is used as the end position (head) of the chain segment
-    private static final EntityDataAccessor<Vector3f> DIR_VEC = SynchedEntityData.defineId(ChainSegment.class, EntityDataSerializers.VECTOR3);
-    private static final EntityDataAccessor<Float> LENGTH = SynchedEntityData.defineId(ChainSegment.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Vector3f> VISUAL_SCALE = SynchedEntityData.defineId(ChainSegment.class, EntityDataSerializers.VECTOR3);
-    private static final EntityDataAccessor<Vector3f> UP_VEC = SynchedEntityData.defineId(ChainSegment.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<Vector3f> DIR_VEC = SynchedEntityData.defineId(AbstractIKSegment.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<Float> LENGTH = SynchedEntityData.defineId(AbstractIKSegment.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Vector3f> VISUAL_SCALE = SynchedEntityData.defineId(AbstractIKSegment.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<Vector3f> UP_VEC = SynchedEntityData.defineId(AbstractIKSegment.class, EntityDataSerializers.VECTOR3);
+    private AbstractIKController owner = null;
+    private int discardTimer = 0;
 
-    public ChainSegment(EntityType<?> pEntityType, Level pLevel) {
+    public AbstractIKSegment(EntityType<?> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
 
@@ -24,15 +29,19 @@ public class ChainSegment extends Entity {
     // synch data
     @Override
     protected void defineSynchedData() {
-        this.entityData.define(LENGTH, 10.0f);
+        this.entityData.define(LENGTH, 1.0f);
         this.entityData.define(VISUAL_SCALE, new Vec3(1,1,1).toVector3f());
-        this.entityData.define(DIR_VEC, new Vec3(0,2,0).toVector3f());
+        this.entityData.define(DIR_VEC, new Vec3(0,1,0).toVector3f());
         this.entityData.define(UP_VEC, new Vec3(0,1,0).toVector3f());
     }
 
     @Override
     public void tick() {
         super.tick();
+        if(!this.level().isClientSide()) {
+            discardTimer++;
+            if (discardTimer > 120) this.discard();
+        }
     }
 
     public float getLength() { return entityData.get(LENGTH);}
@@ -45,11 +54,6 @@ public class ChainSegment extends Entity {
     public void setDirectionVector(Vec3 dirVec) { entityData.set(DIR_VEC, dirVec.normalize().toVector3f());}
     public Vec3 getUpVector() { return new Vec3(entityData.get(UP_VEC));}
     public void setUpVector(Vec3 upVec) { entityData.set(UP_VEC, upVec.normalize().toVector3f());}
-
-//    @Override
-//    public EntityDimensions getDimensions(Pose pPose) {
-//        return super.getDimensions(pPose).scale((float)getVisualScale().x, (float)getVisualScale().y);
-//    }
 
     // save as persistent data
     @Override
@@ -81,4 +85,33 @@ public class ChainSegment extends Entity {
     public boolean fireImmune() {
         return true;
     }
+
+    // lets the segment know it is discoverable by its controller
+    public void pingByOwner(AbstractIKController controller) {
+        owner = controller;
+        discardTimer = 0;
+    }
+
+    @Override
+    protected float getEyeHeight(Pose pPose, EntityDimensions pDimensions) {
+        return pDimensions.height * 0.5F;
+    }
+
+    public Vec3 centeredPosition() {
+        return position().add(0, this.getEyeHeight(), 0);
+    }
+
+    public void smoothMoveTo(Vec3 pos) {
+        this.moveTo(pos);
+//        else {
+//            System.out.println("moving on server: TRUE");
+//            this.moveTo(pos);
+//            var server = this.getServer();
+//            server.getPlayerList().getPlayers().forEach(player -> {
+//                System.out.println("sending packet");
+//                PacketHandler.sendToPlayer(new SegmentMovePacket(this.getId(), pos.x, pos.y, pos.z), player);
+//            });
+//        }
+    }
+
 }

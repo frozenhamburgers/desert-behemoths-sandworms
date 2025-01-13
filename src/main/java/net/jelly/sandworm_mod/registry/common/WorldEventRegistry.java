@@ -10,5 +10,5 @@ import static team.lodestar.lodestone.registry.common.LodestoneWorldEventTypeReg
 
 public class WorldEventRegistry {
     public static WorldEventType WORM_BREACH = registerEventType(new WorldEventType(new ResourceLocation(SandwormMod.MODID, "worm_breach"), WormBreachWorldEvent::new));
-    public static WorldEventType WORM_RIPPLE = registerEventType(new WorldEventType(new ResourceLocation(SandwormMod.MODID, "worm_ripple"), WormRippleWorldEvent::new));
+    public static WorldEventType WORM_RIPPLE = registerEventType(new WorldEventType(new ResourceLocation(SandwormMod.MODID, "worm_ripple"), WormRippleWorldEvent::new, true));
 }

@@ -1,7 +1,7 @@
 package net.jelly.sandworm_mod.entity.IK.worm;
 
 import net.jelly.sandworm_mod.config.CommonConfigs;
-import net.jelly.sandworm_mod.entity.IK.ChainSegment;
+import net.jelly.sandworm_mod.entity.IK.AbstractIKSegment;
 import net.jelly.sandworm_mod.registry.common.DamageTypesRegistry;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.registries.Registries;
@@ -25,13 +25,9 @@ import software.bernie.geckolib.core.object.PlayState;
 import java.util.List;
 import java.util.UUID;
 
-public class WormSegment extends ChainSegment implements GeoEntity {
-    private static int STAGE_TRACK = 0;
-    private static int STAGE_BURROW = 1;
-    private int stage = 0;
+public class WormSegment extends AbstractIKSegment implements GeoEntity {
     private AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private UUID ownerEntityUUID;
-    private int discardTimer = 0;
     private DamageSource dmgSource =
             new DamageSource(this.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypesRegistry.WORM));
 
@@ -45,13 +41,6 @@ public class WormSegment extends ChainSegment implements GeoEntity {
         this.lookAt(EntityAnchorArgument.Anchor.FEET, this.position().add(this.getDirectionVector()));
 
         if(!this.level().isClientSide()) {
-            // check for owner
-            if(getOwner() == null) {
-                if(this.discardTimer < 120) discardTimer++;
-                else this.discard();
-            }
-            else discardTimer = 0;
-
             // collisions & deal damage & kb
             List<Entity> collidingEntities = level().getEntities(this, this.getBoundingBox());
             for (int i = 0; i < collidingEntities.size(); i++) {
@@ -115,10 +104,5 @@ public class WormSegment extends ChainSegment implements GeoEntity {
                         .filter(obj -> obj.getStringUUID().equals(ownerEntityUUID.toString()))
                         .findFirst()
                         .orElse(null);
-    }
-
-    @Override
-    public boolean shouldRenderAtSqrDistance(double pDistance) {
-        return true;
     }
 }

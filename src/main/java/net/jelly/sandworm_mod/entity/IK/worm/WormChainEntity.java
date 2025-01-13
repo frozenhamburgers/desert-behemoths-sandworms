@@ -5,8 +5,8 @@ import mod.chloeprime.aaaparticles.api.common.ParticleEmitterInfo;
 import net.jelly.sandworm_mod.SandwormMod;
 import net.jelly.sandworm_mod.block.ModBlockEntities;
 import net.jelly.sandworm_mod.config.CommonConfigs;
-import net.jelly.sandworm_mod.entity.IK.ChainSegment;
-import net.jelly.sandworm_mod.entity.IK.KinematicChainEntity;
+import net.jelly.sandworm_mod.entity.IK.AbstractIKController;
+import net.jelly.sandworm_mod.entity.IK.AbstractWormController;
 import net.jelly.sandworm_mod.entity.ModEntities;
 import net.jelly.sandworm_mod.item.ModItems;
 import net.jelly.sandworm_mod.sound.ModSounds;
@@ -42,13 +42,11 @@ import java.util.UUID;
 
 import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 
-public class WormChainEntity extends KinematicChainEntity {
+public class WormChainEntity extends AbstractWormController {
     private static float SPEED_SCALE = 1.3f;
     private boolean breaching = false;
     private int soundFrequencyCount = 0;
-    private static final ParticleEmitterInfo SAND_IMPACT = new ParticleEmitterInfo(new ResourceLocation(SandwormMod.MODID, "sandimpact"));
     private static final ParticleEmitterInfo SLOWER_SAND_IMPACT = new ParticleEmitterInfo(new ResourceLocation(SandwormMod.MODID, "slowersandimpact"));
-    private static final ParticleEmitterInfo SAND_SMOKE = new ParticleEmitterInfo(new ResourceLocation(SandwormMod.MODID, "sandsmoke"));
     public LivingEntity aggroTargetEntity;
     public boolean removed = false;
     private int discardTimer = 0;
@@ -60,13 +58,17 @@ public class WormChainEntity extends KinematicChainEntity {
     private WormHeadSegment head;
     public Vec3 thumperTarget = null;
     private int despawnTimer = 0;
+    Vec3 goal;
+    int stage;
 
     public WormChainEntity(EntityType<?> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
 
-    private void initWorm() {
+    public void initWorm() {
+        System.out.println("init Worm");
         if(segmentCount == 0) {
+            System.out.println("adding seg");
             for(int i=0; i<10; i++) addWormSegment(0.35f*5, new Vec3(1,0,0), new Vec3(7.5*((i+2)/11f),7.5*((i+2)/11f),5));
             for(int i=0; i<80; i++) addWormSegment(0.35f*5, new Vec3(1,0,0), new Vec3(7.5,7.5,5));
             addHeadSegment(0.35f*5, new Vec3(1,0,0), new Vec3(7.5,7.5,5));
@@ -80,25 +82,6 @@ public class WormChainEntity extends KinematicChainEntity {
                 for(int i=0; i<this.segmentCount; i++) {
                     segments.get(i).setDirectionVector(lookAtAggroEntity);
                 }
-            }
-        }
-    }
-
-    private void loadSavedSegments() {
-        if(this.segmentCount != 0 && segments.isEmpty()) {
-            // restore segments list upon load
-            List<ChainSegment> nearbyChainSegs = this.level().getEntitiesOfClass(
-                    ChainSegment.class,
-                    new AABB(this.position().add(200, 200, 200), this.position().add(-200, -200, -200))
-            );
-            for(int i=0; i<this.segmentCount; i++) {
-                UUID thisUUID = segmentsUUIDs.get(i);
-                this.segments.add(
-                        nearbyChainSegs.stream()
-                                .filter(obj -> obj.getStringUUID().equals(thisUUID.toString()))
-                                .findFirst()
-                                .orElse(null)
-                );
             }
         }
     }
@@ -275,15 +258,10 @@ public class WormChainEntity extends KinematicChainEntity {
 
     @Override
     public void tick() {
+        super.tick();
         if(!this.level().isClientSide()) {
-            // save & load
-            loadSavedSegments();
-
             // check if despawn is necessary every tick
             if (despawnBehavior() == 1) return;
-
-            // initialize segments if necessary
-            initWorm();
 
             // forward inverse kinematics for worm
             fikBehavior();
@@ -485,7 +463,6 @@ public class WormChainEntity extends KinematicChainEntity {
 
     private int smokeCount = 0;
     private void smokeParticles(Level level, Vec3 pos) {
-//        System.out.println("spawning smoke #" + smokeCount + ": " + pos + ", in: " + level);
         smokeCount++;
         WormBreachWorldEvent breachEvent = new WormBreachWorldEvent().setPosition(pos);
         breachEvent.start(level);
