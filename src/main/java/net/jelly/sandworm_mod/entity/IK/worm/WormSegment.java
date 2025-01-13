@@ -10,6 +10,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -56,6 +57,9 @@ public class WormSegment extends AbstractIKSegment implements GeoEntity {
             }
         }
 
+        for(FireworkRocketEntity rocket : this.level().getEntitiesOfClass(FireworkRocketEntity.class, this.getBoundingBox())) {
+            rocket.explode();
+        }
     }
 
     protected double getDamage() { return (10.0f * CommonConfigs.DAMAGE_SCALE.get()); }
@@ -95,6 +99,7 @@ public class WormSegment extends AbstractIKSegment implements GeoEntity {
         this.ownerEntityUUID = uuid;
     }
     public WormChainEntity getOwner() {
+        if(this.ownerEntityUUID == null) return null;
         List<WormChainEntity> nearbyChainEntities = this.level().getEntitiesOfClass(
                 WormChainEntity.class,
                 new AABB(this.position().add(200, 200, 200), this.position().add(-200, -200, -200))

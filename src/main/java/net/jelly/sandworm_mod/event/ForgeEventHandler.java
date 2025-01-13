@@ -23,6 +23,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -75,29 +76,10 @@ public class ForgeEventHandler {
         Vec3 pos = event.getExplosion().getPosition();
         List<WormHeadSegment> hitHeads = event.getLevel().getEntitiesOfClass(WormHeadSegment.class, new AABB(pos.x + 5, pos.y + 5, pos.z + 5, pos.x - 5, pos.y - 5, pos.z - 5));
         if (!hitHeads.isEmpty()) hitHeads.forEach(head -> {
-            head.playSound(ModSounds.WORM_ROAR.get(), 10f, 1f);
-            WormChainEntity wormChain = head.getOwner();
-            if (wormChain != null) wormChain.blastHit();
-            Entity sourcePlayer = event.getExplosion().getIndirectSourceEntity();
-            if(sourcePlayer == null) {
-                Vec3 explosionPos = event.getExplosion().getPosition();
-                sourcePlayer = event.getLevel().getNearestPlayer(explosionPos.x, explosionPos.y, explosionPos.z, 100.0, true);
-            }
-            if(sourcePlayer instanceof Player) {
-                AdvancementTriggerRegistry.FIRST_BLAST.trigger((ServerPlayer) sourcePlayer);
-                if (wormChain.explodedTimes >= CommonConfigs.HEALTH.get()) AdvancementTriggerRegistry.SANDWORM_FLEE.trigger((ServerPlayer) sourcePlayer);
-            }
+            head.hitSandwormHead((Player) event.getExplosion().getIndirectSourceEntity(), CommonConfigs.EXPLOSION_DAMAGE.get());
         });
     }
 
-
-//    @SubscribeEvent
-//    public static void boom(ExplosionEvent.Detonate event) {
-//        if (event.getLevel().isClientSide()) return;
-//        System.out.println("indirect source:" + event.getExplosion().getIndirectSourceEntity());
-//        System.out.println("direct source:" + event.getExplosion().getDirectSourceEntity());
-//        System.out.println("exploder source:" + event.getExplosion().getExploder());
-//    }
 
     @SubscribeEvent
     public static void brewPotion(PlayerBrewedPotionEvent event) {

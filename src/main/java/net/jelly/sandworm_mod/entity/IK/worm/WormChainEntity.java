@@ -5,7 +5,6 @@ import mod.chloeprime.aaaparticles.api.common.ParticleEmitterInfo;
 import net.jelly.sandworm_mod.SandwormMod;
 import net.jelly.sandworm_mod.block.ModBlockEntities;
 import net.jelly.sandworm_mod.config.CommonConfigs;
-import net.jelly.sandworm_mod.entity.IK.AbstractIKController;
 import net.jelly.sandworm_mod.entity.IK.AbstractWormController;
 import net.jelly.sandworm_mod.entity.ModEntities;
 import net.jelly.sandworm_mod.item.ModItems;
@@ -38,7 +37,6 @@ import team.lodestar.lodestone.registry.common.LodestonePacketRegistry;
 import team.lodestar.lodestone.systems.easing.Easing;
 
 import java.util.List;
-import java.util.UUID;
 
 import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 
@@ -54,12 +52,13 @@ public class WormChainEntity extends AbstractWormController {
     private boolean escaping = false;
     private int noPlayerDiscardTimer = 0;
     private boolean isChasing = false;
-    public int explodedTimes = 0;
+    public int dmgTaken = 0;
     private WormHeadSegment head;
     public Vec3 thumperTarget = null;
     private int despawnTimer = 0;
     Vec3 goal;
     int stage;
+    public boolean vulnerable = true;
 
     public WormChainEntity(EntityType<?> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -224,6 +223,9 @@ public class WormChainEntity extends AbstractWormController {
             // stage 0: controlled movement
             if (stage == 0) {
                 applyAcceleration(moveTowardVec.scale(0.1 * SPEED_SCALE));
+
+                // make vulnerable to attacks again
+                vulnerable = true;
 
                 // if worm is close enough & not "looking" at target, it has charged past it
                 if (moveTowardVec.dot(head.getDirectionVector()) < 0.25 || !(this.level().collidesWithSuffocatingBlock(null, head.getBoundingBox())))
@@ -438,11 +440,21 @@ public class WormChainEntity extends AbstractWormController {
         if(targetV.length() > SPEED_SCALE) targetV = targetV.normalize().scale(SPEED_SCALE);
     }
 
-    public void blastHit() {
-        targetV = new Vec3(targetV.x*0.075, targetV.y+1.2, targetV.z*0.075);
-        sonicBoom();
-        explodedTimes++;
-        if(explodedTimes >= CommonConfigs.HEALTH.get()) {
+    public void blastHit(int dmg) {
+        if(!vulnerable || escaping) return;
+        vulnerable = false;
+        System.out.println(dmgTaken);
+        int totalHealth = CommonConfigs.HEALTH.get();
+        head.playSound(ModSounds.WORM_ROAR.get(), 10f, 1f);
+        if((dmgTaken < totalHealth/3 && dmgTaken+dmg >= totalHealth/3) || (dmgTaken < 2*totalHealth/3 && dmgTaken+dmg >= 2*totalHealth/3)) {
+            targetV = new Vec3(targetV.x*0.075, targetV.y+1.2, targetV.z*0.075);
+            sonicBoom();
+        }
+        else targetV = new Vec3(targetV.x*0.2, targetV.y*0.2, targetV.z*0.2);
+
+        dmgTaken+=dmg;
+        if(dmgTaken >= totalHealth) {
+            sonicBoom();
             ItemEntity toothItem = new ItemEntity(this.level(), head.getX(), head.getY(), head.getZ(), new ItemStack(ModItems.WORM_TOOTH.get(), 1));
             this.level().addFreshEntity(toothItem);
             escaping = true;

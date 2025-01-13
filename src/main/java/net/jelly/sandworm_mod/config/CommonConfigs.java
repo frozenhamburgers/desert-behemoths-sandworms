@@ -14,6 +14,8 @@ public class CommonConfigs {
 
     public static final ForgeConfigSpec.ConfigValue<Integer> SPAWNWORM_WORMSIGN;
     public static final ForgeConfigSpec.ConfigValue<Integer> HEALTH;
+    public static final ForgeConfigSpec.ConfigValue<Integer> EXPLOSION_DAMAGE;
+    public static final ForgeConfigSpec.ConfigValue<Integer> FIREWORK_DAMAGE;
     public static final ForgeConfigSpec.ConfigValue<Integer> RESPAWN_DURATION;
     public static final ForgeConfigSpec.ConfigValue<Integer> DESPAWN_TIMER;
     public static final ForgeConfigSpec.ConfigValue<Double> DAMAGE_SCALE;
@@ -32,8 +34,14 @@ public class CommonConfigs {
         DESPAWN_TIMER = BUILDER.comment("Time til despawn in seconds when not targeting a survival player. Default 3 minutes.")
                 .defineInRange("Despawn Duration", 180, 30, 216000);
 
-        HEALTH = BUILDER.comment("Number of explosions the worm's head can handle before dropping a tooth and running away. Default 3")
-                .defineInRange("Health", 3, 1, 100);
+        HEALTH = BUILDER.comment("Amount of health the worm has. Upon depletion, drops a worm tooth and runs away. Default 300")
+                .defineInRange("Health", 300, 1, 100000);
+
+        EXPLOSION_DAMAGE = BUILDER.comment("Amount of health an explosion to the worm's head takes away. Default 100")
+                .defineInRange("Explosion Damage", 100, 1, 10000);
+
+        FIREWORK_DAMAGE = BUILDER.comment("Amount of health an firework rocket to the worm's head takes away. Default 30")
+                .defineInRange("Firework Damage", 30, 1, 10000);
 
         DAMAGE_SCALE = BUILDER.comment("Value the damage dealt by the worm is scaled by. Default 1.0.")
                 .defineInRange("Damage Multiplier", 1.0, 0.01, 100.0);
