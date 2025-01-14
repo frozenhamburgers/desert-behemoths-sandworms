@@ -72,7 +72,7 @@ public class WormChainEntity extends AbstractWormController {
             for(int i=0; i<80; i++) addWormSegment(0.35f*5, new Vec3(1,0,0), new Vec3(7.5,7.5,5));
             addHeadSegment(0.35f*5, new Vec3(1,0,0), new Vec3(7.5,7.5,5));
             if(aggroTargetEntity == null && thumperTarget == null) {
-                retarget(30);
+                retarget(50);
             }
             Vec3 targetedObjectPos = getTargetedObjectPos();
             if(targetedObjectPos != null) {
@@ -192,8 +192,8 @@ public class WormChainEntity extends AbstractWormController {
     private void wormAIBehavior() {
         // retarget if target entity is gone
         if(thumperTarget == null && (aggroTargetEntity == null || aggroTargetEntity.isRemoved() || aggroTargetEntity.isDeadOrDying() || !isDesertBiome(aggroTargetEntity))) {
-            retarget(30);
-            if(noTargetEscapeTimer >= 20) escaping = true;
+            retarget(50);
+            if(noTargetEscapeTimer >= 60) escaping = true;
         }
         else if (!escaping) {
             // if too far, chase by dolphining
@@ -235,7 +235,7 @@ public class WormChainEntity extends AbstractWormController {
             if (stage == 1) {
                 // if in the air
                 if (!(this.level().collidesWithSuffocatingBlock(null, head.getBoundingBox()))) {
-                    if(targetedObjectPos.y - head.position().y > 30) retarget(30);
+                    if(targetedObjectPos.y - head.position().y > 30) retarget(50);
                     // gravity
                     applyAcceleration(new Vec3(0, -0.0375, 0));
                     // small

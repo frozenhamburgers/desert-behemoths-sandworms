@@ -2,6 +2,7 @@ package net.jelly.sandworm_mod.mixin;
 
 import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormHeadSegment;
+import net.jelly.sandworm_mod.entity.IK.worm.WormSegment;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Spider;
@@ -20,7 +21,7 @@ public abstract class FireworkMixin {
 
     /**
      * @author JellyCarbonara
-     * @reason Disables block collision of spiders
+     * @reason Causes firework explosions to damage sandworm
      */
     @Inject(method = "explode", at = @At("HEAD"), cancellable = true)
     private void disableCollisionForSpider(CallbackInfo ci) {

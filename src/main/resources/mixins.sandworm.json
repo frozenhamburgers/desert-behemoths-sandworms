@@ -6,7 +6,9 @@
     "defaultRequire": 1
   },
   "mixins": [
-    "FireworkMixin"
+    "FireworkMixin",
+    "FishingHookMixin",
+    "PlayerMixin"
   ],
   "client": [
 

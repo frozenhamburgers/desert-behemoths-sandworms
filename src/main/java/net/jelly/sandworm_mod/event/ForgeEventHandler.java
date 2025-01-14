@@ -8,9 +8,12 @@ import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.entity.IK.worm.WormHeadSegment;
 import net.jelly.sandworm_mod.entity.ModEntities;
+import net.jelly.sandworm_mod.helper.IPlayerMixinAccessor;
 import net.jelly.sandworm_mod.sound.ModSounds;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
+import net.minecraft.client.CameraType;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.PlayerAdvancements;
@@ -22,15 +25,24 @@ import net.minecraft.world.entity.EntityEvent;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.brewing.PlayerBrewedPotionEvent;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
+import net.minecraftforge.event.entity.player.ItemFishedEvent;
+import net.minecraftforge.event.entity.player.PlayerFlyableFallEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -85,6 +97,21 @@ public class ForgeEventHandler {
     public static void brewPotion(PlayerBrewedPotionEvent event) {
         if (event.getEntity().level().isClientSide()) return;
         if(event.getStack().getTag().getBoolean("duneElixir")) AdvancementTriggerRegistry.DUNE_ELIXIR.trigger((ServerPlayer) event.getEntity());
+    }
+
+    @SubscribeEvent
+    public static void playerFallEvent(LivingFallEvent event) {
+        if(!(event.getEntity() instanceof ServerPlayer)) return;
+        IPlayerMixinAccessor player = (IPlayerMixinAccessor)event.getEntity();
+        if(player.getGrappling()) {
+            player.setGrappling(false);
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void playerTick(TickEvent.PlayerTickEvent event) {
+        if (!event.side.isClient() && event.player.onGround()) ((IPlayerMixinAccessor) event.player).setGrappling(false);
     }
 
 }

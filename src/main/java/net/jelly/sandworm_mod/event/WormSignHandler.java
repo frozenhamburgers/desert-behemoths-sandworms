@@ -6,6 +6,7 @@ import net.jelly.sandworm_mod.capabilities.wormsign.WormSignProvider;
 import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.entity.ModEntities;
+import net.jelly.sandworm_mod.helper.IPlayerMixinAccessor;
 import net.jelly.sandworm_mod.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EquipmentSlot;

@@ -2,10 +2,12 @@ package net.jelly.sandworm_mod.entity.IK.worm;
 
 import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.AbstractIKSegment;
+import net.jelly.sandworm_mod.helper.IPlayerMixinAccessor;
 import net.jelly.sandworm_mod.registry.common.DamageTypesRegistry;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -45,6 +47,11 @@ public class WormSegment extends AbstractIKSegment implements GeoEntity {
             // collisions & deal damage & kb
             List<Entity> collidingEntities = level().getEntities(this, this.getBoundingBox());
             for (int i = 0; i < collidingEntities.size(); i++) {
+                if(collidingEntities.get(i) instanceof ServerPlayer) {
+                    if(((IPlayerMixinAccessor)collidingEntities.get(i)).getGrappling()) {
+                        continue;
+                    }
+                }
                 if (collidingEntities.get(i) instanceof LivingEntity) {
                     LivingEntity target = (LivingEntity) (collidingEntities.get(i));
                     if(target.hurtTime == 0) {
@@ -55,10 +62,6 @@ public class WormSegment extends AbstractIKSegment implements GeoEntity {
                     }
                 }
             }
-        }
-
-        for(FireworkRocketEntity rocket : this.level().getEntitiesOfClass(FireworkRocketEntity.class, this.getBoundingBox())) {
-            rocket.explode();
         }
     }
 
@@ -109,5 +112,10 @@ public class WormSegment extends AbstractIKSegment implements GeoEntity {
                         .filter(obj -> obj.getStringUUID().equals(ownerEntityUUID.toString()))
                         .findFirst()
                         .orElse(null);
+    }
+
+    @Override
+    public boolean canBeHitByProjectile() {
+        return true;
     }
 }
