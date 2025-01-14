@@ -12,6 +12,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -31,6 +32,7 @@ import java.util.UUID;
 public class WormSegment extends AbstractIKSegment implements GeoEntity {
     private AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private UUID ownerEntityUUID;
+    private WormChainEntity owner;
     private DamageSource dmgSource =
             new DamageSource(this.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypesRegistry.WORM));
 
@@ -41,6 +43,7 @@ public class WormSegment extends AbstractIKSegment implements GeoEntity {
     @Override
     public void tick() {
         super.tick();
+        if(owner == null) owner = getOwner();
         this.lookAt(EntityAnchorArgument.Anchor.FEET, this.position().add(this.getDirectionVector()));
 
         if(!this.level().isClientSide()) {
@@ -49,6 +52,7 @@ public class WormSegment extends AbstractIKSegment implements GeoEntity {
             for (int i = 0; i < collidingEntities.size(); i++) {
                 if(collidingEntities.get(i) instanceof ServerPlayer) {
                     if(((IPlayerMixinAccessor)collidingEntities.get(i)).getGrappling()) {
+                        if(owner.mountableTimer > 0) owner.mountPlayer((Player)collidingEntities.get(i));
                         continue;
                     }
                 }
@@ -117,5 +121,13 @@ public class WormSegment extends AbstractIKSegment implements GeoEntity {
     @Override
     public boolean canBeHitByProjectile() {
         return true;
+    }
+
+    @Override
+    protected void positionRider(Entity pPassenger, Entity.MoveFunction pCallback) {
+        if (this.hasPassenger(pPassenger)) {
+            double d0 = this.getY() + this.m_6048_() + pPassenger.getMyRidingOffset() + 5.0D;
+            pCallback.accept(pPassenger, this.getX(), d0, this.getZ());
+        }
     }
 }

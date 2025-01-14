@@ -59,6 +59,9 @@ public class WormChainEntity extends AbstractWormController {
     Vec3 goal;
     int stage;
     public boolean vulnerable = true;
+    public int mountableTimer = 0;
+    public boolean mounted = false;
+    Player rider;
 
     public WormChainEntity(EntityType<?> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -258,10 +261,16 @@ public class WormChainEntity extends AbstractWormController {
 
     }
 
+    private void mountedWormAIBehavior() {
+        targetV = rider.getLookAngle().normalize();
+        target = head.position().add(targetV);
+    }
+
     @Override
     public void tick() {
         super.tick();
         if(!this.level().isClientSide()) {
+            mountableTimer--;
             // check if despawn is necessary every tick
             if (despawnBehavior() == 1) return;
 
@@ -288,7 +297,8 @@ public class WormChainEntity extends AbstractWormController {
                         this.level().destroyBlock(thumperBPos, false);
                     }
                 }
-                wormAIBehavior();
+                if(!mounted) wormAIBehavior();
+                else mountedWormAIBehavior();
                 VFXSFXBehavior();
                 fabrik();
             }
@@ -448,6 +458,7 @@ public class WormChainEntity extends AbstractWormController {
         head.playSound(ModSounds.WORM_ROAR.get(), 10f, 1f);
         if((dmgTaken < totalHealth/3 && dmgTaken+dmg >= totalHealth/3) || (dmgTaken < 2*totalHealth/3 && dmgTaken+dmg >= 2*totalHealth/3)) {
             targetV = new Vec3(targetV.x*0.075, targetV.y+1.2, targetV.z*0.075);
+            mountableTimer = 120;
             sonicBoom();
         }
         else targetV = new Vec3(targetV.x*0.2, targetV.y*0.2, targetV.z*0.2);
@@ -515,6 +526,12 @@ public class WormChainEntity extends AbstractWormController {
         }
         if(aggroTargetEntity != null) return aggroTargetEntity.position();
         return null;
+    }
+
+    public void mountPlayer(Player player) {
+        player.startRiding(segments.get(segmentCount - 3));
+        mounted = true;
+        rider = player;
     }
 
     @Override
