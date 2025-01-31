@@ -28,14 +28,19 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
 import team.lodestar.lodestone.handlers.WorldEventHandler;
 import team.lodestar.lodestone.network.screenshake.PositionedScreenshakePacket;
 import team.lodestar.lodestone.registry.common.LodestonePacketRegistry;
 import team.lodestar.lodestone.systems.easing.Easing;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
@@ -261,8 +266,86 @@ public class WormChainEntity extends AbstractWormController {
 
     }
 
+
+    private @Nullable BlockPos findTopY(int x, int z, int topY, int bottomY) {
+        // Start from the top Y value and move downward
+        for (int y = topY; y >= bottomY; y--) {
+            BlockPos pos = new BlockPos(x, y, z);
+            BlockState state = this.level().getBlockState(pos);
+
+            // Check if this block is solid and has air above it
+            if (!state.isAir() && this.level().getBlockState(pos.above()).isAir()) {
+                return new BlockPos(x,y,z);
+            }
+        }
+
+        // If no suitable block is found, return the bottom Y (default to ground level)
+        return new BlockPos(x,bottomY,z);
+    }
+
     private void mountedWormAIBehavior() {
-        targetV = rider.getLookAngle().normalize();
+        // if dismount
+        if(segments.get(segmentCount - 3).getPassengers().isEmpty()) {
+            this.mounted = false;
+            this.escaping = true;
+        }
+
+        // SURFACE NORMAL CALCULATION
+        AABB wormAABB = head.getBoundingBox();
+        int minBX = (int)Math.floor(wormAABB.minX);
+        int maxBX = (int)Math.floor(wormAABB.maxX);
+        int minBZ = (int)Math.floor(wormAABB.minZ);
+        int maxBZ = (int)Math.floor(wormAABB.maxZ);
+        int minBY = (int)Math.floor(wormAABB.minY);
+        int maxBY = (int)Math.floor(wormAABB.maxY);
+
+        List<BlockPos> sampledPositions = new ArrayList<>();
+        sampledPositions.add(findTopY(minBX, minBZ, maxBY, minBY-1)); // Bottom-left
+        sampledPositions.add(findTopY(maxBX, minBZ, maxBY, minBY-1)); // Bottom-right
+        sampledPositions.add(findTopY(minBX, maxBZ, maxBY, minBY-1)); // Top-left
+        sampledPositions.add(findTopY(maxBX, maxBZ, maxBY, minBY-1)); // Top-right
+        sampledPositions.add(findTopY((minBX + maxBX) / 2, (minBZ + maxBZ) / 2, maxBY, minBY-1)); // Center
+
+        Vec3 normal = new Vec3(0,0,0);
+        boolean onSurface = false;
+        for(int i=0; i<4; i++) {
+            if(!this.level().getBlockState(sampledPositions.get(i)).isAir()) {
+                onSurface = true;
+                break;
+            }
+        }
+        if(onSurface) {
+            Vec3 p1 = sampledPositions.get(0).getCenter();
+            Vec3 p2 = sampledPositions.get(1).getCenter();
+            Vec3 p3 = sampledPositions.get(2).getCenter();
+            Vec3 p4 = sampledPositions.get(3).getCenter();
+
+            Vec3 v1 = p4.subtract(p1);
+            Vec3 v2 = p3.subtract(p2);
+
+            normal = v2.cross(v1).normalize();
+        }
+        System.out.println("normal: " + normal);
+
+        // gravity
+        Vec3 gForce = new Vec3(0,-0.016,0);
+        // steering
+        Vec3 riderForce = new Vec3(0,0,0);
+        if(normal.length() > 0) {
+            riderForce = rider.getLookAngle().normalize().scale(0.04);
+            if(rider.zza > 0) riderForce = riderForce.add(rider.getLookAngle().normalize().scale(0.04));
+        }
+        // net force is all forces before normal & friciton are applied
+        Vec3 netForce = new Vec3(0,0,0).add(riderForce).add(gForce);
+        // normal
+        Vec3 normalForce = normal.scale(-netForce.dot(normal));
+        // friction
+        double frictionCoefficient = 0.8; // Example coefficient of friction
+        Vec3 frictionForce = targetV.scale(normalForce.length()).scale(-frictionCoefficient);
+        targetV = targetV.add(netForce).add(normalForce).add(frictionForce);
+        if (targetV.dot(normal) < 0) {
+            targetV = targetV.subtract(normal.scale(targetV.dot(normal))); // Remove downward normal component of velocity
+        }
         target = head.position().add(targetV);
     }
 
@@ -270,7 +353,7 @@ public class WormChainEntity extends AbstractWormController {
     public void tick() {
         super.tick();
         if(!this.level().isClientSide()) {
-            mountableTimer--;
+            if(mountableTimer > 0) mountableTimer--;
             // check if despawn is necessary every tick
             if (despawnBehavior() == 1) return;
 

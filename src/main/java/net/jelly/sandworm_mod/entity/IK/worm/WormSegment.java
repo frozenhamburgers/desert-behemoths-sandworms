@@ -126,7 +126,7 @@ public class WormSegment extends AbstractIKSegment implements GeoEntity {
     @Override
     protected void positionRider(Entity pPassenger, Entity.MoveFunction pCallback) {
         if (this.hasPassenger(pPassenger)) {
-            double d0 = this.getY() + this.m_6048_() + pPassenger.getMyRidingOffset() + 5.0D;
+            double d0 = this.getY() + this.m_6048_() + pPassenger.getMyRidingOffset() + 1.75D;
             pCallback.accept(pPassenger, this.getX(), d0, this.getZ());
         }
     }

@@ -3,6 +3,7 @@ package net.jelly.sandworm_mod.event;
 import dev.architectury.registry.ReloadListenerRegistry;
 import mod.chloeprime.aaaparticles.client.loader.EffekAssetLoader;
 import net.jelly.sandworm_mod.SandwormMod;
+import net.jelly.sandworm_mod.entity.IK.worm.WormSegment;
 import net.jelly.sandworm_mod.registry.client.ParticleRegistry;
 import net.jelly.sandworm_mod.registry.common.WorldEventRegistry;
 import net.jelly.sandworm_mod.vfx.SonicBoomPostProcessor;
@@ -12,9 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -34,11 +33,11 @@ public class ClientEvents {
         public static void onCameraSetup(ViewportEvent event) {
             Player player = Minecraft.getInstance().player;
             if (player.getVehicle() != null) {
-                if (player.getVehicle() instanceof Boat) {
+                if (player.getVehicle() instanceof WormSegment) {
                     float scale = 1;
                     if (Minecraft.getInstance().options.getCameraType() == CameraType.THIRD_PERSON_BACK ||
                             Minecraft.getInstance().options.getCameraType() == CameraType.THIRD_PERSON_FRONT) {
-                        event.getCamera().move(-event.getCamera().getMaxZoom(scale * 5F), 0F, 0);
+                        event.getCamera().move(-event.getCamera().getMaxZoom(scale * 7.5F), 0F, 0);
                     }
                 }
             }
@@ -47,7 +46,7 @@ public class ClientEvents {
         @SubscribeEvent
         public static void onEntityMount(EntityMountEvent event) {
             System.out.println("mount");
-            if (event.getEntityBeingMounted() instanceof Boat && event.getEntityMounting() == Minecraft.getInstance().player) {
+            if (event.getEntityBeingMounted() instanceof WormSegment && event.getEntityMounting() == Minecraft.getInstance().player) {
                 if(event.isMounting()) Minecraft.getInstance().options.setCameraType(CameraType.THIRD_PERSON_BACK);
                 else Minecraft.getInstance().options.setCameraType(CameraType.FIRST_PERSON);
             }
