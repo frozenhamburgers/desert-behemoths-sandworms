@@ -6,4 +6,6 @@ public interface IPlayerMixinAccessor {
 
     boolean getGrappling();
     void setGrappling(boolean b);
+    void tickGrapplingTimer();
+    int getGrapplingTimer();
 }

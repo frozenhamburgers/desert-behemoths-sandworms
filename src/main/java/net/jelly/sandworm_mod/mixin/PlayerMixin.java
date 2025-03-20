@@ -20,13 +20,23 @@ public abstract class PlayerMixin implements IPlayerMixinAccessor {
      */
 
     private boolean grappling;
+    private int grapplingTimer = 0;
 
     public void setGrappling(boolean b) {
+        grapplingTimer = 60;
         grappling = b;
     }
 
     public boolean getGrappling() {
         return grappling;
+    }
+
+    public void tickGrapplingTimer() {
+        if(grapplingTimer > 0) grapplingTimer--;
+    }
+
+    public int getGrapplingTimer() {
+        return grapplingTimer;
     }
 
 }

@@ -111,7 +111,12 @@ public class ForgeEventHandler {
 
     @SubscribeEvent
     public static void playerTick(TickEvent.PlayerTickEvent event) {
-        if (!event.side.isClient() && event.player.onGround()) ((IPlayerMixinAccessor) event.player).setGrappling(false);
+        if (!event.side.isClient() && event.player.onGround()) {
+            ((IPlayerMixinAccessor) event.player).tickGrapplingTimer();
+            if(((IPlayerMixinAccessor) event.player).getGrapplingTimer() <= 0) {
+                ((IPlayerMixinAccessor) event.player).setGrappling(false);
+            }
+        }
     }
 
 }

@@ -199,6 +199,7 @@ public class WormChainEntity extends AbstractWormController {
 
     // returns
     private void wormAIBehavior() {
+        System.out.println(this.mountableTimer);
         // retarget if target entity is gone
         if(thumperTarget == null && (aggroTargetEntity == null || aggroTargetEntity.isRemoved() || aggroTargetEntity.isDeadOrDying() || !isDesertBiome(aggroTargetEntity))) {
             retarget(50);
@@ -209,6 +210,7 @@ public class WormChainEntity extends AbstractWormController {
             Vec3 targetedObjectPos = getTargetedObjectPos();
             if(targetedObjectPos == null) {
                 target = head.position().add(targetV);
+                System.out.println("no target! targetV:" + targetV);
                 return;
             }
             if (head.position().subtract(targetedObjectPos).horizontalDistance() > 50) {
@@ -327,7 +329,7 @@ public class WormChainEntity extends AbstractWormController {
 
             normal = v2.cross(v1).normalize();
         }
-        System.out.println("normal: " + normal);
+//        System.out.println("normal: " + normal);
 
         // gravity
         Vec3 gForce = new Vec3(0,-0.016,0);
@@ -548,7 +550,7 @@ public class WormChainEntity extends AbstractWormController {
         head.playSound(ModSounds.WORM_ROAR.get(), 10f, 1f);
         if((dmgTaken < totalHealth/3 && dmgTaken+dmg >= totalHealth/3) || (dmgTaken < 2*totalHealth/3 && dmgTaken+dmg >= 2*totalHealth/3)) {
             targetV = new Vec3(targetV.x*0.075, targetV.y+1.2, targetV.z*0.075);
-            mountableTimer = 120;
+            mountableTimer = 240;
             sonicBoom();
         }
         else targetV = new Vec3(targetV.x*0.2, targetV.y*0.2, targetV.z*0.2);

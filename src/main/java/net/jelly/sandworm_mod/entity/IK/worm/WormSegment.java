@@ -43,27 +43,29 @@ public class WormSegment extends AbstractIKSegment implements GeoEntity {
     @Override
     public void tick() {
         super.tick();
-        if(owner == null) owner = getOwner();
+        if (owner == null) owner = getOwner();
         this.lookAt(EntityAnchorArgument.Anchor.FEET, this.position().add(this.getDirectionVector()));
+        if (this.level().isClientSide()) return;
 
-        if(!this.level().isClientSide()) {
-            // collisions & deal damage & kb
-            List<Entity> collidingEntities = level().getEntities(this, this.getBoundingBox());
-            for (int i = 0; i < collidingEntities.size(); i++) {
-                if(collidingEntities.get(i) instanceof ServerPlayer) {
-                    if(((IPlayerMixinAccessor)collidingEntities.get(i)).getGrappling()) {
-                        if(owner.mountableTimer > 0) owner.mountPlayer((Player)collidingEntities.get(i));
-                        continue;
-                    }
+        // collisions & deal damage & kb
+        List<Entity> collidingEntities = level().getEntities(this, this.getBoundingBox());
+        for (int i = 0; i < collidingEntities.size(); i++) {
+            if (collidingEntities.get(i) instanceof ServerPlayer) {
+                Player player = (Player)(collidingEntities.get(i));
+                // player must be falling at a certain speed onto the worm to mount
+                if(owner.mountableTimer > 0 && player.getDeltaMovement().y < -1.0) {
+                    owner.mountPlayer(player);
+                    continue;
                 }
-                if (collidingEntities.get(i) instanceof LivingEntity) {
-                    LivingEntity target = (LivingEntity) (collidingEntities.get(i));
-                    if(target.hurtTime == 0) {
-                        Vec3 vec3 = (target.position().subtract(this.position())).normalize();
-                        target.hurt(dmgSource, (float)getDamage());
-                        Vec3 knockback = getKB();
-                        target.addDeltaMovement(new Vec3(vec3.x*knockback.x, vec3.y*knockback.y, vec3.z*knockback.z));
-                    }
+                if (((IPlayerMixinAccessor)player).getGrappling()) continue;
+            }
+            if (collidingEntities.get(i) instanceof LivingEntity) {
+                LivingEntity target = (LivingEntity) (collidingEntities.get(i));
+                if (target.hurtTime == 0) {
+                    Vec3 vec3 = (target.position().subtract(this.position())).normalize();
+                    target.hurt(dmgSource, (float) getDamage());
+                    Vec3 knockback = getKB();
+                    target.addDeltaMovement(new Vec3(vec3.x * knockback.x, vec3.y * knockback.y, vec3.z * knockback.z));
                 }
             }
         }
