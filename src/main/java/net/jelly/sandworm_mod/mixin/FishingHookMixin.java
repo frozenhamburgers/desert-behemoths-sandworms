@@ -24,16 +24,16 @@ public abstract class FishingHookMixin {
      */
     @Inject(method = "retrieve", at = @At("HEAD"), cancellable = true)
     private void retrieveHook(ItemStack pStack, CallbackInfoReturnable<Integer> cir) {
-        FishingHook self = (FishingHook)(Object)this;
-        if(self.level().isClientSide()) return;
-        Player player = self.getPlayerOwner();
-        Entity hooked = self.getHookedIn();
-        if (hooked != null) {
-            System.out.println(self.getHookedIn());
-            ((IPlayerMixinAccessor)player).setGrappling(true);
-            player.hurtMarked = true;
-            player.setDeltaMovement(hooked.position().subtract(player.position()).normalize().scale(Math.min(hooked.distanceTo(player)/3,4)));
-        }
+//        FishingHook self = (FishingHook)(Object)this;
+//        if(self.level().isClientSide()) return;
+//        Player player = self.getPlayerOwner();
+//        Entity hooked = self.getHookedIn();
+//        if (hooked != null) {
+//            System.out.println(self.getHookedIn());
+//            ((IPlayerMixinAccessor)player).setGrappling(true);
+//            player.hurtMarked = true;
+//            player.setDeltaMovement(hooked.position().subtract(player.position()).normalize().scale(Math.min(hooked.distanceTo(player)/3,4)));
+//        }
     }
 
 }

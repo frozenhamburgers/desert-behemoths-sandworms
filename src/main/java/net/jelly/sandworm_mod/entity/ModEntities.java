@@ -6,6 +6,7 @@ import net.jelly.sandworm_mod.entity.IK.worm.WormHeadSegment;
 import net.jelly.sandworm_mod.entity.IK.worm.WormSegment;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -41,6 +42,12 @@ public class ModEntities {
             EntityType.Builder.of(WormChainEntity::new, MobCategory.MISC)
                     .sized(0.5f,0.5f)
                     .build("worm_chain")
+    );
+
+    public static final RegistryObject<EntityType<WormHook>> WORM_HOOK = ENTITY_TYPES.register("worm_hook", () ->
+            EntityType.Builder.<WormHook>of(WormHook::new, MobCategory.MISC)
+                    .noSave().noSummon().sized(0.25F, 0.25F).clientTrackingRange(4).updateInterval(5)
+                    .build("worm_hook")
     );
 
     public static void register(IEventBus eventBus) {

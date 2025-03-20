@@ -66,6 +66,7 @@ public class WormChainEntity extends AbstractWormController {
     public boolean vulnerable = true;
     public int mountableTimer = 0;
     public boolean mounted = false;
+    private int dismountTimer = 0;
     Player rider;
 
     public WormChainEntity(EntityType<?> pEntityType, Level pLevel) {
@@ -288,6 +289,7 @@ public class WormChainEntity extends AbstractWormController {
         if(segments.get(segmentCount - 3).getPassengers().isEmpty()) {
             this.mounted = false;
             this.escaping = true;
+            return;
         }
 
         // SURFACE NORMAL CALCULATION
@@ -309,7 +311,7 @@ public class WormChainEntity extends AbstractWormController {
         Vec3 normal = new Vec3(0,0,0);
         boolean onSurface = false;
         for(int i=0; i<4; i++) {
-            if(!this.level().getBlockState(sampledPositions.get(i)).isAir()) {
+            if(this.level().getBlockState(sampledPositions.get(i)).isSuffocating(this.level(), sampledPositions.get(i))) {
                 onSurface = true;
                 break;
             }
@@ -347,6 +349,11 @@ public class WormChainEntity extends AbstractWormController {
             targetV = targetV.subtract(normal.scale(targetV.dot(normal))); // Remove downward normal component of velocity
         }
         target = head.position().add(targetV);
+
+        // dismount if leave biome for 10+ seconds
+        if(this.dismountTimer > 200 || this.escaping) this.segments.get(segmentCount - 3).getPassengers().get(0).dismountTo(head.position().x, head.position().y+5, head.position().z);
+        if(!isDesertBiome(head)) this.dismountTimer++;
+        else this.dismountTimer = 0;
     }
 
     @Override
@@ -534,7 +541,7 @@ public class WormChainEntity extends AbstractWormController {
     }
 
     public void blastHit(int dmg) {
-        if(!vulnerable || escaping) return;
+        if((!mounted && !vulnerable) || escaping) return;
         vulnerable = false;
         System.out.println(dmgTaken);
         int totalHealth = CommonConfigs.HEALTH.get();
@@ -547,7 +554,8 @@ public class WormChainEntity extends AbstractWormController {
         else targetV = new Vec3(targetV.x*0.2, targetV.y*0.2, targetV.z*0.2);
 
         dmgTaken+=dmg;
-        if(dmgTaken >= totalHealth) {
+        // if mounted, any source of damage causes a tooth to drop and the worm to escape
+        if(dmgTaken >= totalHealth || mounted) {
             sonicBoom();
             ItemEntity toothItem = new ItemEntity(this.level(), head.getX(), head.getY(), head.getZ(), new ItemStack(ModItems.WORM_TOOTH.get(), 1));
             this.level().addFreshEntity(toothItem);

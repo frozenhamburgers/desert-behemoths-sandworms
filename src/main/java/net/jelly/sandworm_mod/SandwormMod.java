@@ -7,6 +7,7 @@ import net.jelly.sandworm_mod.block.ModBlocks;
 import net.jelly.sandworm_mod.block.thumper.ThumperRenderer;
 import net.jelly.sandworm_mod.brewing.WormToothBrewing;
 import net.jelly.sandworm_mod.config.CommonConfigs;
+import net.jelly.sandworm_mod.entity.IK.WormHookRenderer;
 import net.jelly.sandworm_mod.entity.IK.worm.WormControllerRenderer;
 import net.jelly.sandworm_mod.entity.IK.worm.WormHeadSegmentRenderer;
 import net.jelly.sandworm_mod.entity.IK.worm.WormSegmentRenderer;
@@ -99,6 +100,7 @@ public class SandwormMod
             EntityRenderers.register(ModEntities.WORM_CHAIN.get(), WormControllerRenderer::new);
             EntityRenderers.register(ModEntities.WORM_HEAD_SEGMENT.get(), WormHeadSegmentRenderer::new);
             BlockEntityRenderers.register(ModBlockEntities.THUMPER_ENTITY.get(), ThumperRenderer::new);
+            EntityRenderers.register(ModEntities.WORM_HOOK.get(), WormHookRenderer::new);
         }
     }
 }
