@@ -7,16 +7,18 @@ import net.jelly.sandworm_mod.block.ModBlocks;
 import net.jelly.sandworm_mod.block.thumper.ThumperRenderer;
 import net.jelly.sandworm_mod.brewing.WormToothBrewing;
 import net.jelly.sandworm_mod.config.CommonConfigs;
-import net.jelly.sandworm_mod.entity.IK.WormHookRenderer;
+import net.jelly.sandworm_mod.entity.hook.WormHookRenderer;
 import net.jelly.sandworm_mod.entity.IK.worm.WormControllerRenderer;
 import net.jelly.sandworm_mod.entity.IK.worm.WormHeadSegmentRenderer;
 import net.jelly.sandworm_mod.entity.IK.worm.WormSegmentRenderer;
 import net.jelly.sandworm_mod.entity.ModEntities;
+import net.jelly.sandworm_mod.item.ModItemProperties;
 import net.jelly.sandworm_mod.item.ModItems;
 import net.jelly.sandworm_mod.sound.ModSounds;
 import net.jelly.sandworm_mod.registry.client.ParticleRegistry;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
@@ -101,6 +103,7 @@ public class SandwormMod
             EntityRenderers.register(ModEntities.WORM_HEAD_SEGMENT.get(), WormHeadSegmentRenderer::new);
             BlockEntityRenderers.register(ModBlockEntities.THUMPER_ENTITY.get(), ThumperRenderer::new);
             EntityRenderers.register(ModEntities.WORM_HOOK.get(), WormHookRenderer::new);
+            ModItemProperties.registerItemProperties();
         }
     }
 }

@@ -1,6 +1,6 @@
 package net.jelly.sandworm_mod.item;
 
-import net.jelly.sandworm_mod.entity.WormHook;
+import net.jelly.sandworm_mod.entity.hook.WormHook;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -10,20 +10,17 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.FishingRodItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class WormHookItem extends FishingRodItem {
+public class WormRodItem extends FishingRodItem {
 
-    public WormHookItem(Properties pProperties) {
+    public WormRodItem(Properties pProperties) {
         super(pProperties);
     }
 
@@ -48,6 +45,8 @@ public class WormHookItem extends FishingRodItem {
                 WormHook hook = new WormHook(pPlayer, pLevel);
                 pLevel.addFreshEntity(hook);
                 setHookUUID(itemstack, hook.getUUID());
+                System.out.println("adding fresh hook:");
+                System.out.println("WormHook EntityType: " + hook.getType());
             }
 
             pPlayer.awardStat(Stats.ITEM_USED.get(this));

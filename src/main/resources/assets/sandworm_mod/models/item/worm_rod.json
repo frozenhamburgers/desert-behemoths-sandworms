@@ -1,0 +1,14 @@
+{
+  "parent": "sandworm_mod:item/worm_rod_handheld",
+  "textures": {
+    "layer0": "sandworm_mod:item/worm_rod"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "cast": 1
+      },
+      "model": "sandworm_mod:item/worm_rod_cast"
+    }
+  ]
+}
