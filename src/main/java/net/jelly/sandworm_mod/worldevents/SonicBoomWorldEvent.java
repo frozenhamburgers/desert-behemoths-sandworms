@@ -10,6 +10,7 @@ import team.lodestar.lodestone.systems.worldevent.WorldEventInstance;
 
 public class SonicBoomWorldEvent extends WorldEventInstance {
     private Entity followEntity;
+    private int followEntityId = Integer.MIN_VALUE;
     public int lifetime = 0;
     public SonicBoomFx fx;
 
@@ -39,6 +40,11 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
     public void tick(Level level) {
         if(this.level == null) return;
 
+        if (followEntity == null && followEntityId != Integer.MIN_VALUE) {
+            followEntity = this.level.getEntity(followEntityId);
+            followEntityId = Integer.MIN_VALUE;
+        }
+
         if (followEntity == null) {
             this.end(level);
             return;
@@ -63,16 +69,15 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
                 fx.magnitude = lerp(maxMagnitude, 0, (float) lifetime / (in + sustain + out));
                 // fx.frequency = lerp(4, 0, (float) (lifetime-in) / out);
             }
-            if (lifetime >= in + sustain + out) {
+        }
+
+        if (lifetime >= in + sustain + out) {
+            if (level.isClientSide() && fx != null) {
                 fx.remove();
-                this.end(level);
-                return;
+                fx = null;
             }
-        } else {
-            if (lifetime >= in+sustain+out) {
-                this.end(level);
-                return;
-            }
+            this.end(level);
+            return;
         }
 
         lifetime++;
@@ -100,10 +105,7 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
     @Override
     public WorldEventInstance deserializeNBT(CompoundTag tag) {
         if (tag.contains("followEntityId")) {
-            int entityId = tag.getInt("followEntityId");
-            if (level != null) {
-                followEntity = level.getEntity(entityId);
-            }
+            followEntityId = tag.getInt("followEntityId");
         }
         lifetime = tag.getInt("lifetime");
         return super.deserializeNBT(tag);
