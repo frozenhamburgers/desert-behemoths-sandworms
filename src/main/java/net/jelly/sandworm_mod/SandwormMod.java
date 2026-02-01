@@ -37,7 +37,7 @@ public class SandwormMod
     // Define mod id i n a common place for everything to reference
     public static final String MODID = "sandworm_mod";
     // Directly reference a slf4j logger
-    public static final Logger LOGGER = LogUtils.getLogger();
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     public SandwormMod()
     {

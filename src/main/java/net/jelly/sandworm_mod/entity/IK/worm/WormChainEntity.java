@@ -462,7 +462,6 @@ public class WormChainEntity extends KinematicChainEntity {
 
     public void blastHit() {
         targetV = new Vec3(targetV.x*0.075, targetV.y+1.2, targetV.z*0.075);
-        SandwormMod.LOGGER.info("worm hit by explosion, targetV: {}, explodedTimes: {}", targetV, explodedTimes);
         sonicBoom();
         explodedTimes++;
         if(explodedTimes >= CommonConfigs.HEALTH.get()) {
@@ -502,14 +501,11 @@ public class WormChainEntity extends KinematicChainEntity {
     }
 
     private void sonicBoom() {
-        SandwormMod.LOGGER.info("worm sonic boom");
-        if(head == null) {
-            return;
-        }
-        SonicBoomWorldEvent sonicBoomEvent = new SonicBoomWorldEvent().setFollowEntity(this.head);
-        sonicBoomEvent.start(this.level());
-        sonicBoomEvent.setDirty();
-        WorldEventHandler.addWorldEvent(this.level(), sonicBoomEvent);
+        if(head == null) return;
+        SonicBoomWorldEvent breachEvent = new SonicBoomWorldEvent().spawnRipple(this.head);
+        breachEvent.start(this.level());
+        breachEvent.setDirty();
+        WorldEventHandler.addWorldEvent(this.level(), breachEvent);
 
         List<Player> players = (List<Player>) this.level().players();
         // screenshake (packets sent per player)
