@@ -29,7 +29,7 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
     private static float maxFrequency = 160;
 
     public SonicBoomWorldEvent() {
-        super(WorldEventRegistry.WORM_BREACH);
+        super(WorldEventRegistry.SONIC_BOOM);
     }
 
     public SonicBoomWorldEvent spawnRipple(Entity followEntity) {
@@ -44,12 +44,14 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
 
     @Override
     public void tick(Level level) {
+        LOGGER.info("Ticking Sonic Boom World Event, followEntityId: {}, level: {}", followEntityId, level.isClientSide);
         if(this.level == null) {
             LOGGER.info("Level is null, discarding Sonic Boom World Event");
             return;
         }
 
         if (level.isClientSide()) {
+            LOGGER.info("followEntity: {}, followEntityId: {}", followEntity, followEntityId);
             if (followEntity == null && followEntityId != Integer.MIN_VALUE) {
                 LOGGER.info("Follow entity is null, trying to get it from id: {}", followEntityId);
                 followEntity = this.level.getEntity(followEntityId);
