@@ -1,6 +1,5 @@
 package net.jelly.sandworm_mod.entity.IK.worm;
 
-import com.mojang.logging.LogUtils;
 import mod.chloeprime.aaaparticles.api.common.AAALevel;
 import mod.chloeprime.aaaparticles.api.common.ParticleEmitterInfo;
 import net.jelly.sandworm_mod.SandwormMod;
@@ -33,7 +32,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
-import org.slf4j.Logger;
 import team.lodestar.lodestone.handlers.WorldEventHandler;
 import team.lodestar.lodestone.network.screenshake.PositionedScreenshakePacket;
 import team.lodestar.lodestone.registry.common.LodestonePacketRegistry;
@@ -45,8 +43,6 @@ import java.util.UUID;
 import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 
 public class WormChainEntity extends KinematicChainEntity {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
     private static float SPEED_SCALE = 1.3f;
     private boolean breaching = false;
     private int soundFrequencyCount = 0;
@@ -466,7 +462,7 @@ public class WormChainEntity extends KinematicChainEntity {
 
     public void blastHit() {
         targetV = new Vec3(targetV.x*0.075, targetV.y+1.2, targetV.z*0.075);
-        LOGGER.info("worm hit by explosion, targetV: {}, explodedTimes: {}", targetV, explodedTimes);
+        SandwormMod.LOGGER.info("worm hit by explosion, targetV: {}, explodedTimes: {}", targetV, explodedTimes);
         sonicBoom();
         explodedTimes++;
         if(explodedTimes >= CommonConfigs.HEALTH.get()) {
@@ -506,15 +502,14 @@ public class WormChainEntity extends KinematicChainEntity {
     }
 
     private void sonicBoom() {
-        LOGGER.info("worm sonic boom");
+        SandwormMod.LOGGER.info("worm sonic boom");
         if(head == null) {
-            LOGGER.info("worm sonic boom, no head");
             return;
         }
-        SonicBoomWorldEvent breachEvent = new SonicBoomWorldEvent().spawnRipple(this.head);
-        breachEvent.start(this.level());
-        breachEvent.setDirty();
-        WorldEventHandler.addWorldEvent(this.level(), breachEvent);
+        SonicBoomWorldEvent sonicBoomEvent = new SonicBoomWorldEvent().setFollowEntity(this.head);
+        sonicBoomEvent.start(this.level());
+        sonicBoomEvent.setDirty();
+        WorldEventHandler.addWorldEvent(this.level(), sonicBoomEvent);
 
         List<Player> players = (List<Player>) this.level().players();
         // screenshake (packets sent per player)

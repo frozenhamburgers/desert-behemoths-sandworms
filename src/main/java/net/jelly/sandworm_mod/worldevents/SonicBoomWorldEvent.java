@@ -1,18 +1,16 @@
 package net.jelly.sandworm_mod.worldevents;
 
-import com.mojang.logging.LogUtils;
+import net.jelly.sandworm_mod.SandwormMod;
 import net.jelly.sandworm_mod.registry.common.WorldEventRegistry;
 import net.jelly.sandworm_mod.vfx.SonicBoomFx;
 import net.jelly.sandworm_mod.vfx.SonicBoomPostProcessor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import org.slf4j.Logger;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import team.lodestar.lodestone.systems.worldevent.WorldEventInstance;
 
 public class SonicBoomWorldEvent extends WorldEventInstance {
-
-    private static final Logger LOGGER = LogUtils.getLogger();
 
     private Entity followEntity;
     private int followEntityId = Integer.MIN_VALUE;
@@ -32,7 +30,7 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
         super(WorldEventRegistry.SONIC_BOOM);
     }
 
-    public SonicBoomWorldEvent spawnRipple(Entity followEntity) {
+    public SonicBoomWorldEvent setFollowEntity(Entity followEntity) {
         this.followEntity = followEntity;
         if(followEntity == null) {
             this.discarded = true;
@@ -44,22 +42,19 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
 
     @Override
     public void tick(Level level) {
-        LOGGER.info("Ticking Sonic Boom World Event, followEntityId: {}, level: {}", followEntityId, level.isClientSide);
         if(this.level == null) {
-            LOGGER.info("Level is null, discarding Sonic Boom World Event");
             return;
         }
 
-        if (level.isClientSide()) {
-            LOGGER.info("followEntity: {}, followEntityId: {}", followEntity, followEntityId);
+        if (FMLEnvironment.dist.isClient()) {
             if (followEntity == null && followEntityId != Integer.MIN_VALUE) {
-                LOGGER.info("Follow entity is null, trying to get it from id: {}", followEntityId);
+                SandwormMod.LOGGER.info("Follow entity is null, trying to get it from id: {}", followEntityId);
                 followEntity = this.level.getEntity(followEntityId);
                 followEntityId = Integer.MIN_VALUE;
             }
 
             if (fx == null) {
-                LOGGER.info("Creating Sonic Boom FX instance");
+                SandwormMod.LOGGER.info("Creating Sonic Boom FX instance");
                 fx = new SonicBoomFx(followEntity.position().toVector3f(), 0, 0, 0,0);
                 SonicBoomPostProcessor.INSTANCE.addFxInstance(fx);
                 SonicBoomPostProcessor.INSTANCE.setActive(true);
@@ -80,11 +75,12 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
         }
 
         if (lifetime >= in + sustain + out) {
-            LOGGER.info("Sonic Boom World Event ended");
-            if (level.isClientSide() && fx != null) {
+            if (FMLEnvironment.dist.isClient() && fx != null) {
+                SandwormMod.LOGGER.info("Removing Sonic Boom FX instance");
                 fx.remove();
                 fx = null;
             }
+            SandwormMod.LOGGER.info("Sonic Boom World Event ended");
             this.end(level);
             return;
         }
@@ -104,7 +100,7 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
 
     @Override
     public CompoundTag serializeNBT(CompoundTag tag) {
-        LOGGER.info("Serializing Sonic Boom World Event, followEntity: {}", followEntity);
+        SandwormMod.LOGGER.info("Serializing Sonic Boom World Event, followEntity: {}", followEntity);
         if (followEntity != null) {
             tag.putInt("followEntityId", followEntity.getId());
         }
@@ -114,7 +110,9 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
 
     @Override
     public WorldEventInstance deserializeNBT(CompoundTag tag) {
-        LOGGER.info("Deserializing Sonic Boom World Event, followEntityId: {}", followEntityId);
+        SandwormMod.LOGGER.info("Deserializing Sonic Boom World Event on {}, followEntityId: {}",
+            FMLEnvironment.dist.isClient() ? "CLIENT" : "SERVER",
+            tag.contains("followEntityId") ? tag.getInt("followEntityId") : "none");
         if (tag.contains("followEntityId")) {
             followEntityId = tag.getInt("followEntityId");
         }
