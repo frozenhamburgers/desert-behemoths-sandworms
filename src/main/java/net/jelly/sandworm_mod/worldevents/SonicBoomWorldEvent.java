@@ -1,15 +1,22 @@
 package net.jelly.sandworm_mod.worldevents;
 
+import com.mojang.logging.LogUtils;
 import net.jelly.sandworm_mod.registry.common.WorldEventRegistry;
 import net.jelly.sandworm_mod.vfx.SonicBoomFx;
 import net.jelly.sandworm_mod.vfx.SonicBoomPostProcessor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+import org.slf4j.Logger;
 import team.lodestar.lodestone.systems.worldevent.WorldEventInstance;
 
 public class SonicBoomWorldEvent extends WorldEventInstance {
+
+    public static final Logger LOGGER = LogUtils.getLogger();
+
     private Entity followEntity;
+    private int followEntityId = Integer.MIN_VALUE;
     public int lifetime = 0;
     public SonicBoomFx fx;
 
@@ -23,7 +30,7 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
     private static float maxFrequency = 160;
 
     public SonicBoomWorldEvent() {
-        super(WorldEventRegistry.WORM_BREACH);
+        super(WorldEventRegistry.SONIC_BOOM);
     }
 
     public SonicBoomWorldEvent spawnRipple(Entity followEntity) {
@@ -32,19 +39,22 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
             this.discarded = true;
             return this;
         }
+        this.followEntityId = followEntity.getId();
         return this;
     }
 
     @Override
     public void tick(Level level) {
-        if(this.level == null) return;
-
-        if (followEntity == null) {
-            this.end(level);
+        if(this.level == null) {
             return;
         }
 
-        if (level.isClientSide()) {
+        if (FMLEnvironment.dist.isClient()) {
+            if (followEntity == null && followEntityId != Integer.MIN_VALUE) {
+                followEntity = this.level.getEntity(followEntityId);
+                followEntityId = Integer.MIN_VALUE;
+            }
+
             if (fx == null) {
                 fx = new SonicBoomFx(followEntity.position().toVector3f(), 0, 0, 0,0);
                 SonicBoomPostProcessor.INSTANCE.addFxInstance(fx);
@@ -63,16 +73,15 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
                 fx.magnitude = lerp(maxMagnitude, 0, (float) lifetime / (in + sustain + out));
                 // fx.frequency = lerp(4, 0, (float) (lifetime-in) / out);
             }
-            if (lifetime >= in + sustain + out) {
+        }
+
+        if (lifetime >= in + sustain + out) {
+            if (FMLEnvironment.dist.isClient() && fx != null) {
                 fx.remove();
-                this.end(level);
-                return;
+                fx = null;
             }
-        } else {
-            if (lifetime >= in+sustain+out) {
-                this.end(level);
-                return;
-            }
+            this.end(level);
+            return;
         }
 
         lifetime++;
@@ -90,6 +99,7 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
 
     @Override
     public CompoundTag serializeNBT(CompoundTag tag) {
+        LOGGER.info("Serializing Sonic Boom World Event, followEntity: {}", followEntity);
         if (followEntity != null) {
             tag.putInt("followEntityId", followEntity.getId());
         }
@@ -99,11 +109,11 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
 
     @Override
     public WorldEventInstance deserializeNBT(CompoundTag tag) {
+        LOGGER.info("Deserializing Sonic Boom World Event on {}, followEntityId: {}",
+            FMLEnvironment.dist.isClient() ? "CLIENT" : "SERVER",
+            tag.contains("followEntityId") ? tag.getInt("followEntityId") : "none");
         if (tag.contains("followEntityId")) {
-            int entityId = tag.getInt("followEntityId");
-            if (level != null) {
-                followEntity = level.getEntity(entityId);
-            }
+            followEntityId = tag.getInt("followEntityId");
         }
         lifetime = tag.getInt("lifetime");
         return super.deserializeNBT(tag);
