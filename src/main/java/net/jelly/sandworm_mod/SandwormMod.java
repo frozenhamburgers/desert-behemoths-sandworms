@@ -6,7 +6,7 @@ import net.jelly.sandworm_mod.block.ModBlockEntities;
 import net.jelly.sandworm_mod.block.ModBlocks;
 import net.jelly.sandworm_mod.block.thumper.ThumperRenderer;
 import net.jelly.sandworm_mod.brewing.WormToothBrewing;
-import net.jelly.sandworm_mod.config.CommonConfigs;
+import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.entity.IK.KinematicChainRenderer;
 import net.jelly.sandworm_mod.entity.IK.worm.WormHeadSegmentRenderer;
 import net.jelly.sandworm_mod.entity.IK.worm.WormSegmentRenderer;
@@ -64,7 +64,7 @@ public class SandwormMod
         ParticleRegistry.register(modEventBus);
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, CommonConfigs.SPEC, "sandwormmod-server.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfigs.SPEC, "sandwormmod-server.toml");
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);

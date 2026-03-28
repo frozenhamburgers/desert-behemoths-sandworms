@@ -4,7 +4,7 @@ import mod.chloeprime.aaaparticles.api.common.AAALevel;
 import mod.chloeprime.aaaparticles.api.common.ParticleEmitterInfo;
 import net.jelly.sandworm_mod.SandwormMod;
 import net.jelly.sandworm_mod.block.ModBlockEntities;
-import net.jelly.sandworm_mod.config.CommonConfigs;
+import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.entity.IK.ChainSegment;
 import net.jelly.sandworm_mod.entity.IK.KinematicChainEntity;
 import net.jelly.sandworm_mod.entity.ModEntities;
@@ -294,7 +294,7 @@ public class WormChainEntity extends KinematicChainEntity {
                 if(!(aggroTargetEntity instanceof Player)) despawnTimer++;
                 else if (((Player) aggroTargetEntity).isCreative()) despawnTimer++;
                 else despawnTimer = 0;
-                if(despawnTimer >= CommonConfigs.DESPAWN_TIMER.get()*20) escaping = true;
+                if(despawnTimer >= ServerConfigs.DESPAWN_TIMER.get()*20) escaping = true;
             }
 
             if(!segments.isEmpty()) {
@@ -464,7 +464,7 @@ public class WormChainEntity extends KinematicChainEntity {
         targetV = new Vec3(targetV.x*0.075, targetV.y+1.2, targetV.z*0.075);
         sonicBoom();
         explodedTimes++;
-        if(explodedTimes >= CommonConfigs.HEALTH.get()) {
+        if(explodedTimes >= ServerConfigs.HEALTH.get()) {
             ItemEntity toothItem = new ItemEntity(this.level(), head.getX(), head.getY(), head.getZ(), new ItemStack(ModItems.WORM_TOOTH.get(), 1));
             this.level().addFreshEntity(toothItem);
             escaping = true;

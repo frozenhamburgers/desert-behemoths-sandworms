@@ -3,7 +3,7 @@ package net.jelly.sandworm_mod.helper;
 import com.mojang.logging.LogUtils;
 import net.jelly.sandworm_mod.advancements.AdvancementTriggerRegistry;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSignProvider;
-import net.jelly.sandworm_mod.config.CommonConfigs;
+import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.entity.ModEntities;
 import net.jelly.sandworm_mod.sound.ModSounds;
@@ -15,7 +15,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
@@ -97,7 +96,7 @@ public class WarningSpawnHelper {
         LOGGER.info("Sandworm triggered by {}!", player.getDisplayName().getString());
 
         // Send spawn warning to all nearby players if enabled
-        if (CommonConfigs.ENABLE_WARNING_MESSAGES.get()) {
+        if (ServerConfigs.ENABLE_WARNING_MESSAGES.get()) {
             Component spawnMessage = Component.translatable("msg.sandworm_mod.spawn");
             List<Player> nearbyPlayers = player.level().getNearbyPlayers(TargetingConditions.forNonCombat(), null,
                     new AABB(player.position().add(200, 500, 200), player.position().subtract(200, 500, 200)));

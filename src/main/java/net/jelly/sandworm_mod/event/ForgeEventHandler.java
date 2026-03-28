@@ -3,7 +3,7 @@ package net.jelly.sandworm_mod.event;
 import net.jelly.sandworm_mod.SandwormMod;
 import net.jelly.sandworm_mod.advancements.AdvancementTriggerRegistry;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSignProvider;
-import net.jelly.sandworm_mod.config.CommonConfigs;
+import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.entity.IK.worm.WormHeadSegment;
 import net.jelly.sandworm_mod.sound.ModSounds;
@@ -61,7 +61,7 @@ public class ForgeEventHandler {
             }
             if(sourcePlayer instanceof Player) {
                 AdvancementTriggerRegistry.FIRST_BLAST.trigger((ServerPlayer) sourcePlayer);
-                if (wormChain.explodedTimes >= CommonConfigs.HEALTH.get()) AdvancementTriggerRegistry.SANDWORM_FLEE.trigger((ServerPlayer) sourcePlayer);
+                if (wormChain.explodedTimes >= ServerConfigs.HEALTH.get()) AdvancementTriggerRegistry.SANDWORM_FLEE.trigger((ServerPlayer) sourcePlayer);
             }
         });
     }

@@ -1,6 +1,6 @@
 package net.jelly.sandworm_mod.entity.IK.worm;
 
-import net.jelly.sandworm_mod.config.CommonConfigs;
+import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.entity.IK.ChainSegment;
 import net.jelly.sandworm_mod.registry.common.DamageTypesRegistry;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
@@ -69,7 +69,7 @@ public class WormSegment extends ChainSegment implements GeoEntity {
 
     }
 
-    protected double getDamage() { return (10.0f * CommonConfigs.DAMAGE_SCALE.get()); }
+    protected double getDamage() { return (10.0f * ServerConfigs.DAMAGE_SCALE.get()); }
     protected Vec3 getKB() {return new Vec3(3,2,3); }
 
     @Override

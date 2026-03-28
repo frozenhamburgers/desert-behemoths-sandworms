@@ -1,7 +1,7 @@
 package net.jelly.sandworm_mod.block;
 
 import net.jelly.sandworm_mod.advancements.AdvancementTriggerRegistry;
-import net.jelly.sandworm_mod.config.CommonConfigs;
+import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.sound.ModSounds;
 import net.minecraft.core.BlockPos;
@@ -97,13 +97,13 @@ public class ThumperBlockEntity extends BlockEntity implements GeoBlockEntity {
             return;
         }
 
-        if(e.thumping && e.wormSign == CommonConfigs.SPAWNWORM_WORMSIGN.get()/20) {
+        if(e.thumping && e.wormSign == ServerConfigs.SPAWNWORM_WORMSIGN.get()/20) {
             // send warning & put on cooldown
             e.pauseTicks = 500;
             e.wormSign++;
             thumperWarning(level, blockPos.getCenter());
         }
-        else if(e.wormSign >= CommonConfigs.SPAWNWORM_WORMSIGN.get()/10) {
+        else if(e.wormSign >= ServerConfigs.SPAWNWORM_WORMSIGN.get()/10) {
             e.wormSign = 0;
             e.pauseTicks = 500;
             spawnWormThumper(level, blockPos);

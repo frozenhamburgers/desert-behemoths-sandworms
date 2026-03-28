@@ -4,7 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.jelly.sandworm_mod.SandwormMod;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSign;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSignProvider;
-import net.jelly.sandworm_mod.config.CommonConfigs;
+import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.sound.ModSounds;
 import net.minecraft.core.BlockPos;
@@ -33,7 +33,7 @@ public class WormSignHandler {
     // WORMSIGN
     @SubscribeEvent
     public static void tickWS(TickEvent.PlayerTickEvent event) {
-        int spawnWorm = CommonConfigs.SPAWNWORM_WORMSIGN.get();
+        int spawnWorm = ServerConfigs.SPAWNWORM_WORMSIGN.get();
         if(event.side == LogicalSide.CLIENT) return;
         Player player = event.player;
 
@@ -54,7 +54,7 @@ public class WormSignHandler {
                 ws.setStageTimer(0);
                 ws.subWS(2*spawnWorm);
                 ws.setMultiplier(0);
-                ws.setRespawnTimer(CommonConfigs.RESPAWN_DURATION.get()*40);
+                ws.setRespawnTimer(ServerConfigs.RESPAWN_DURATION.get()*40);
             });
             return;
         }
@@ -122,19 +122,19 @@ public class WormSignHandler {
 
 
     private static void incrementWormSign(int add, Player player, WormSign ws) {
-        int spawnWorm = CommonConfigs.SPAWNWORM_WORMSIGN.get();
+        int spawnWorm = ServerConfigs.SPAWNWORM_WORMSIGN.get();
         int wsAdded = ws.getWS() + add;
         if (ws.getWS() < spawnWorm / 2 && (wsAdded) >= spawnWorm / 2) {
             LOGGER.info("Sandworm stage 1: {}/{}", wsAdded, spawnWorm);
             warningScreenshake(player, 0.5, ModSounds.WORM_WARNING_1.get(), ws.getStage(), ws.getWS(),
-                    CommonConfigs.ENABLE_WARNING_MESSAGES.get() ? Component.translatable("msg.sandworm_mod.stage_1") : null);
+                    ServerConfigs.ENABLE_WARNING_MESSAGES.get() ? Component.translatable("msg.sandworm_mod.stage_1") : null);
             ws.setStage(1);
             ws.setStageTimer(600);
             ws.setSignTimer();
         } else if (ws.getWS() < spawnWorm * 0.8 && (wsAdded) >= spawnWorm * 0.8) {
             LOGGER.info("Sandworm stage 2: {}/{}", wsAdded, spawnWorm);
             warningScreenshake(player, 0.6, ModSounds.WORM_WARNING_2.get(), ws.getStage(), ws.getWS(),
-                    CommonConfigs.ENABLE_WARNING_MESSAGES.get() ? Component.translatable("msg.sandworm_mod.stage_2") : null);
+                    ServerConfigs.ENABLE_WARNING_MESSAGES.get() ? Component.translatable("msg.sandworm_mod.stage_2") : null);
             ws.setStage(2);
             ws.setStageTimer(600);
             ws.setSignTimer();
@@ -143,7 +143,7 @@ public class WormSignHandler {
     }
 
     private static void decrementWormSign(int decrement, WormSign ws) {
-        int spawnWorm = CommonConfigs.SPAWNWORM_WORMSIGN.get();
+        int spawnWorm = ServerConfigs.SPAWNWORM_WORMSIGN.get();
         if(ws.getStage() == 0) {
             ws.subWS(decrement);
             ws.setStageTimer(0);
@@ -178,7 +178,7 @@ public class WormSignHandler {
     // Returns true only if vehicle is in whitelist AND not in blacklist
     private static boolean isVehicleAllowed(Entity vehicle) {
         String vehicleId = ForgeRegistries.ENTITY_TYPES.getKey(vehicle.getType()).toString();
-        return CommonConfigs.isVehicleAllowed(vehicleId);
+        return ServerConfigs.isVehicleAllowed(vehicleId);
     }
 
     // Handle wormsign triggering for vehicles
@@ -194,7 +194,7 @@ public class WormSignHandler {
         }
 
         // Increment wormsign using configured multiplier
-        double multiplier = CommonConfigs.VEHICLE_TRIGGER_MULTIPLIER.get();
+        double multiplier = ServerConfigs.VEHICLE_TRIGGER_MULTIPLIER.get();
         incrementWormSign((int) multiplier, player, ws);
     }
 }

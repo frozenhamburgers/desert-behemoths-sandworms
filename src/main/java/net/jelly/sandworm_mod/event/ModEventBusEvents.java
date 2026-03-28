@@ -2,7 +2,7 @@ package net.jelly.sandworm_mod.event;
 
 import net.jelly.sandworm_mod.SandwormMod;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSign;
-import net.jelly.sandworm_mod.config.CommonConfigs;
+import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.item.ModItems;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
@@ -41,6 +41,6 @@ public class ModEventBusEvents {
 
     @SubscribeEvent
     public static void onConfigEvent(ModConfigEvent event) {
-        CommonConfigs.reloadVehicleConfig();
+        ServerConfigs.reloadVehicleConfig();
     }
 }
