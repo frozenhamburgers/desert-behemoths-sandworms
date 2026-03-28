@@ -130,14 +130,14 @@ public class WormSignHandler {
         if (ws.getWS() < spawnWorm / 2 && (wsAdded) >= spawnWorm / 2) {
             LOGGER.info("Sandworm stage 1: {}/{}", wsAdded, spawnWorm);
             warningScreenshake(player, 0.5, ModSounds.WORM_WARNING_1.get(), ws.getStage(), ws.getWS(),
-                    Component.translatable("msg.sandworm_mod.stage_1"));
+                    CommonConfigs.ENABLE_WARNING_MESSAGES.get() ? Component.translatable("msg.sandworm_mod.stage_1") : null);
             ws.setStage(1);
             ws.setStageTimer(600);
             ws.setSignTimer();
         } else if (ws.getWS() < spawnWorm * 0.8 && (wsAdded) >= spawnWorm * 0.8) {
             LOGGER.info("Sandworm stage 2: {}/{}", wsAdded, spawnWorm);
             warningScreenshake(player, 0.6, ModSounds.WORM_WARNING_2.get(), ws.getStage(), ws.getWS(),
-                    Component.translatable("msg.sandworm_mod.stage_2"));
+                    CommonConfigs.ENABLE_WARNING_MESSAGES.get() ? Component.translatable("msg.sandworm_mod.stage_2") : null);
             ws.setStage(2);
             ws.setStageTimer(600);
             ws.setSignTimer();

@@ -15,6 +15,7 @@ public class CommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<Double> DAMAGE_SCALE;
     public static final ForgeConfigSpec.ConfigValue<Double> HEAD_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Boolean> DEFAULT_SPAWNING;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_WARNING_MESSAGES;
 
     // Vehicle trigger configs
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_VEHICLE_TRIGGERS;
@@ -53,6 +54,9 @@ public class CommonConfigs {
                 "  ]\n" +
                 "}")
                         .define("Default Spawning", true);
+
+        ENABLE_WARNING_MESSAGES = BUILDER.comment("Enable warning messages when sandworm is approaching (messages to nearby players)")
+                .define("Enable Warning Messages", false);
 
         // Vehicle trigger configurations
         ENABLE_VEHICLE_TRIGGERS = BUILDER.comment("Enable sandworm spawning when players are in vehicles")

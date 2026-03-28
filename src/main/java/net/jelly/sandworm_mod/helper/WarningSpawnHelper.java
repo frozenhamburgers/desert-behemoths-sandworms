@@ -2,6 +2,7 @@ package net.jelly.sandworm_mod.helper;
 
 import net.jelly.sandworm_mod.advancements.AdvancementTriggerRegistry;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSignProvider;
+import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.entity.ModEntities;
 import net.jelly.sandworm_mod.sound.ModSounds;
@@ -90,15 +91,17 @@ public class WarningSpawnHelper {
         player.level().addFreshEntity(sandWorm);
         sandWorm.playSound(ModSounds.WORM_SPAWN.get(), 100, 1);
 
-        // Send spawn warning to all nearby players
-        Component spawnMessage = Component.translatable("msg.sandworm_mod.spawn");
-        List<Player> nearbyPlayers = player.level().getNearbyPlayers(TargetingConditions.forNonCombat(), null,
-                new AABB(player.position().add(200, 500, 200), player.position().subtract(200, 500, 200)));
-        nearbyPlayers.forEach(p -> {
-            if (p instanceof ServerPlayer serverPlayer) {
-                serverPlayer.sendSystemMessage(spawnMessage, false);
-            }
-        });
+        // Send spawn warning to all nearby players if enabled
+        if (CommonConfigs.ENABLE_WARNING_MESSAGES.get()) {
+            Component spawnMessage = Component.translatable("msg.sandworm_mod.spawn");
+            List<Player> nearbyPlayers = player.level().getNearbyPlayers(TargetingConditions.forNonCombat(), null,
+                    new AABB(player.position().add(200, 500, 200), player.position().subtract(200, 500, 200)));
+            nearbyPlayers.forEach(p -> {
+                if (p instanceof ServerPlayer serverPlayer) {
+                    serverPlayer.sendSystemMessage(spawnMessage, false);
+                }
+            });
+        }
 
         AdvancementTriggerRegistry.SHAI_HULUD.trigger((ServerPlayer) player);
     }
