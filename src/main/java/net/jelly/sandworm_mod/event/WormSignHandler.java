@@ -18,6 +18,7 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 import static net.jelly.sandworm_mod.helper.WarningSpawnHelper.spawnWorm;
@@ -164,6 +165,10 @@ public class WormSignHandler {
         return entity.level().getBlockState(below).isSolid();
     }
 
+    // Entity registry helper
+    private static String getEntityId(Entity entity) {
+        return ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString();
+    }
 
 
 }
