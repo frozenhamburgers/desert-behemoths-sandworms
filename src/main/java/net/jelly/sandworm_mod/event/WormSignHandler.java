@@ -126,15 +126,18 @@ public class WormSignHandler {
 
     private static void incrementWormSign(int add, Player player, WormSign ws) {
         int spawnWorm = CommonConfigs.SPAWNWORM_WORMSIGN.get();
-        if (ws.getWS() < spawnWorm / 2 && (ws.getWS() + add) >= spawnWorm / 2) {
+        int wsAdded = ws.getWS() + add;
+        if (ws.getWS() < spawnWorm / 2 && (wsAdded) >= spawnWorm / 2) {
+            LOGGER.info("Sandworm stage 1: {}/{}", wsAdded, spawnWorm);
             warningScreenshake(player, 0.5, ModSounds.WORM_WARNING_1.get(), ws.getStage(), ws.getWS(),
-                    Component.translatable("msg.sandworm_mod.stage_0"));
+                    Component.translatable("msg.sandworm_mod.stage_1"));
             ws.setStage(1);
             ws.setStageTimer(600);
             ws.setSignTimer();
-        } else if (ws.getWS() < spawnWorm * 0.8 && (ws.getWS() + add) >= spawnWorm * 0.8) {
+        } else if (ws.getWS() < spawnWorm * 0.8 && (wsAdded) >= spawnWorm * 0.8) {
+            LOGGER.info("Sandworm stage 2: {}/{}", wsAdded, spawnWorm);
             warningScreenshake(player, 0.6, ModSounds.WORM_WARNING_2.get(), ws.getStage(), ws.getWS(),
-                    Component.translatable("msg.sandworm_mod.stage_1"));
+                    Component.translatable("msg.sandworm_mod.stage_2"));
             ws.setStage(2);
             ws.setStageTimer(600);
             ws.setSignTimer();
@@ -190,7 +193,6 @@ public class WormSignHandler {
         List<? extends String> whitelist = CommonConfigs.VEHICLE_WHITELIST.get();
         List<? extends String> blacklist = CommonConfigs.VEHICLE_BLACKLIST.get();
 
-        LOGGER.info("vehicle: {}, whitelist:{}, blacklist: {}", vehicleId, whitelist, blacklist);
         // Must be in whitelist AND NOT be in blacklist
         return whitelist.contains(vehicleId) && !blacklist.contains(vehicleId);
     }
@@ -211,6 +213,4 @@ public class WormSignHandler {
         double multiplier = CommonConfigs.VEHICLE_TRIGGER_MULTIPLIER.get();
         incrementWormSign((int) multiplier, player, ws);
     }
-
-
 }

@@ -1,0 +1,11 @@
+{
+  "block.sandworm_mod.thumper": "サンダー",
+  "death.attack.worm": "%1$sは丸呑みにされた",
+  "entity.sandworm_mod.worm_chain": "サンドワーム",
+  "entity.sandworm_mod.worm_head_segment": "サンドワームの頭",
+  "entity.sandworm_mod.worm_segment": "サンドワームの体",
+  "item.sandworm_mod.sandworm_tooth": "サンドワームの歯",
+  "msg.sandworm_mod.stage_1": "§eサンドワームがあなたを感じている...",
+  "msg.sandworm_mod.stage_2": "§cサンドワームがまもなく目覚める！",
+  "msg.sandworm_mod.spawn": "§4来た！！！"
+}

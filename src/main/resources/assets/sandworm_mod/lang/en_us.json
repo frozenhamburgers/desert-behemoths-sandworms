@@ -1,12 +1,11 @@
 {
-  "death.attack.worm": "%1$s was swallowed whole",
-  "item.sandworm_mod.sandworm_tooth": "Sandworm Tooth",
   "block.sandworm_mod.thumper": "Thumper",
-
+  "death.attack.worm": "%1$s was swallowed whole",
   "entity.sandworm_mod.worm_chain": "Sandworm",
   "entity.sandworm_mod.worm_head_segment": "Sandworm Head",
   "entity.sandworm_mod.worm_segment": "Sandworm Body",
-
-  "msg.sandworm_mod.stage_0": "§eSandworm feels you...",
-  "msg.sandworm_mod.stage_1": "§cSandworm is awaken..."
+  "item.sandworm_mod.sandworm_tooth": "Sandworm Tooth",
+  "msg.sandworm_mod.stage_1": "§eThe sandworm feels you...",
+  "msg.sandworm_mod.stage_2": "§cThe sandworm is awakening soon!",
+  "msg.sandworm_mod.spawn": "§4IT'S COMING!!!"
 }

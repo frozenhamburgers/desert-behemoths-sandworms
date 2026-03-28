@@ -89,6 +89,17 @@ public class WarningSpawnHelper {
         sandWorm.setAggroTargetEntity(player);
         player.level().addFreshEntity(sandWorm);
         sandWorm.playSound(ModSounds.WORM_SPAWN.get(), 100, 1);
+
+        // Send spawn warning to all nearby players
+        Component spawnMessage = Component.translatable("msg.sandworm_mod.spawn");
+        List<Player> nearbyPlayers = player.level().getNearbyPlayers(TargetingConditions.forNonCombat(), null,
+                new AABB(player.position().add(200, 500, 200), player.position().subtract(200, 500, 200)));
+        nearbyPlayers.forEach(p -> {
+            if (p instanceof ServerPlayer serverPlayer) {
+                serverPlayer.sendSystemMessage(spawnMessage, false);
+            }
+        });
+
         AdvancementTriggerRegistry.SHAI_HULUD.trigger((ServerPlayer) player);
     }
 

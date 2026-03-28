@@ -1,0 +1,11 @@
+{
+  "block.sandworm_mod.thumper": "Batteur",
+  "death.attack.worm": "%1$s a été avalé tout rond",
+  "entity.sandworm_mod.worm_chain": "Ver des sables",
+  "entity.sandworm_mod.worm_head_segment": "Tête du ver des sables",
+  "entity.sandworm_mod.worm_segment": "Corps du ver des sables",
+  "item.sandworm_mod.sandworm_tooth": "Dent de ver des sables",
+  "msg.sandworm_mod.stage_1": "§eLe ver des sables te sent...",
+  "msg.sandworm_mod.stage_2": "§cLe ver des sables va bientôt s'éveiller !",
+  "msg.sandworm_mod.spawn": "§4IL ARRIVE !!!"
+}
