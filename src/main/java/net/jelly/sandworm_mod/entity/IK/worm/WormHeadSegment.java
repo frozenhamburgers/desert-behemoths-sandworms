@@ -10,7 +10,7 @@ import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib.animatable.GeoEntity;
 
 public class WormHeadSegment extends WormSegment implements GeoEntity {
-    private static final ParticleEmitterInfo SPLASH = new ParticleEmitterInfo(new ResourceLocation(SandwormMod.MODID, "herald"));
+    private static final ParticleEmitterInfo SPLASH = new ParticleEmitterInfo(ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "herald"));
     public WormHeadSegment(EntityType<?> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }

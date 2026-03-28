@@ -12,7 +12,7 @@ public class SonicBoomPostProcessor extends MultiInstancePostProcessor<SonicBoom
 
     @Override
     public ResourceLocation getPostChainLocation() {
-        return new ResourceLocation(SandwormMod.MODID, "sonic_boom_post");
+        return ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "sonic_boom_post");
     }
     // Max amount of FxInstances that can be added to the post processor at once
     @Override

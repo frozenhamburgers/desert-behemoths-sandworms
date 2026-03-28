@@ -46,9 +46,9 @@ public class WormChainEntity extends KinematicChainEntity {
     private static float SPEED_SCALE = 1.3f;
     private boolean breaching = false;
     private int soundFrequencyCount = 0;
-    private static final ParticleEmitterInfo SAND_IMPACT = new ParticleEmitterInfo(new ResourceLocation(SandwormMod.MODID, "sandimpact"));
-    private static final ParticleEmitterInfo SLOWER_SAND_IMPACT = new ParticleEmitterInfo(new ResourceLocation(SandwormMod.MODID, "slowersandimpact"));
-    private static final ParticleEmitterInfo SAND_SMOKE = new ParticleEmitterInfo(new ResourceLocation(SandwormMod.MODID, "sandsmoke"));
+    private static final ParticleEmitterInfo SAND_IMPACT = new ParticleEmitterInfo(ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "sandimpact"));
+    private static final ParticleEmitterInfo SLOWER_SAND_IMPACT = new ParticleEmitterInfo(ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "slowersandimpact"));
+    private static final ParticleEmitterInfo SAND_SMOKE = new ParticleEmitterInfo(ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "sandsmoke"));
     public LivingEntity aggroTargetEntity;
     public boolean removed = false;
     private int discardTimer = 0;

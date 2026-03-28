@@ -24,7 +24,7 @@ public class ChainSegmentRenderer extends EntityRenderer<ChainSegment> {
         return null;
     }
 
-    protected static final ResourceLocation LIGHT_TRAIL = new ResourceLocation(SandwormMod.MODID, "textures/vfx/light_trail.png");
+    protected static final ResourceLocation LIGHT_TRAIL = ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "textures/vfx/light_trail.png");
     protected static final RenderType LIGHT_TYPE = LodestoneRenderTypeRegistry.ADDITIVE_TEXTURE.apply(RenderTypeToken.createToken(LIGHT_TRAIL));
 
     @Override

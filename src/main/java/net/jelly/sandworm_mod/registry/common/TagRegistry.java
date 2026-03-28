@@ -7,5 +7,5 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 
 public class TagRegistry {
-    public static final TagKey<Biome> SANDWORM_SPAWNABLE = TagKey.create(Registries.BIOME, new ResourceLocation(SandwormMod.MODID, "can_spawn_sandworms"));
+    public static final TagKey<Biome> SANDWORM_SPAWNABLE = TagKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "can_spawn_sandworms"));
 }

@@ -39,7 +39,7 @@ public class ClientEvents {
         public static void onClientSetup(FMLClientSetupEvent event) {
             // register shaders
             PostProcessHandler.addInstance(SonicBoomPostProcessor.INSTANCE);
-            ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, new EffekAssetLoader(), new ResourceLocation(SandwormMod.MODID, "effeks"));
+            ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, new EffekAssetLoader(), ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "effeks"));
         }
 
         @SubscribeEvent
