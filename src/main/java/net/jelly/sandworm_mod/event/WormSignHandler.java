@@ -161,12 +161,6 @@ public class WormSignHandler {
         }
     }
 
-    // Vehicle detection methods - TO BE IMPLEMENTED
-    private static boolean canTriggerFromVehicle(Player player) {
-        // TODO: Implement vehicle detection after fixing Forge compatibility
-        return false;
-    }
-
     // Ground detection
     private static boolean isOnGround(Entity entity) {
         // Check if entity is on ground
