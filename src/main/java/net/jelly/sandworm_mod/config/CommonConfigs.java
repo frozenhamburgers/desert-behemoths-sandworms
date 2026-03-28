@@ -56,7 +56,7 @@ public class CommonConfigs {
 
         // Vehicle trigger configurations
         ENABLE_VEHICLE_TRIGGERS = BUILDER.comment("Enable sandworm spawning when players are in vehicles")
-                .define("Enable Vehicle Triggers", false);
+                .define("Enable Vehicle Triggers", true);
 
         VEHICLE_BLACKLIST = BUILDER.comment("List of vehicles that will NOT trigger sandworms. Format: [modid:entity_name]. Default: empty.")
                 .defineList("Vehicle Blacklist", List.of(),
