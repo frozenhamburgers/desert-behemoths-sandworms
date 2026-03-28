@@ -71,6 +71,15 @@ public class WormSignHandler {
                 return;
             }
 
+            // Check for vehicle triggering
+            if (player.isPassenger()) {
+                Entity vehicle = player.getVehicle();
+                if (vehicle != null && isVehicleAllowed(vehicle)) {
+                    handleVehicleTrigger(vehicle, player, ws);
+                    return;
+                }
+            }
+
             if (ws.getSignTimer() < 200) {
                 if (player.isSprinting()) {
                     incrementWormSign((4-softBoots), player, ws);
@@ -194,6 +203,23 @@ public class WormSignHandler {
         }
 
         return true;
+    }
+
+    // Handle wormsign triggering for vehicles
+    private static void handleVehicleTrigger(Entity vehicle, Player player, WormSign ws) {
+        // Check if vehicle is on solid ground
+        if (!isOnGround(vehicle)) {
+            return;
+        }
+
+        // Check if vehicle is moving (any non-zero velocity)
+        if (vehicle.getDeltaMovement().lengthSqr() == 0) {
+            return;
+        }
+
+        // Increment wormsign using configured multiplier
+        double multiplier = CommonConfigs.VEHICLE_TRIGGER_MULTIPLIER.get();
+        incrementWormSign((int) multiplier, player, ws);
     }
 
 
