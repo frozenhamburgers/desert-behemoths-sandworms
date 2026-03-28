@@ -1,12 +1,8 @@
 package net.jelly.sandworm_mod.config;
 
-import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.common.ForgeConfigSpec;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Predicate;
 
 public class CommonConfigs {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
@@ -62,11 +58,11 @@ public class CommonConfigs {
         ENABLE_VEHICLE_TRIGGERS = BUILDER.comment("Enable sandworm spawning when players are in vehicles")
                 .define("Enable Vehicle Triggers", false);
 
-        VEHICLE_BLACKLIST = BUILDER.comment("List of vehicles that will NOT trigger sandworms. Format: [modid:*] or [modid:entity_name]. Default: empty.")
+        VEHICLE_BLACKLIST = BUILDER.comment("List of vehicles that will NOT trigger sandworms. Format: [modid:entity_name]. Default: empty.")
                 .defineList("Vehicle Blacklist", List.of(),
                         obj -> obj instanceof String && ((String) obj).matches("^[a-z0-9_-]+:(\\*|[a-z0-9_/-]+)$"));
 
-        VEHICLE_WHITELIST = BUILDER.comment("List of vehicles that WILL trigger sandworms. Format: [modid:*] or [modid:entity_name]. Default: empty.")
+        VEHICLE_WHITELIST = BUILDER.comment("List of vehicles that WILL trigger sandworms. Format: [modid:entity_name]. Default: empty.")
                 .defineList("Vehicle Whitelist", List.of(),
                         obj -> obj instanceof String && ((String) obj).matches("^[a-z0-9_-]+:(\\*|[a-z0-9_/-]+)$"));
 
