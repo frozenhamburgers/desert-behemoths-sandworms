@@ -1,5 +1,6 @@
 package net.jelly.sandworm_mod.event;
 
+import com.mojang.logging.LogUtils;
 import net.jelly.sandworm_mod.SandwormMod;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSign;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSignProvider;
@@ -19,6 +20,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.slf4j.Logger;
 
 import java.util.List;
 
@@ -28,6 +30,7 @@ import static net.jelly.sandworm_mod.helper.WarningSpawnHelper.warningScreenshak
 
 @Mod.EventBusSubscriber(modid = SandwormMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class WormSignHandler {
+    private static final Logger LOGGER = LogUtils.getLogger();
     // WORMSIGN
     @SubscribeEvent
     public static void tickWS(TickEvent.PlayerTickEvent event) {
@@ -192,6 +195,7 @@ public class WormSignHandler {
         List<? extends String> whitelist = CommonConfigs.VEHICLE_WHITELIST.get();
         List<? extends String> blacklist = CommonConfigs.VEHICLE_BLACKLIST.get();
 
+        LOGGER.debug("vehicle: {}, whitelist:{}, blacklist: {}", vehicleId, whitelist, blacklist);
         // Must be in whitelist AND NOT be in blacklist
         return whitelist.contains(vehicleId) && !blacklist.contains(vehicleId);
     }
