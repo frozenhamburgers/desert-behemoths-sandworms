@@ -39,6 +39,7 @@ public class SandwormMod
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
 
+    @SuppressWarnings("deprecated")
     public SandwormMod()
     {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();

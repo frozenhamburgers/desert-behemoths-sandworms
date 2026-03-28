@@ -98,7 +98,7 @@ dependencies {
     modRuntimeOnly "curse.maven:lodestone-616457:5460471"
     modImplementation "curse.maven:lodestone-616457:5460471"
     modImplementation "curse.maven:architectury-api-419699:5137938"
-    modImplementation "curse.maven:aaa-particles-979809:5152797"
+    modImplementation "curse.maven:aaa-particles-979809:6616719"
 }
 
 sourceSets.main.resources {
