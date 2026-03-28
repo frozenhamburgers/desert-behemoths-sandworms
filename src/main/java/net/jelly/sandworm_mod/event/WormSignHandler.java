@@ -11,7 +11,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.LightLayer;
@@ -23,8 +22,6 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.slf4j.Logger;
-
-import java.util.List;
 
 import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 import static net.jelly.sandworm_mod.helper.WarningSpawnHelper.spawnWorm;
@@ -177,24 +174,11 @@ public class WormSignHandler {
         return entity.level().getBlockState(below).isSolid();
     }
 
-    // Entity registry helper
-    private static String getEntityId(Entity entity) {
-        return ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString();
-    }
-
     // Check if vehicle is allowed to trigger wormsign
     // Returns true only if vehicle is in whitelist AND not in blacklist
     private static boolean isVehicleAllowed(Entity vehicle) {
-        if (!CommonConfigs.ENABLE_VEHICLE_TRIGGERS.get()) {
-            return false;
-        }
-
-        String vehicleId = getEntityId(vehicle);
-        List<? extends String> whitelist = CommonConfigs.VEHICLE_WHITELIST.get();
-        List<? extends String> blacklist = CommonConfigs.VEHICLE_BLACKLIST.get();
-
-        // Must be in whitelist AND NOT be in blacklist
-        return whitelist.contains(vehicleId) && !blacklist.contains(vehicleId);
+        String vehicleId = ForgeRegistries.ENTITY_TYPES.getKey(vehicle.getType()).toString();
+        return CommonConfigs.isVehicleAllowed(vehicleId);
     }
 
     // Handle wormsign triggering for vehicles

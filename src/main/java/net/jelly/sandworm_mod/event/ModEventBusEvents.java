@@ -2,6 +2,7 @@ package net.jelly.sandworm_mod.event;
 
 import net.jelly.sandworm_mod.SandwormMod;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSign;
+import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.item.ModItems;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
@@ -9,6 +10,7 @@ import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 @Mod.EventBusSubscriber(modid= SandwormMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModEventBusEvents {
@@ -37,4 +39,8 @@ public class ModEventBusEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onConfigEvent(ModConfigEvent event) {
+        CommonConfigs.reloadVehicleConfig();
+    }
 }

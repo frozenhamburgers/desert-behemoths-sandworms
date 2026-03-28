@@ -1,5 +1,7 @@
 package net.jelly.sandworm_mod.config;
 
+import net.jelly.sandworm_mod.vehicle.VehicleMatcher;
+import net.jelly.sandworm_mod.vehicle.VehicleTriggerMode;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.List;
@@ -18,10 +20,12 @@ public class CommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_WARNING_MESSAGES;
 
     // Vehicle trigger configs
-    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_VEHICLE_TRIGGERS;
+    public static final ForgeConfigSpec.EnumValue<VehicleTriggerMode> VEHICLE_TRIGGER_MODE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> VEHICLE_BLACKLIST;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> VEHICLE_WHITELIST;
     public static final ForgeConfigSpec.ConfigValue<Double> VEHICLE_TRIGGER_MULTIPLIER;
+
+    public static VehicleMatcher vehicleMatcher;
 
     static {
         BUILDER.push("Desert Behemoths: Sandworms! Config");
@@ -44,23 +48,30 @@ public class CommonConfigs {
         HEAD_MULTIPLIER = BUILDER.comment("Multiplier for damage dealt by the head of the worm compared to a body segment. Default 2.0 (head deals double damage).")
                 .defineInRange("Head Multiplier", 2.0, 0.01, 100.0);
 
-        DEFAULT_SPAWNING = BUILDER.comment("By default, the sandworm can spawn in any biome golden rabbits spawn in. This option enables or disables that.\n" +
-                "To add additional biomes the sandworm can spawn in, create a datapack that edits the sandworm_mod:can_spawn_sandworms biome tag.\n" +
-                "Specifically, create can_spawn_sandworms.json in data->sandworm_mod->tags->worldgen->biome.\n" +
-                "Bellow is an example json file that allows sandworms to spawn in jungles:\n" +
-                "{\n" +
-                "  \"values\": [\n" +
-                "    \"minecraft:jungle\"\n" +
-                "  ]\n" +
-                "}")
+        DEFAULT_SPAWNING = BUILDER.comment("""
+                        By default, the sandworm can spawn in any biome golden rabbits spawn in. This option enables or disables that.
+                        To add additional biomes the sandworm can spawn in, create a datapack that edits the sandworm_mod:can_spawn_sandworms biome tag.
+                        Specifically, create can_spawn_sandworms.json in data->sandworm_mod->tags->worldgen->biome.
+                        Bellow is an example json file that allows sandworms to spawn in jungles:
+                        {
+                          "values": [
+                            "minecraft:jungle"
+                          ]
+                        }""")
                         .define("Default Spawning", true);
 
         ENABLE_WARNING_MESSAGES = BUILDER.comment("Enable warning messages when sandworm is approaching (messages to nearby players)")
                 .define("Enable Warning Messages", false);
 
-        // Vehicle trigger configurations
-        ENABLE_VEHICLE_TRIGGERS = BUILDER.comment("Enable sandworm spawning when players are in vehicles")
-                .define("Enable Vehicle Triggers", true);
+        VEHICLE_TRIGGER_MODE = BUILDER
+                .comment("""
+                        Vehicle trigger mode: ALL, NONE, WHITELIST, BLACKLIST, BOTH.
+                        - ALL: all vehicles trigger.
+                        - NONE: no vehicles trigger.
+                        - WHITELIST: only vehicles in the whitelist trigger (blacklist ignored).
+                        - BLACKLIST: all vehicles except those in the blacklist trigger (whitelist ignored).
+                        - BOTH: vehicle must be in whitelist AND not in blacklist to trigger.""")
+                .defineEnum("Vehicle Trigger Mode", VehicleTriggerMode.NONE);
 
         VEHICLE_BLACKLIST = BUILDER.comment("List of vehicles that will NOT trigger sandworms. Format: [modid:entity_name]. Default: empty.")
                 .defineList("Vehicle Blacklist", List.of(),
@@ -77,5 +88,14 @@ public class CommonConfigs {
         SPEC = BUILDER.build();
     }
 
+    public static void reloadVehicleConfig() {
+        VehicleTriggerMode mode = CommonConfigs.VEHICLE_TRIGGER_MODE.get();
+        List<? extends String> whitelist = CommonConfigs.VEHICLE_WHITELIST.get();
+        List<? extends String> blacklist = CommonConfigs.VEHICLE_BLACKLIST.get();
+        vehicleMatcher = new VehicleMatcher(mode, whitelist, blacklist);
+    }
 
+    public static boolean isVehicleAllowed(String vehicleId) {
+        return vehicleMatcher.isVehicleAllowed(vehicleId);
+    }
 }
