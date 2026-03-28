@@ -5,22 +5,17 @@ import net.jelly.sandworm_mod.capabilities.wormsign.WormSign;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSignProvider;
 import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
-import net.jelly.sandworm_mod.entity.ModEntities;
 import net.jelly.sandworm_mod.sound.ModSounds;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
-
-import java.util.Random;
 
 import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 import static net.jelly.sandworm_mod.helper.WarningSpawnHelper.spawnWorm;
@@ -60,7 +55,6 @@ public class WormSignHandler {
         //normal wormsign handling
         int softBoots = player.getItemBySlot(EquipmentSlot.FEET).getEnchantmentLevel(Enchantments.FALL_PROTECTION);
         player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
-            System.out.println(ws.getWS());
             if(!ws.canRespawn()) {
                 ws.decrementRespawnTimer();
                 return;
@@ -101,8 +95,6 @@ public class WormSignHandler {
                 float similarity = 1 - percentDiff;
                 ws.addMultiplier(similarity * 0.7);
                 incrementWormSign((int) (80 * ws.getMultiplier() * (1-softBoots/16.0)), player, ws);
-//                            System.out.println("add:" + (int) (40 * ws.getMultiplier()));
-//                            System.out.println("multiplier:" + ws.getMultiplier());
                 ws.setLastJumpTime(ws.getThisJumpTime());
                 ws.setThisJumpTime(0);
             }
