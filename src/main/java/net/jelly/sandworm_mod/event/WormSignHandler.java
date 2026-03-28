@@ -6,6 +6,8 @@ import net.jelly.sandworm_mod.capabilities.wormsign.WormSignProvider;
 import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.sound.ModSounds;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -54,6 +56,12 @@ public class WormSignHandler {
 
         //normal wormsign handling
         int softBoots = player.getItemBySlot(EquipmentSlot.FEET).getEnchantmentLevel(Enchantments.FALL_PROTECTION);
+
+        // Check if player is on ground (prevent flying)
+        if (!isOnGround(player)) {
+            return;
+        }
+
         player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
             if(!ws.canRespawn()) {
                 ws.decrementRespawnTimer();
@@ -136,6 +144,24 @@ public class WormSignHandler {
             ws.decrementStageTimer();
             if(ws.dropStage()) ws.setStage(1);
         }
+    }
+
+    // Vehicle detection methods - TO BE IMPLEMENTED
+    private static boolean canTriggerFromVehicle(Player player) {
+        // TODO: Implement vehicle detection after fixing Forge compatibility
+        return false;
+    }
+
+    // Ground detection
+    private static boolean isOnGround(Entity entity) {
+        // Check if entity is on ground
+        if (entity.onGround()) {
+            return true;
+        }
+
+        // Additional check: check if there's a solid block below
+        BlockPos below = entity.blockPosition().below();
+        return entity.level().getBlockState(below).isSolid();
     }
 
 

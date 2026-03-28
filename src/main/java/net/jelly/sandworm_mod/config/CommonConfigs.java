@@ -20,6 +20,12 @@ public class CommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<Double> HEAD_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Boolean> DEFAULT_SPAWNING;
 
+    // Vehicle trigger configs
+    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_VEHICLE_TRIGGERS;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> VEHICLE_BLACKLIST;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> VEHICLE_WHITELIST;
+    public static final ForgeConfigSpec.ConfigValue<Double> VEHICLE_TRIGGER_MULTIPLIER;
+
     static {
         BUILDER.push("Desert Behemoths: Sandworms! Config");
 
@@ -51,6 +57,21 @@ public class CommonConfigs {
                 "  ]\n" +
                 "}")
                         .define("Default Spawning", true);
+
+        // Vehicle trigger configurations
+        ENABLE_VEHICLE_TRIGGERS = BUILDER.comment("Enable sandworm spawning when players are in vehicles")
+                .define("Enable Vehicle Triggers", false);
+
+        VEHICLE_BLACKLIST = BUILDER.comment("List of vehicles that will NOT trigger sandworms. Format: [modid:*] or [modid:entity_name]. Default: empty.")
+                .defineList("Vehicle Blacklist", List.of(),
+                        obj -> obj instanceof String && ((String) obj).matches("^[a-z0-9_-]+:(\\*|[a-z0-9_/-]+)$"));
+
+        VEHICLE_WHITELIST = BUILDER.comment("List of vehicles that WILL trigger sandworms. Format: [modid:*] or [modid:entity_name]. Default: empty.")
+                .defineList("Vehicle Whitelist", List.of(),
+                        obj -> obj instanceof String && ((String) obj).matches("^[a-z0-9_-]+:(\\*|[a-z0-9_/-]+)$"));
+
+        VEHICLE_TRIGGER_MULTIPLIER = BUILDER.comment("Wormsign increment per tick when riding vehicles. Default 2.0 (compared to 4.0 for sprinting players).")
+                .defineInRange("Vehicle Trigger Multiplier", 2.0, 0.01, 100.0);
 
         BUILDER.pop();
         SPEC = BUILDER.build();
