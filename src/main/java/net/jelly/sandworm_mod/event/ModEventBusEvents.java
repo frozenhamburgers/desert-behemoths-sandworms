@@ -10,6 +10,7 @@ import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 @Mod.EventBusSubscriber(modid= SandwormMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -41,6 +42,9 @@ public class ModEventBusEvents {
 
     @SubscribeEvent
     public static void onConfigEvent(ModConfigEvent event) {
-        ServerConfigs.reloadVehicleConfig();
+        if (event.getConfig().getModId().equals(SandwormMod.MODID) &&
+                event.getConfig().getType() == ModConfig.Type.SERVER) {
+            ServerConfigs.reloadVehicleConfig();
+        }
     }
 }
