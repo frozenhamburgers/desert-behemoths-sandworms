@@ -20,6 +20,8 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.List;
+
 import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 import static net.jelly.sandworm_mod.helper.WarningSpawnHelper.spawnWorm;
 import static net.jelly.sandworm_mod.helper.WarningSpawnHelper.warningScreenshake;
@@ -168,6 +170,30 @@ public class WormSignHandler {
     // Entity registry helper
     private static String getEntityId(Entity entity) {
         return ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString();
+    }
+
+    // Check if vehicle is allowed to trigger wormsign
+    // Returns true only if vehicle is in whitelist AND not in blacklist
+    private static boolean isVehicleAllowed(Entity vehicle) {
+        if (!CommonConfigs.ENABLE_VEHICLE_TRIGGERS.get()) {
+            return false;
+        }
+
+        String vehicleId = getEntityId(vehicle);
+        List<? extends String> whitelist = CommonConfigs.VEHICLE_WHITELIST.get();
+        List<? extends String> blacklist = CommonConfigs.VEHICLE_BLACKLIST.get();
+
+        // Must be in whitelist
+        if (!whitelist.contains(vehicleId)) {
+            return false;
+        }
+
+        // Must NOT be in blacklist
+        if (blacklist.contains(vehicleId)) {
+            return false;
+        }
+
+        return true;
     }
 
 
