@@ -1,5 +1,6 @@
 package net.jelly.sandworm_mod.helper;
 
+import com.mojang.logging.LogUtils;
 import net.jelly.sandworm_mod.advancements.AdvancementTriggerRegistry;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSignProvider;
 import net.jelly.sandworm_mod.config.CommonConfigs;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
+import org.slf4j.Logger;
 import team.lodestar.lodestone.network.screenshake.ScreenshakePacket;
 import team.lodestar.lodestone.registry.common.LodestonePacketRegistry;
 import team.lodestar.lodestone.systems.easing.Easing;
@@ -28,6 +30,7 @@ import java.util.Random;
 import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 
 public class WarningSpawnHelper {
+    private static final Logger LOGGER = LogUtils.getLogger();
     public static void warningScreenshake(Player player, double strength, SoundEvent sound, int stage, int wormsign, Component message) {
         player.level().playSeededSound(null, player.getX(), player.getY(), player.getZ(), sound, SoundSource.MASTER, 12.5f,1,0);
 
@@ -90,6 +93,8 @@ public class WarningSpawnHelper {
         sandWorm.setAggroTargetEntity(player);
         player.level().addFreshEntity(sandWorm);
         sandWorm.playSound(ModSounds.WORM_SPAWN.get(), 100, 1);
+
+        LOGGER.info("Sandworm triggered by {}!", player.getDisplayName().getString());
 
         // Send spawn warning to all nearby players if enabled
         if (CommonConfigs.ENABLE_WARNING_MESSAGES.get()) {
