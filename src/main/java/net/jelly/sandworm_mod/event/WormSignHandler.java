@@ -8,8 +8,10 @@ import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.sound.ModSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.LightLayer;
@@ -74,22 +76,19 @@ public class WormSignHandler {
                 return;
             }
 
-            // Check for vehicle triggering
-            if (player.isPassenger()) {
-                Entity vehicle = player.getVehicle();
-                if (vehicle != null && isVehicleAllowed(vehicle)) {
-                    handleVehicleTrigger(vehicle, player, ws);
-                    return;
-                }
-            }
-
             if (ws.getSignTimer() < 200) {
-                if (player.isSprinting()) {
+                if (player.isPassenger()) {
+                    Entity vehicle = player.getVehicle();
+                    if (vehicle != null && isVehicleAllowed(vehicle)) {
+                        handleVehicleTrigger(vehicle, player, ws);
+                    }
+                } else if (player.isSprinting()) {
                     incrementWormSign((4-softBoots), player, ws);
                 }
+
                 ws.addThisJumpTime(1);
                 ws.addMultiplier(-0.01);
-                if (ws.getSignTimer() == 0) decrementWormSign(1, ws);;
+                if (ws.getSignTimer() == 0) decrementWormSign(1, ws);
 
                 // spawn sandworm
                 if (ws.getWS() >= spawnWorm) {
@@ -128,12 +127,14 @@ public class WormSignHandler {
     private static void incrementWormSign(int add, Player player, WormSign ws) {
         int spawnWorm = CommonConfigs.SPAWNWORM_WORMSIGN.get();
         if (ws.getWS() < spawnWorm / 2 && (ws.getWS() + add) >= spawnWorm / 2) {
-            warningScreenshake(player, 0.5, ModSounds.WORM_WARNING_1.get(), ws.getStage(), ws.getWS());
+            warningScreenshake(player, 0.5, ModSounds.WORM_WARNING_1.get(), ws.getStage(), ws.getWS(),
+                    Component.translatable("msg.sandworm_mod.stage_0"));
             ws.setStage(1);
             ws.setStageTimer(600);
             ws.setSignTimer();
         } else if (ws.getWS() < spawnWorm * 0.8 && (ws.getWS() + add) >= spawnWorm * 0.8) {
-            warningScreenshake(player, 0.6, ModSounds.WORM_WARNING_2.get(), ws.getStage(), ws.getWS());
+            warningScreenshake(player, 0.6, ModSounds.WORM_WARNING_2.get(), ws.getStage(), ws.getWS(),
+                    Component.translatable("msg.sandworm_mod.stage_1"));
             ws.setStage(2);
             ws.setStageTimer(600);
             ws.setSignTimer();
@@ -189,7 +190,7 @@ public class WormSignHandler {
         List<? extends String> whitelist = CommonConfigs.VEHICLE_WHITELIST.get();
         List<? extends String> blacklist = CommonConfigs.VEHICLE_BLACKLIST.get();
 
-        LOGGER.debug("vehicle: {}, whitelist:{}, blacklist: {}", vehicleId, whitelist, blacklist);
+        LOGGER.info("vehicle: {}, whitelist:{}, blacklist: {}", vehicleId, whitelist, blacklist);
         // Must be in whitelist AND NOT be in blacklist
         return whitelist.contains(vehicleId) && !blacklist.contains(vehicleId);
     }

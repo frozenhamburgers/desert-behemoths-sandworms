@@ -6,6 +6,7 @@ import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.entity.ModEntities;
 import net.jelly.sandworm_mod.sound.ModSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -26,7 +27,7 @@ import java.util.Random;
 import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 
 public class WarningSpawnHelper {
-    public static void warningScreenshake(Player player, double strength, SoundEvent sound, int stage, int wormsign) {
+    public static void warningScreenshake(Player player, double strength, SoundEvent sound, int stage, int wormsign, Component message) {
         player.level().playSeededSound(null, player.getX(), player.getY(), player.getZ(), sound, SoundSource.MASTER, 12.5f,1,0);
 
         // send screenshake to all players within 200 blocks & unify their wormsigns & wormsign stages
@@ -40,6 +41,11 @@ public class WarningSpawnHelper {
                 ws.setWS(wormsign);
                 ws.setSignTimer();
             });
+
+            // Send warning message if provided
+            if (message != null && p instanceof ServerPlayer serverPlayer) {
+                serverPlayer.sendSystemMessage(message, false);
+            }
         });
     }
 
