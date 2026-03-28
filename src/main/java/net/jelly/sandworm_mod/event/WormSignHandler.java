@@ -192,17 +192,8 @@ public class WormSignHandler {
         List<? extends String> whitelist = CommonConfigs.VEHICLE_WHITELIST.get();
         List<? extends String> blacklist = CommonConfigs.VEHICLE_BLACKLIST.get();
 
-        // Must be in whitelist
-        if (!whitelist.contains(vehicleId)) {
-            return false;
-        }
-
-        // Must NOT be in blacklist
-        if (blacklist.contains(vehicleId)) {
-            return false;
-        }
-
-        return true;
+        // Must be in whitelist AND NOT be in blacklist
+        return whitelist.contains(vehicleId) && !blacklist.contains(vehicleId);
     }
 
     // Handle wormsign triggering for vehicles
