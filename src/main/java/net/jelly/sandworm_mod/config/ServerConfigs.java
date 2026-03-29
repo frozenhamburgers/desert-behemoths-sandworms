@@ -85,12 +85,12 @@ public class ServerConfigs {
         VEHICLE_BLACKLIST = BUILDER.comment("""
                 List of vehicles that will NOT trigger sandworms. Format: ["modid:*", "modid:entity_name", "*horse", "*car*"]. Default: empty.""")
                 .defineList("vehicle_blacklist", List.of(),
-                        obj -> obj instanceof String && ((String) obj).matches("^[a-z0-9_-]+:(\\*|[a-z0-9_/-]+)$"));
+                        obj -> obj instanceof String && !((String) obj).isBlank());
 
         VEHICLE_WHITELIST = BUILDER.comment("""
                 List of vehicles that WILL trigger sandworms. Format: ["modid:*", "modid:entity_name", "*horse", "*car*"]. Default: empty.""")
                 .defineList("vehicle_whitelist", List.of(),
-                        obj -> obj instanceof String && ((String) obj).matches("^[a-z0-9_-]+:(\\*|[a-z0-9_/-]+)$"));
+                        obj -> obj instanceof String && !((String) obj).isBlank());
 
         ENABLE_WARNING_MESSAGES = BUILDER.comment("Enable warning messages when sandworm is approaching (messages to nearby players)")
                 .define("enable_warning_messages", false);
