@@ -48,7 +48,7 @@ public class WormSignHandler {
 
         // if worm already present
         if (!player.level().getEntitiesOfClass(WormChainEntity.class,
-                new AABB(player.position().add(600, 200, 600), player.position().subtract(600, 200, 600))).isEmpty()) {
+                new AABB(player.position().add(800, 200, 800), player.position().subtract(800, 200, 800))).isEmpty()) {
             player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
                 ws.setStage(0);
                 ws.setStageTimer(0);
@@ -120,7 +120,6 @@ public class WormSignHandler {
         });
     }
 
-
     private static void incrementWormSign(int add, Player player, WormSign ws) {
         int spawnWorm = ServerConfigs.SPAWNWORM_WORMSIGN.get();
         int wsAdded = ws.getWS() + add;
@@ -189,7 +188,7 @@ public class WormSignHandler {
         }
 
         // Check if vehicle is moving (any non-zero velocity)
-        if (vehicle.getDeltaMovement().lengthSqr() == 0) {
+        if (vehicle.getDeltaMovement().lengthSqr() < 0.01) {
             return;
         }
 
