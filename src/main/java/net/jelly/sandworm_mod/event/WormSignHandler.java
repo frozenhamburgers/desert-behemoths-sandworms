@@ -41,7 +41,7 @@ public class WormSignHandler {
         if (!isDesertBiome(player.getServer().getLevel(player.level().dimension()), player.blockPosition())
                 || player.level().getBrightness(LightLayer.SKY, player.blockPosition()) <= 0) {
             player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
-                decrementWormSign(1, ws);
+                decrementWormSign(1, player, ws);
             });
             return;
         }
@@ -52,15 +52,10 @@ public class WormSignHandler {
             player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
                 ws.setStage(0);
                 ws.setStageTimer(0);
-                ws.subWS(2*spawnWorm);
+                ws.subWS(2 * spawnWorm);
                 ws.setMultiplier(0);
                 ws.setRespawnTimer(ServerConfigs.RESPAWN_DURATION.get()*40);
             });
-            return;
-        }
-
-        // Check if player is on ground (prevent flying)
-        if (!isOnGround(player)) {
             return;
         }
 
@@ -82,7 +77,7 @@ public class WormSignHandler {
 
                 ws.addThisJumpTime(1);
                 ws.addMultiplier(-0.01);
-                if (ws.getSignTimer() == 0) decrementWormSign(1, ws);
+                if (ws.getSignTimer() == 0) decrementWormSign(1, player, ws);
 
                 // spawn sandworm
                 if (ws.getWS() >= spawnWorm) {
@@ -121,14 +116,14 @@ public class WormSignHandler {
         int spawnWorm = ServerConfigs.SPAWNWORM_WORMSIGN.get();
         int wsAdded = ws.getWS() + add;
         if (ws.getWS() < spawnWorm / 2 && (wsAdded) >= spawnWorm / 2) {
-            LOGGER.info("Sandworm stage 1: {}/{}", wsAdded, spawnWorm);
+            LOGGER.info("Sandworm reached stage 1: {}/{}, player: {}", wsAdded, spawnWorm, player.getDisplayName().getString());
             warningScreenshake(player, 0.5, ModSounds.WORM_WARNING_1.get(), ws.getStage(), ws.getWS(),
                     ServerConfigs.ENABLE_WARNING_MESSAGES.get() ? Component.translatable("msg.sandworm_mod.stage_1") : null);
             ws.setStage(1);
             ws.setStageTimer(600);
             ws.setSignTimer();
         } else if (ws.getWS() < spawnWorm * 0.8 && (wsAdded) >= spawnWorm * 0.8) {
-            LOGGER.info("Sandworm stage 2: {}/{}", wsAdded, spawnWorm);
+            LOGGER.info("Sandworm reached stage 2: {}/{}, player: {}", wsAdded, spawnWorm, player.getDisplayName().getString());
             warningScreenshake(player, 0.6, ModSounds.WORM_WARNING_2.get(), ws.getStage(), ws.getWS(),
                     ServerConfigs.ENABLE_WARNING_MESSAGES.get() ? Component.translatable("msg.sandworm_mod.stage_2") : null);
             ws.setStage(2);
@@ -138,23 +133,33 @@ public class WormSignHandler {
         ws.addWS(add);
     }
 
-    private static void decrementWormSign(int decrement, WormSign ws) {
+    private static void decrementWormSign(int decrement, Player player, WormSign ws) {
         int spawnWorm = ServerConfigs.SPAWNWORM_WORMSIGN.get();
         if(ws.getStage() == 0) {
             ws.subWS(decrement);
             ws.setStageTimer(0);
-        }
-        else if (ws.getStage() == 1) {
-            if(ws.getWS() - decrement >= spawnWorm / 2) ws.subWS(decrement);
-            else ws.setWS(spawnWorm/2);
+        } else if (ws.getStage() == 1) {
+            if (ws.getWS() - decrement >= spawnWorm / 2) {
+                ws.subWS(decrement);
+            } else {
+                ws.setWS(spawnWorm/2);
+            }
             ws.decrementStageTimer();
-            if(ws.dropStage()) ws.setStage(0);
-        }
-        else if (ws.getStage() == 2) {
-            if(ws.getWS() - decrement >= spawnWorm * 0.8) ws.subWS(decrement);
-            else ws.setWS((int)(spawnWorm * 0.8));
+            if(ws.dropStage()) {
+                ws.setStage(0);
+                LOGGER.info("Sandworm dropped to stage 0: {}/{}, player: {}", ws.getWS(), spawnWorm, player.getDisplayName().getString());
+            }
+        } else if (ws.getStage() == 2) {
+            if (ws.getWS() - decrement >= spawnWorm * 0.8) {
+                ws.subWS(decrement);
+            } else {
+                ws.setWS((int)(spawnWorm * 0.8));
+            }
             ws.decrementStageTimer();
-            if(ws.dropStage()) ws.setStage(1);
+            if (ws.dropStage()) {
+                ws.setStage(1);
+                LOGGER.info("Sandworm dropped to stage 1: {}/{}, player: {}", ws.getWS(), spawnWorm, player.getDisplayName().getString());
+            }
         }
     }
 
@@ -194,6 +199,10 @@ public class WormSignHandler {
     }
 
     private static void handlePlayerSprintTrigger(Player player, WormSign ws) {
+        // Check if player is on ground (prevent flying)
+        if (!isOnGround(player)) {
+            return;
+        }
         int enchantmentLevel = player.getItemBySlot(EquipmentSlot.FEET).getEnchantmentLevel(Enchantments.FALL_PROTECTION);
         int multiplier = ServerConfigs.PLAYER_TRIGGER_MULTIPLIER.get();
         int playerTrigger = Math.max(multiplier - enchantmentLevel, 0);
