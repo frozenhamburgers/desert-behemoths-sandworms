@@ -59,9 +59,6 @@ public class WormSignHandler {
             return;
         }
 
-        //normal wormsign handling
-        int softBoots = player.getItemBySlot(EquipmentSlot.FEET).getEnchantmentLevel(Enchantments.FALL_PROTECTION);
-
         // Check if player is on ground (prevent flying)
         if (!isOnGround(player)) {
             return;
@@ -80,7 +77,7 @@ public class WormSignHandler {
                         handleVehicleTrigger(vehicle, player, ws);
                     }
                 } else if (player.isSprinting()) {
-                    incrementWormSign((4-softBoots), player, ws);
+                    handlePlayerSprintTrigger(player, ws);
                 }
 
                 ws.addThisJumpTime(1);
@@ -192,8 +189,16 @@ public class WormSignHandler {
             return;
         }
 
-        // Increment wormsign using configured multiplier
-        double multiplier = ServerConfigs.VEHICLE_TRIGGER_MULTIPLIER.get();
-        incrementWormSign((int) multiplier, player, ws);
+        int vehicleMultiplier = ServerConfigs.VEHICLE_TRIGGER_MULTIPLIER.get();
+        incrementWormSign(vehicleMultiplier, player, ws);
+    }
+
+    private static void handlePlayerSprintTrigger(Player player, WormSign ws) {
+        int enchantmentLevel = player.getItemBySlot(EquipmentSlot.FEET).getEnchantmentLevel(Enchantments.FALL_PROTECTION);
+        int multiplier = ServerConfigs.PLAYER_TRIGGER_MULTIPLIER.get();
+        int playerTrigger = Math.max(multiplier - enchantmentLevel, 0);
+        if (playerTrigger > 0) {
+            incrementWormSign(playerTrigger, player, ws);
+        }
     }
 }

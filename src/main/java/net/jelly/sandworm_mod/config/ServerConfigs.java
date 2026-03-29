@@ -18,11 +18,13 @@ public class ServerConfigs {
     public static final ForgeConfigSpec.ConfigValue<Double> HEAD_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Boolean> DEFAULT_SPAWNING;
 
-    // Vehicle trigger configs
+    // Trigger configs
+    public static final ForgeConfigSpec.ConfigValue<Integer> PLAYER_TRIGGER_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<Integer> VEHICLE_TRIGGER_MULTIPLIER;
+
     public static final ForgeConfigSpec.EnumValue<VehicleTriggerMode> VEHICLE_TRIGGER_MODE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> VEHICLE_BLACKLIST;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> VEHICLE_WHITELIST;
-    public static final ForgeConfigSpec.ConfigValue<Double> VEHICLE_TRIGGER_MULTIPLIER;
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_WARNING_MESSAGES;
 
@@ -60,6 +62,15 @@ public class ServerConfigs {
                           ]
                         }""")
                         .define("default_spawning", true);
+        BUILDER.pop();
+
+        BUILDER.push("trigger");
+
+        PLAYER_TRIGGER_MULTIPLIER = BUILDER.comment("Wormsign increment per tick when player sprinting. Default 4.")
+                .defineInRange("player_trigger_multiplier", 4, 1, 100);
+
+        VEHICLE_TRIGGER_MULTIPLIER = BUILDER.comment("Wormsign increment per tick when riding vehicles. Default 4.")
+                .defineInRange("vehicle_trigger_multiplier", 4, 1, 100);
 
         VEHICLE_TRIGGER_MODE = BUILDER
                 .comment("""
@@ -71,17 +82,15 @@ public class ServerConfigs {
                         - BOTH: vehicle must be in whitelist AND not in blacklist to trigger.""")
                 .defineEnum("vehicle_trigger_mode", VehicleTriggerMode.BOTH);
 
-        VEHICLE_BLACKLIST = BUILDER.comment("List of vehicles that will NOT trigger sandworms. Format: [modid:entity_name]. Default: empty.")
+        VEHICLE_BLACKLIST = BUILDER.comment("""
+                List of vehicles that will NOT trigger sandworms. Format: ["modid:*", "modid:entity_name", "*horse", "*car*"]. Default: empty.""")
                 .defineList("vehicle_blacklist", List.of(),
                         obj -> obj instanceof String && ((String) obj).matches("^[a-z0-9_-]+:(\\*|[a-z0-9_/-]+)$"));
 
-        VEHICLE_WHITELIST = BUILDER.comment("List of vehicles that WILL trigger sandworms. Format: [modid:entity_name]. Default: empty.")
+        VEHICLE_WHITELIST = BUILDER.comment("""
+                List of vehicles that WILL trigger sandworms. Format: ["modid:*", "modid:entity_name", "*horse", "*car*"]. Default: empty.""")
                 .defineList("vehicle_whitelist", List.of(),
                         obj -> obj instanceof String && ((String) obj).matches("^[a-z0-9_-]+:(\\*|[a-z0-9_/-]+)$"));
-
-        VEHICLE_TRIGGER_MULTIPLIER = BUILDER.comment("Wormsign increment per tick when riding vehicles. Default 4.0 (compared to 4.0 for sprinting players).")
-                .defineInRange("vehicle_trigger_multiplier", 4.0, 0.01, 100.0);
-
 
         ENABLE_WARNING_MESSAGES = BUILDER.comment("Enable warning messages when sandworm is approaching (messages to nearby players)")
                 .define("enable_warning_messages", false);

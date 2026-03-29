@@ -18,16 +18,11 @@ import team.lodestar.lodestone.systems.postprocess.PostProcessHandler;
 
 import static team.lodestar.lodestone.registry.client.LodestoneWorldEventRendererRegistry.registerRenderer;
 
-
 public class ClientEvents {
     // FORGE CLIENT EVENTS
     @Mod.EventBusSubscriber(modid= SandwormMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
     public static class ForgeClientEvents {
     }
-
-
-
-
 
     // MOD CLIENT EVENTS
     @Mod.EventBusSubscriber(modid= SandwormMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -53,6 +48,4 @@ public class ClientEvents {
         }
 
     }
-
-
 }
