@@ -80,7 +80,7 @@ public class ServerConfigs {
                         - WHITELIST: only vehicles in the whitelist trigger (blacklist ignored).
                         - BLACKLIST: all vehicles except those in the blacklist trigger (whitelist ignored).
                         - BOTH: vehicle must be in whitelist AND not in blacklist to trigger.""")
-                .defineEnum("vehicle_trigger_mode", VehicleTriggerMode.BOTH);
+                .defineEnum("vehicle_trigger_mode", VehicleTriggerMode.ALL);
 
         VEHICLE_BLACKLIST = BUILDER.comment("""
                 List of vehicles that will NOT trigger sandworms. Format: ["modid:*", "modid:entity_name", "*horse", "*car*"]. Default: empty.""")
