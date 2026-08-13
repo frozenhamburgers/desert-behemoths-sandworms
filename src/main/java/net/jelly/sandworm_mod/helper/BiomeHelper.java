@@ -1,6 +1,6 @@
 package net.jelly.sandworm_mod.helper;
 
-import net.jelly.sandworm_mod.config.CommonConfigs;
+import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.registry.common.TagRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -13,7 +13,7 @@ public class BiomeHelper {
 
     public static boolean isDesertBiome(ServerLevel level, BlockPos blockPos) {
         Holder<Biome> thisBiome = level.getBiomeManager().getBiome(blockPos);
-        return (CommonConfigs.DEFAULT_SPAWNING.get() && thisBiome.is(BiomeTags.SPAWNS_GOLD_RABBITS)) || thisBiome.is(TagRegistry.SANDWORM_SPAWNABLE);
+        return (ServerConfigs.DEFAULT_SPAWNING.get() && thisBiome.is(BiomeTags.SPAWNS_GOLD_RABBITS)) || thisBiome.is(TagRegistry.SANDWORM_SPAWNABLE);
     }
 
     public static boolean isDesertBiome(Entity entity) {

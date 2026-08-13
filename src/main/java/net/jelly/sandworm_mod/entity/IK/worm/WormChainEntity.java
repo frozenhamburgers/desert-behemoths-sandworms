@@ -4,7 +4,7 @@ import mod.chloeprime.aaaparticles.api.common.AAALevel;
 import mod.chloeprime.aaaparticles.api.common.ParticleEmitterInfo;
 import net.jelly.sandworm_mod.SandwormMod;
 import net.jelly.sandworm_mod.block.ModBlockEntities;
-import net.jelly.sandworm_mod.config.CommonConfigs;
+import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.entity.IK.ChainSegment;
 import net.jelly.sandworm_mod.entity.IK.KinematicChainEntity;
 import net.jelly.sandworm_mod.entity.ModEntities;
@@ -46,9 +46,9 @@ public class WormChainEntity extends KinematicChainEntity {
     private static float SPEED_SCALE = 1.3f;
     private boolean breaching = false;
     private int soundFrequencyCount = 0;
-    private static final ParticleEmitterInfo SAND_IMPACT = new ParticleEmitterInfo(new ResourceLocation(SandwormMod.MODID, "sandimpact"));
-    private static final ParticleEmitterInfo SLOWER_SAND_IMPACT = new ParticleEmitterInfo(new ResourceLocation(SandwormMod.MODID, "slowersandimpact"));
-    private static final ParticleEmitterInfo SAND_SMOKE = new ParticleEmitterInfo(new ResourceLocation(SandwormMod.MODID, "sandsmoke"));
+    private static final ParticleEmitterInfo SAND_IMPACT = new ParticleEmitterInfo(ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "sandimpact"));
+    private static final ParticleEmitterInfo SLOWER_SAND_IMPACT = new ParticleEmitterInfo(ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "slowersandimpact"));
+    private static final ParticleEmitterInfo SAND_SMOKE = new ParticleEmitterInfo(ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "sandsmoke"));
     public LivingEntity aggroTargetEntity;
     public boolean removed = false;
     private int discardTimer = 0;
@@ -294,7 +294,7 @@ public class WormChainEntity extends KinematicChainEntity {
                 if(!(aggroTargetEntity instanceof Player)) despawnTimer++;
                 else if (((Player) aggroTargetEntity).isCreative()) despawnTimer++;
                 else despawnTimer = 0;
-                if(despawnTimer >= CommonConfigs.DESPAWN_TIMER.get()*20) escaping = true;
+                if(despawnTimer >= ServerConfigs.DESPAWN_TIMER.get()*20) escaping = true;
             }
 
             if(!segments.isEmpty()) {
@@ -464,7 +464,7 @@ public class WormChainEntity extends KinematicChainEntity {
         targetV = new Vec3(targetV.x*0.075, targetV.y+1.2, targetV.z*0.075);
         sonicBoom();
         explodedTimes++;
-        if(explodedTimes >= CommonConfigs.HEALTH.get()) {
+        if(explodedTimes >= ServerConfigs.HEALTH.get()) {
             ItemEntity toothItem = new ItemEntity(this.level(), head.getX(), head.getY(), head.getZ(), new ItemStack(ModItems.WORM_TOOTH.get(), 1));
             this.level().addFreshEntity(toothItem);
             escaping = true;

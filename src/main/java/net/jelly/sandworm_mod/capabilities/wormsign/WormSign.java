@@ -30,7 +30,7 @@ public class WormSign {
         multiplier+=mult;
         if(multiplier > 3) multiplier = 3;
         if(multiplier < 0) multiplier = 0;
-        if(multiplier == Double.NaN) multiplier = 0;
+        if(Double.isNaN(multiplier)) multiplier = 0;
     }
 
     public void setMultiplier(double mult) {

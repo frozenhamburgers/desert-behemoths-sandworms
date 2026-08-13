@@ -22,7 +22,7 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> THUMPER = registerSoundEvents("thumper");
 
     private static RegistryObject<SoundEvent> registerSoundEvents(String name) {
-        return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(SandwormMod.MODID, name)));
+        return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, name)));
     }
 
     public static void register(IEventBus eventBus) {

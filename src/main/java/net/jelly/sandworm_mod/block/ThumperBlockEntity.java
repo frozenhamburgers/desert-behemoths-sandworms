@@ -1,7 +1,8 @@
 package net.jelly.sandworm_mod.block;
 
+import com.mojang.logging.LogUtils;
 import net.jelly.sandworm_mod.advancements.AdvancementTriggerRegistry;
-import net.jelly.sandworm_mod.config.CommonConfigs;
+import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.sound.ModSounds;
 import net.minecraft.core.BlockPos;
@@ -13,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import org.slf4j.Logger;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -24,6 +26,8 @@ import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 import static net.jelly.sandworm_mod.helper.WarningSpawnHelper.*;
 
 public class ThumperBlockEntity extends BlockEntity implements GeoBlockEntity {
+    private final static Logger LOGGER = LogUtils.getLogger();
+
     private AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private boolean thumping = false;
     private int wormSign = 0;
@@ -97,13 +101,15 @@ public class ThumperBlockEntity extends BlockEntity implements GeoBlockEntity {
             return;
         }
 
-        if(e.thumping && e.wormSign == CommonConfigs.SPAWNWORM_WORMSIGN.get()/20) {
+        if(e.thumping && e.wormSign == ServerConfigs.SPAWNWORM_WORMSIGN.get()/20) {
             // send warning & put on cooldown
+            LOGGER.info("thumper stage 1");
             e.pauseTicks = 500;
             e.wormSign++;
             thumperWarning(level, blockPos.getCenter());
         }
-        else if(e.wormSign >= CommonConfigs.SPAWNWORM_WORMSIGN.get()/10) {
+        else if(e.wormSign >= ServerConfigs.SPAWNWORM_WORMSIGN.get()/10) {
+            LOGGER.info("Sandworm triggered by thumper");
             e.wormSign = 0;
             e.pauseTicks = 500;
             spawnWormThumper(level, blockPos);

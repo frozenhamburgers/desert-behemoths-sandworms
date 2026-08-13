@@ -10,16 +10,16 @@ public class ThumperModel extends GeoModel<ThumperBlockEntity> {
 
     @Override
     public ResourceLocation getModelResource(ThumperBlockEntity thumperBlockEntity) {
-        return new ResourceLocation(SandwormMod.MODID, "geo/thumper.geo.json");
+        return ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "geo/thumper.geo.json");
     }
 
     @Override
     public ResourceLocation getTextureResource(ThumperBlockEntity thumperBlockEntity) {
-        return new ResourceLocation("minecraft", "textures/block/piston_side.png");
+        return ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/piston_side.png");
     }
 
     @Override
     public ResourceLocation getAnimationResource(ThumperBlockEntity thumperBlockEntity) {
-        return new ResourceLocation(SandwormMod.MODID, "animations/thumper.animation.json");
+        return ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "animations/thumper.animation.json");
     }
 }
