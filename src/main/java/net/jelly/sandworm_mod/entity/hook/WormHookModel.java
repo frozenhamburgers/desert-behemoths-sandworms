@@ -11,16 +11,16 @@ import software.bernie.geckolib.model.GeoModel;
 public class WormHookModel extends GeoModel<WormHook> {
 	@Override
 	public ResourceLocation getModelResource(WormHook wormHook) {
-		return new ResourceLocation(SandwormMod.MODID, "geo/worm_hook.geo.json");
+		return ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "geo/worm_hook.geo.json");
 	}
 
 	@Override
 	public ResourceLocation getTextureResource(WormHook wormHook) {
-		return new ResourceLocation(SandwormMod.MODID, "textures/item/worm_rod.png");
+		return ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "textures/item/worm_rod.png");
 	}
 
 	@Override
 	public ResourceLocation getAnimationResource(WormHook wormHook) {
-		return new ResourceLocation(SandwormMod.MODID, "animations/no_animation.json");
+		return ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "animations/no_animation.json");
 	}
 }

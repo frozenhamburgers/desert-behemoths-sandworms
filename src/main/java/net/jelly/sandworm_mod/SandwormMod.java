@@ -6,7 +6,7 @@ import net.jelly.sandworm_mod.block.ModBlockEntities;
 import net.jelly.sandworm_mod.block.ModBlocks;
 import net.jelly.sandworm_mod.block.thumper.ThumperRenderer;
 import net.jelly.sandworm_mod.brewing.WormToothBrewing;
-import net.jelly.sandworm_mod.config.CommonConfigs;
+import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.entity.hook.WormHookRenderer;
 import net.jelly.sandworm_mod.entity.IK.worm.WormControllerRenderer;
 import net.jelly.sandworm_mod.entity.IK.worm.WormHeadSegmentRenderer;
@@ -18,7 +18,6 @@ import net.jelly.sandworm_mod.sound.ModSounds;
 import net.jelly.sandworm_mod.registry.client.ParticleRegistry;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
@@ -33,9 +32,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
-import static net.minecraftforge.common.brewing.BrewingRecipeRegistry.addRecipe;
-
 // The value here should match an entry in the META-INF/mods.toml file
+@SuppressWarnings("deprecated")
 @Mod(SandwormMod.MODID)
 public class SandwormMod
 {
@@ -44,6 +42,7 @@ public class SandwormMod
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
 
+    @SuppressWarnings("deprecated")
     public SandwormMod()
     {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -68,7 +67,7 @@ public class SandwormMod
         ParticleRegistry.register(modEventBus);
 
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfigs.SPEC, "sandwormmod-common.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfigs.SPEC, "sandwormmod-server.toml");
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);

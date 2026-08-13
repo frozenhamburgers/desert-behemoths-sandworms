@@ -1,27 +1,29 @@
 package net.jelly.sandworm_mod.event;
 
+import com.mojang.logging.LogUtils;
 import net.jelly.sandworm_mod.SandwormMod;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSign;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSignProvider;
-import net.jelly.sandworm_mod.config.CommonConfigs;
+import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.entity.ModEntities;
 import net.jelly.sandworm_mod.helper.IPlayerMixinAccessor;
 import net.jelly.sandworm_mod.sound.ModSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
-
-import java.util.Random;
+import net.minecraftforge.registries.ForgeRegistries;
+import org.slf4j.Logger;
 
 import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 import static net.jelly.sandworm_mod.helper.WarningSpawnHelper.spawnWorm;
@@ -29,10 +31,11 @@ import static net.jelly.sandworm_mod.helper.WarningSpawnHelper.warningScreenshak
 
 @Mod.EventBusSubscriber(modid = SandwormMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class WormSignHandler {
+    private static final Logger LOGGER = LogUtils.getLogger();
     // WORMSIGN
     @SubscribeEvent
     public static void tickWS(TickEvent.PlayerTickEvent event) {
-        int spawnWorm = CommonConfigs.SPAWNWORM_WORMSIGN.get();
+        int spawnWorm = ServerConfigs.SPAWNWORM_WORMSIGN.get();
         if(event.side == LogicalSide.CLIENT) return;
         Player player = event.player;
 
@@ -40,26 +43,24 @@ public class WormSignHandler {
         if (!isDesertBiome(player.getServer().getLevel(player.level().dimension()), player.blockPosition())
                 || player.level().getBrightness(LightLayer.SKY, player.blockPosition()) <= 0) {
             player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
-                decrementWormSign(1, ws);
+                decrementWormSign(1, player, ws);
             });
             return;
         }
 
         // if worm already present
         if (!player.level().getEntitiesOfClass(WormChainEntity.class,
-                new AABB(player.position().add(600, 200, 600), player.position().subtract(600, 200, 600))).isEmpty()) {
+                new AABB(player.position().add(800, 200, 800), player.position().subtract(800, 200, 800))).isEmpty()) {
             player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
                 ws.setStage(0);
                 ws.setStageTimer(0);
-                ws.subWS(2*spawnWorm);
+                ws.subWS(2 * spawnWorm);
                 ws.setMultiplier(0);
-                ws.setRespawnTimer(CommonConfigs.RESPAWN_DURATION.get()*40);
+                ws.setRespawnTimer(ServerConfigs.RESPAWN_DURATION.get()*40);
             });
             return;
         }
 
-        //normal wormsign handling
-        int softBoots = player.getItemBySlot(EquipmentSlot.FEET).getEnchantmentLevel(Enchantments.FALL_PROTECTION);
         player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
             if(!ws.canRespawn()) {
                 ws.decrementRespawnTimer();
@@ -67,12 +68,18 @@ public class WormSignHandler {
             }
 
             if (ws.getSignTimer() < 200) {
-                if (player.isSprinting()) {
-                    incrementWormSign((4-softBoots), player, ws);
+                if (player.isPassenger()) {
+                    Entity vehicle = player.getVehicle();
+                    if (vehicle != null && isVehicleAllowed(vehicle)) {
+                        handleVehicleTrigger(vehicle, player, ws);
+                    }
+                } else if (player.isSprinting()) {
+                    handlePlayerSprintTrigger(player, ws);
                 }
+
                 ws.addThisJumpTime(1);
                 ws.addMultiplier(-0.01);
-                if (ws.getSignTimer() == 0) decrementWormSign(1, ws);;
+                if (ws.getSignTimer() == 0) decrementWormSign(1, player, ws);
 
                 // spawn sandworm
                 if (ws.getWS() >= spawnWorm) {
@@ -101,24 +108,26 @@ public class WormSignHandler {
                 float similarity = 1 - percentDiff;
                 ws.addMultiplier(similarity * 0.7);
                 incrementWormSign((int) (80 * ws.getMultiplier() * (1-softBoots/16.0)), player, ws);
-//                            System.out.println("add:" + (int) (40 * ws.getMultiplier()));
-//                            System.out.println("multiplier:" + ws.getMultiplier());
                 ws.setLastJumpTime(ws.getThisJumpTime());
                 ws.setThisJumpTime(0);
             }
         });
     }
 
-
     private static void incrementWormSign(int add, Player player, WormSign ws) {
-        int spawnWorm = CommonConfigs.SPAWNWORM_WORMSIGN.get();
-        if (ws.getWS() < spawnWorm / 2 && (ws.getWS() + add) >= spawnWorm / 2) {
-            warningScreenshake(player, 0.5, ModSounds.WORM_WARNING_1.get(), ws.getStage(), ws.getWS());
+        int spawnWorm = ServerConfigs.SPAWNWORM_WORMSIGN.get();
+        int wsAdded = ws.getWS() + add;
+        if (ws.getWS() < spawnWorm / 2 && (wsAdded) >= spawnWorm / 2) {
+            LOGGER.info("Sandworm reached stage 1: {}/{}, player: {}", wsAdded, spawnWorm, player.getDisplayName().getString());
+            warningScreenshake(player, 0.5, ModSounds.WORM_WARNING_1.get(), ws.getStage(), ws.getWS(),
+                    ServerConfigs.ENABLE_WARNING_MESSAGES.get() ? Component.translatable("msg.sandworm_mod.stage_1") : null);
             ws.setStage(1);
             ws.setStageTimer(600);
             ws.setSignTimer();
-        } else if (ws.getWS() < spawnWorm * 0.8 && (ws.getWS() + add) >= spawnWorm * 0.8) {
-            warningScreenshake(player, 0.6, ModSounds.WORM_WARNING_2.get(), ws.getStage(), ws.getWS());
+        } else if (ws.getWS() < spawnWorm * 0.8 && (wsAdded) >= spawnWorm * 0.8) {
+            LOGGER.info("Sandworm reached stage 2: {}/{}, player: {}", wsAdded, spawnWorm, player.getDisplayName().getString());
+            warningScreenshake(player, 0.6, ModSounds.WORM_WARNING_2.get(), ws.getStage(), ws.getWS(),
+                    ServerConfigs.ENABLE_WARNING_MESSAGES.get() ? Component.translatable("msg.sandworm_mod.stage_2") : null);
             ws.setStage(2);
             ws.setStageTimer(600);
             ws.setSignTimer();
@@ -126,26 +135,81 @@ public class WormSignHandler {
         ws.addWS(add);
     }
 
-    private static void decrementWormSign(int decrement, WormSign ws) {
-        int spawnWorm = CommonConfigs.SPAWNWORM_WORMSIGN.get();
+    private static void decrementWormSign(int decrement, Player player, WormSign ws) {
+        int spawnWorm = ServerConfigs.SPAWNWORM_WORMSIGN.get();
         if(ws.getStage() == 0) {
             ws.subWS(decrement);
             ws.setStageTimer(0);
-        }
-        else if (ws.getStage() == 1) {
-            if(ws.getWS() - decrement >= spawnWorm / 2) ws.subWS(decrement);
-            else ws.setWS(spawnWorm/2);
+        } else if (ws.getStage() == 1) {
+            if (ws.getWS() - decrement >= spawnWorm / 2) {
+                ws.subWS(decrement);
+            } else {
+                ws.setWS(spawnWorm/2);
+            }
             ws.decrementStageTimer();
-            if(ws.dropStage()) ws.setStage(0);
-        }
-        else if (ws.getStage() == 2) {
-            if(ws.getWS() - decrement >= spawnWorm * 0.8) ws.subWS(decrement);
-            else ws.setWS((int)(spawnWorm * 0.8));
+            if(ws.dropStage()) {
+                ws.setStage(0);
+                LOGGER.info("Sandworm dropped to stage 0: {}/{}, player: {}", ws.getWS(), spawnWorm, player.getDisplayName().getString());
+            }
+        } else if (ws.getStage() == 2) {
+            if (ws.getWS() - decrement >= spawnWorm * 0.8) {
+                ws.subWS(decrement);
+            } else {
+                ws.setWS((int)(spawnWorm * 0.8));
+            }
             ws.decrementStageTimer();
-            if(ws.dropStage()) ws.setStage(1);
+            if (ws.dropStage()) {
+                ws.setStage(1);
+                LOGGER.info("Sandworm dropped to stage 1: {}/{}, player: {}", ws.getWS(), spawnWorm, player.getDisplayName().getString());
+            }
         }
     }
 
+    // Ground detection
+    private static boolean isOnGround(Entity entity) {
+        // Check if entity is on ground
+        if (entity.onGround()) {
+            return true;
+        }
 
+        // Additional check: check if there's a solid block below
+        BlockPos below = entity.blockPosition().below();
+        return entity.level().getBlockState(below).isSolid();
+    }
 
+    // Check if vehicle is allowed to trigger wormsign
+    // Returns true only if vehicle is in whitelist AND not in blacklist
+    private static boolean isVehicleAllowed(Entity vehicle) {
+        String vehicleId = ForgeRegistries.ENTITY_TYPES.getKey(vehicle.getType()).toString();
+        return ServerConfigs.isVehicleAllowed(vehicleId);
+    }
+
+    // Handle wormsign triggering for vehicles
+    private static void handleVehicleTrigger(Entity vehicle, Player player, WormSign ws) {
+        // Check if vehicle is on solid ground
+        if (!isOnGround(vehicle)) {
+            return;
+        }
+
+        // Check if vehicle is moving (any non-zero velocity)
+        if (vehicle.getDeltaMovement().lengthSqr() < 0.01) {
+            return;
+        }
+
+        int vehicleMultiplier = ServerConfigs.VEHICLE_TRIGGER_MULTIPLIER.get();
+        incrementWormSign(vehicleMultiplier, player, ws);
+    }
+
+    private static void handlePlayerSprintTrigger(Player player, WormSign ws) {
+        // Check if player is on ground (prevent flying)
+        if (!isOnGround(player)) {
+            return;
+        }
+        int enchantmentLevel = player.getItemBySlot(EquipmentSlot.FEET).getEnchantmentLevel(Enchantments.FALL_PROTECTION);
+        int multiplier = ServerConfigs.PLAYER_TRIGGER_MULTIPLIER.get();
+        int playerTrigger = Math.max(multiplier - enchantmentLevel, 0);
+        if (playerTrigger > 0) {
+            incrementWormSign(playerTrigger, player, ws);
+        }
+    }
 }

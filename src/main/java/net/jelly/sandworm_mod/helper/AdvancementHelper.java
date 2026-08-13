@@ -11,7 +11,7 @@ import java.util.Optional;
 public class AdvancementHelper {
     public static void grantAdvancement(ServerPlayer player, ResourceLocation advancementId) {
         Optional<Advancement> advancementOptional = player.server.getAdvancements().getAllAdvancements().stream()
-                .filter(adv -> adv.m_138327_().equals(advancementId))
+                .filter(adv -> adv.getId().equals(advancementId))
                 .findFirst();
 
         if (advancementOptional.isPresent()) {

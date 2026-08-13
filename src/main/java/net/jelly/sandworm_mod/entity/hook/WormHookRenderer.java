@@ -2,15 +2,12 @@ package net.jelly.sandworm_mod.entity.hook;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
-import net.jelly.sandworm_mod.entity.IK.worm.WormSegmentModel;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
@@ -24,18 +21,11 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 @OnlyIn(Dist.CLIENT)
 public class WormHookRenderer extends GeoEntityRenderer<WormHook> {
-    protected static final ResourceLocation TEXTURE_LOCATION = new ResourceLocation("textures/entity/zombie.png");
-    private static final RenderType RENDER_TYPE = RenderType.entityCutout(TEXTURE_LOCATION);
     private static final double VIEW_BOBBING_SCALE = 960.0D;
 
     public WormHookRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new WormHookModel());
     }
-
-//    @Override
-//    public ResourceLocation getTextureLocation(WormHook pEntity) {
-//        return TEXTURE_LOCATION;
-//    }
 
     @Override
     public void render(WormHook pEntity, float pEntityYaw, float pPartialTicks, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {

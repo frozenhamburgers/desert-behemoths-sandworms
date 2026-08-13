@@ -1,21 +1,24 @@
 package net.jelly.sandworm_mod.helper;
 
+import com.mojang.logging.LogUtils;
 import net.jelly.sandworm_mod.advancements.AdvancementTriggerRegistry;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSignProvider;
+import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.jelly.sandworm_mod.entity.ModEntities;
 import net.jelly.sandworm_mod.sound.ModSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
+import org.slf4j.Logger;
 import team.lodestar.lodestone.network.screenshake.ScreenshakePacket;
 import team.lodestar.lodestone.registry.common.LodestonePacketRegistry;
 import team.lodestar.lodestone.systems.easing.Easing;
@@ -26,7 +29,8 @@ import java.util.Random;
 import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 
 public class WarningSpawnHelper {
-    public static void warningScreenshake(Player player, double strength, SoundEvent sound, int stage, int wormsign) {
+    private static final Logger LOGGER = LogUtils.getLogger();
+    public static void warningScreenshake(Player player, double strength, SoundEvent sound, int stage, int wormsign, Component message) {
         player.level().playSeededSound(null, player.getX(), player.getY(), player.getZ(), sound, SoundSource.MASTER, 12.5f,1,0);
 
         // send screenshake to all players within 200 blocks & unify their wormsigns & wormsign stages
@@ -40,6 +44,11 @@ public class WarningSpawnHelper {
                 ws.setWS(wormsign);
                 ws.setSignTimer();
             });
+
+            // Send warning message if provided
+            if (message != null && p instanceof ServerPlayer serverPlayer) {
+                serverPlayer.sendSystemMessage(message, false);
+            }
         });
     }
 
@@ -83,6 +92,21 @@ public class WarningSpawnHelper {
         sandWorm.setAggroTargetEntity(player);
         player.level().addFreshEntity(sandWorm);
         sandWorm.playSound(ModSounds.WORM_SPAWN.get(), 100, 1);
+
+        LOGGER.info("Sandworm triggered by {}!", player.getDisplayName().getString());
+
+        // Send spawn warning to all nearby players if enabled
+        if (ServerConfigs.ENABLE_WARNING_MESSAGES.get()) {
+            Component spawnMessage = Component.translatable("msg.sandworm_mod.spawn");
+            List<Player> nearbyPlayers = player.level().getNearbyPlayers(TargetingConditions.forNonCombat(), null,
+                    new AABB(player.position().add(200, 500, 200), player.position().subtract(200, 500, 200)));
+            nearbyPlayers.forEach(p -> {
+                if (p instanceof ServerPlayer serverPlayer) {
+                    serverPlayer.sendSystemMessage(spawnMessage, false);
+                }
+            });
+        }
+
         AdvancementTriggerRegistry.SHAI_HULUD.trigger((ServerPlayer) player);
     }
 

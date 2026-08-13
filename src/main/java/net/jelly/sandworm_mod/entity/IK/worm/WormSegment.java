@@ -1,8 +1,8 @@
 package net.jelly.sandworm_mod.entity.IK.worm;
 
-import net.jelly.sandworm_mod.config.CommonConfigs;
 import net.jelly.sandworm_mod.entity.IK.AbstractIKSegment;
 import net.jelly.sandworm_mod.helper.IPlayerMixinAccessor;
+import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.registry.common.DamageTypesRegistry;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.registries.Registries;
@@ -71,7 +71,7 @@ public class WormSegment extends AbstractIKSegment implements GeoEntity {
         }
     }
 
-    protected double getDamage() { return (10.0f * CommonConfigs.DAMAGE_SCALE.get()); }
+    protected double getDamage() { return (10.0f * ServerConfigs.DAMAGE_SCALE.get()); }
     protected Vec3 getKB() {return new Vec3(3,2,3); }
 
     @Override
@@ -128,7 +128,7 @@ public class WormSegment extends AbstractIKSegment implements GeoEntity {
     @Override
     protected void positionRider(Entity pPassenger, Entity.MoveFunction pCallback) {
         if (this.hasPassenger(pPassenger)) {
-            double d0 = this.getY() + this.m_6048_() + pPassenger.getMyRidingOffset() + 1.75D;
+            double d0 = this.getY() + this.getPassengersRidingOffset() + pPassenger.getMyRidingOffset() + 1.75D;
             pCallback.accept(pPassenger, this.getX(), d0, this.getZ());
         }
     }

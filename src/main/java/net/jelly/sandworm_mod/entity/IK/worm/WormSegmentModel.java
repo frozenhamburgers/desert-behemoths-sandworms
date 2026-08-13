@@ -10,17 +10,17 @@ import software.bernie.geckolib.model.GeoModel;
 public class WormSegmentModel extends GeoModel<WormSegment> {
 	@Override
 	public ResourceLocation getModelResource(WormSegment wormSegment) {
-		return new ResourceLocation(SandwormMod.MODID, "geo/worm_segment.geo.json");
+		return ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "geo/worm_segment.geo.json");
 	}
 
 	@Override
 	public ResourceLocation getTextureResource(WormSegment wormSegment) {
-		return new ResourceLocation(SandwormMod.MODID, "textures/entity/worm_segment_texture.png");
+		return ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "textures/entity/worm_segment_texture.png");
 	}
 
 	@Override
 	public ResourceLocation getAnimationResource(WormSegment wormSegment) {
-		return new ResourceLocation(SandwormMod.MODID, "animations/no_animation.json");
+		return ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "animations/no_animation.json");
 	}
 
 }

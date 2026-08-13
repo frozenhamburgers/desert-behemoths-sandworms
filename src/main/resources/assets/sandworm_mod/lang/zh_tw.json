@@ -1,0 +1,11 @@
+{
+  "death.attack.worm": "%1$s葬身蟲腹",
+  "block.sandworm_mod.thumper": "震擊器",
+  "entity.sandworm_mod.worm_chain": "沙蟲",
+  "entity.sandworm_mod.worm_head_segment": "沙蟲頭部",
+  "entity.sandworm_mod.worm_segment": "沙蟲軀體",
+  "item.sandworm_mod.sandworm_tooth": "沙蟲牙齒",
+  "msg.sandworm_mod.stage_1": "§e沙蟲感受到了震動...",
+  "msg.sandworm_mod.stage_2": "§c沙蟲即將甦醒！",
+  "msg.sandworm_mod.spawn": "§4它來了！！！"
+}

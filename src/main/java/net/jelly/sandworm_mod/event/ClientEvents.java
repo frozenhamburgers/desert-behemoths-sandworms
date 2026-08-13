@@ -23,7 +23,6 @@ import team.lodestar.lodestone.systems.postprocess.PostProcessHandler;
 
 import static team.lodestar.lodestone.registry.client.LodestoneWorldEventRendererRegistry.registerRenderer;
 
-
 public class ClientEvents {
     // FORGE CLIENT EVENTS
 
@@ -54,10 +53,6 @@ public class ClientEvents {
 
     }
 
-
-
-
-
     // MOD CLIENT EVENTS
     @Mod.EventBusSubscriber(modid= SandwormMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ModClientEvents {
@@ -68,7 +63,7 @@ public class ClientEvents {
         public static void onClientSetup(FMLClientSetupEvent event) {
             // register shaders
             PostProcessHandler.addInstance(SonicBoomPostProcessor.INSTANCE);
-            ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, new EffekAssetLoader(), new ResourceLocation(SandwormMod.MODID, "effeks"));
+            ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, new EffekAssetLoader(), ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "effeks"));
         }
 
         @SubscribeEvent
@@ -84,6 +79,4 @@ public class ClientEvents {
         // worm mounting
 
     }
-
-
 }

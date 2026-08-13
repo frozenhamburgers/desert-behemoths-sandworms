@@ -4,7 +4,7 @@ import mod.chloeprime.aaaparticles.api.common.AAALevel;
 import mod.chloeprime.aaaparticles.api.common.ParticleEmitterInfo;
 import net.jelly.sandworm_mod.SandwormMod;
 import net.jelly.sandworm_mod.block.ModBlockEntities;
-import net.jelly.sandworm_mod.config.CommonConfigs;
+import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.entity.IK.AbstractWormController;
 import net.jelly.sandworm_mod.entity.ModEntities;
 import net.jelly.sandworm_mod.item.ModItems;
@@ -17,7 +17,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
@@ -49,7 +48,9 @@ public class WormChainEntity extends AbstractWormController {
     private static float SPEED_SCALE = 1.3f;
     private boolean breaching = false;
     private int soundFrequencyCount = 0;
-    private static final ParticleEmitterInfo SLOWER_SAND_IMPACT = new ParticleEmitterInfo(new ResourceLocation(SandwormMod.MODID, "slowersandimpact"));
+    private static final ParticleEmitterInfo SAND_IMPACT = new ParticleEmitterInfo(ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "sandimpact"));
+    private static final ParticleEmitterInfo SLOWER_SAND_IMPACT = new ParticleEmitterInfo(ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "slowersandimpact"));
+    private static final ParticleEmitterInfo SAND_SMOKE = new ParticleEmitterInfo(ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "sandsmoke"));
     public LivingEntity aggroTargetEntity;
     public boolean removed = false;
     private int discardTimer = 0;
@@ -74,9 +75,7 @@ public class WormChainEntity extends AbstractWormController {
     }
 
     public void initWorm() {
-        System.out.println("init Worm");
         if(segmentCount == 0) {
-            System.out.println("adding seg");
             for(int i=0; i<10; i++) addWormSegment(0.35f*5, new Vec3(1,0,0), new Vec3(7.5*((i+2)/11f),7.5*((i+2)/11f),5));
             for(int i=0; i<80; i++) addWormSegment(0.35f*5, new Vec3(1,0,0), new Vec3(7.5,7.5,5));
             addHeadSegment(0.35f*5, new Vec3(1,0,0), new Vec3(7.5,7.5,5));
@@ -171,7 +170,7 @@ public class WormChainEntity extends AbstractWormController {
                 double dist = targetedObjectPos.distanceTo(head.position());
                 float intensity = (float) Math.pow((1f + Math.pow(1.1f, dist - 17.5f)), -1) + 0.2f;
                 if (soundFrequencyCount >= 10 - (intensity * 10)) {
-                    level().playSound(null, head, SoundEvents.SAND_BREAK, SoundSource.HOSTILE, 80f * intensity, intensity);
+                    head.playSound(SoundEvents.SAND_BREAK, 80f * intensity, intensity);
                     head.playSound(ModSounds.WORM_BURROW.get(), 80f * intensity, intensity);
                     soundFrequencyCount = 0;
                 } else soundFrequencyCount++;
@@ -199,7 +198,6 @@ public class WormChainEntity extends AbstractWormController {
 
     // returns
     private void wormAIBehavior() {
-        System.out.println(this.mountableTimer);
         // retarget if target entity is gone
         if(thumperTarget == null && (aggroTargetEntity == null || aggroTargetEntity.isRemoved() || aggroTargetEntity.isDeadOrDying() || !isDesertBiome(aggroTargetEntity))) {
             retarget(50);
@@ -210,7 +208,6 @@ public class WormChainEntity extends AbstractWormController {
             Vec3 targetedObjectPos = getTargetedObjectPos();
             if(targetedObjectPos == null) {
                 target = head.position().add(targetV);
-                System.out.println("no target! targetV:" + targetV);
                 return;
             }
             if (head.position().subtract(targetedObjectPos).horizontalDistance() > 50) {
@@ -375,7 +372,7 @@ public class WormChainEntity extends AbstractWormController {
                 if(!(aggroTargetEntity instanceof Player)) despawnTimer++;
                 else if (((Player) aggroTargetEntity).isCreative()) despawnTimer++;
                 else despawnTimer = 0;
-                if(despawnTimer >= CommonConfigs.DESPAWN_TIMER.get()*20) escaping = true;
+                if(despawnTimer >= ServerConfigs.DESPAWN_TIMER.get()*20) escaping = true;
             }
 
             if(!segments.isEmpty()) {
@@ -546,7 +543,7 @@ public class WormChainEntity extends AbstractWormController {
         if((!mounted && !vulnerable) || escaping) return;
         vulnerable = false;
         System.out.println(dmgTaken);
-        int totalHealth = CommonConfigs.HEALTH.get();
+        int totalHealth = ServerConfigs.HEALTH.get();
         head.playSound(ModSounds.WORM_ROAR.get(), 10f, 1f);
         if((dmgTaken < totalHealth/3 && dmgTaken+dmg >= totalHealth/3) || (dmgTaken < 2*totalHealth/3 && dmgTaken+dmg >= 2*totalHealth/3)) {
             targetV = new Vec3(targetV.x*0.075, targetV.y+1.2, targetV.z*0.075);
