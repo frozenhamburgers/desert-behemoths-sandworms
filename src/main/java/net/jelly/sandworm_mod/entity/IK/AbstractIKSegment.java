@@ -4,6 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
@@ -21,8 +22,67 @@ public abstract class AbstractIKSegment extends Entity {
     private AbstractIKController owner = null;
     private int discardTimer = 0;
 
+    // vanilla Entity (unlike LivingEntity) does not smooth incoming network position/rotation
+    // updates over multiple ticks -> snaps & jerky movement
+    // these fields replicate LivingEntity's client-side lerp so segments (esp. the head) glide
+    // between synced positions instead of stair-stepping once per tracker update.
+    // maybe should've used LivingEntity from the start :/
+    private int lerpSteps;
+    private double lerpX, lerpY, lerpZ;
+    private float lerpYRot, lerpXRot;
+
+    // DIR_VEC/UP_VEC: Track the previous and current resolved values here so the renderer can blend between them using partialTick.
+    private boolean firstDirUpTick = true;
+    private Vec3 renderOldDirVec = new Vec3(0, 1, 0);
+    private Vec3 renderNewDirVec = new Vec3(0, 1, 0);
+    private Vec3 renderOldUpVec = new Vec3(0, 1, 0);
+    private Vec3 renderNewUpVec = new Vec3(0, 1, 0);
+
     public AbstractIKSegment(EntityType<?> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+    }
+
+    @Override
+    public void lerpTo(double pX, double pY, double pZ, float pYRot, float pXRot, int pLerpSteps, boolean pTeleport) {
+        this.lerpX = pX;
+        this.lerpY = pY;
+        this.lerpZ = pZ;
+        this.lerpYRot = pYRot;
+        this.lerpXRot = pXRot;
+        this.lerpSteps = pLerpSteps;
+    }
+
+    private void clientInterpolationTick() {
+        if (firstDirUpTick) {
+            renderOldDirVec = renderNewDirVec = getDirectionVector();
+            renderOldUpVec = renderNewUpVec = getUpVector();
+            firstDirUpTick = false;
+        } else {
+            renderOldDirVec = renderNewDirVec;
+            renderOldUpVec = renderNewUpVec;
+            renderNewDirVec = getDirectionVector();
+            renderNewUpVec = getUpVector();
+        }
+
+        if (lerpSteps > 0) {
+            double x = getX() + (lerpX - getX()) / lerpSteps;
+            double y = getY() + (lerpY - getY()) / lerpSteps;
+            double z = getZ() + (lerpZ - getZ()) / lerpSteps;
+            float yRot = (float) (getYRot() + Mth.wrapDegrees(lerpYRot - getYRot()) / lerpSteps);
+            float xRot = (float) (getXRot() + Mth.wrapDegrees(lerpXRot - getXRot()) / lerpSteps);
+            lerpSteps--;
+            setOldPosAndRot();
+            setPos(x, y, z);
+            setRot(yRot, xRot);
+        }
+    }
+
+    public Vec3 getRenderDirectionVector(float partialTick) {
+        return renderOldDirVec.lerp(renderNewDirVec, partialTick).normalize();
+    }
+
+    public Vec3 getRenderUpVector(float partialTick) {
+        return renderOldUpVec.lerp(renderNewUpVec, partialTick).normalize();
     }
 
 
@@ -37,6 +97,9 @@ public abstract class AbstractIKSegment extends Entity {
 
     @Override
     public void tick() {
+        if (this.level().isClientSide()) {
+            clientInterpolationTick();
+        }
         super.tick();
         if(!this.level().isClientSide()) {
             discardTimer++;

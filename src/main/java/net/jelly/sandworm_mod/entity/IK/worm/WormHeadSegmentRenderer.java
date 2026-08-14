@@ -23,8 +23,8 @@ public class WormHeadSegmentRenderer extends GeoEntityRenderer<WormHeadSegment> 
     @Override
     public void render(WormHeadSegment entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         poseStack.pushPose();
-        Vec3 dirVec = entity.getDirectionVector();
-        Vec3 upVec = entity.getUpVector();
+        Vec3 dirVec = entity.getRenderDirectionVector(partialTick);
+        Vec3 upVec = entity.getRenderUpVector(partialTick);
         Matrix4f matrix = new Matrix4f();
         matrix.rotateTowards(dirVec.toVector3f(), upVec.toVector3f());
         Vec3 scaleVec = entity.getVisualScale();
