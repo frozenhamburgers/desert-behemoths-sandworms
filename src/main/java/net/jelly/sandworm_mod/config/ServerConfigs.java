@@ -31,6 +31,8 @@ public class ServerConfigs {
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_WARNING_MESSAGES;
 
+    public static final ForgeConfigSpec.ConfigValue<Integer> WORM_TOOTH_MAX_TIER;
+
     public static VehicleMatcher vehicleMatcher;
 
     static {
@@ -103,6 +105,13 @@ public class ServerConfigs {
 
         ENABLE_WARNING_MESSAGES = BUILDER.comment("Enable warning messages when sandworm is approaching (messages to nearby players)")
                 .define("enable_warning_messages", false);
+
+        BUILDER.pop();
+
+        BUILDER.push("brewing");
+
+        WORM_TOOTH_MAX_TIER = BUILDER.comment("Maximum number of times a potion can be upgraded by brewing it with worm teeth. Default 2.")
+                .defineInRange("worm_tooth_max_tier", 2, 1, 100);
 
         BUILDER.pop();
         SPEC = BUILDER.build();
