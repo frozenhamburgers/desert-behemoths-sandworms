@@ -9,7 +9,9 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.UnaryOperator;
 
 public class AbstractIKController extends Entity {
     public float tolerance = 0.01f;
@@ -134,6 +136,47 @@ public class AbstractIKController extends Entity {
                 currentSegment.smoothMoveTo(nextTail);
             }
             currentSegment.setDirectionVector(currentSegment.position().subtract(lastPosition));
+        }
+    }
+
+    /**
+     * Same forward-reaching pass as {@link #fabrikForward()}, but any non-head index present in
+     * {@code controlPoints} gets to perturb its spot in the chain via the supplied function.
+     * Each segment's "natural" position is computed exactly as {@link #fabrikForward()} always
+     * has - rigidly extended off its already-solved head-ward neighbor - and a control point
+     * function receives that live, this-tick natural position and returns the position to
+     * actually use (e.g. nudged down by gravity), rather than being handed a stale position from
+     * a separate pass.
+ *
+     * Because the pass still only ever walks head-to-root, and each control point only sees the
+     * natural position already implied by the segment ahead of it, nothing a control point does
+     * can ripple forward into the arc(s) ahead of it, let alone drag on the head itself.
+     */
+    public void fabrikForwardSegmented(Map<Integer, UnaryOperator<Vec3>> controlPoints) {
+        for (int i = segmentCount - 1; i >= 0; i--) {
+            AbstractIKSegment currentSegment = segments.get(i);
+            Vec3 lastPosition;
+            Vec3 root = this.position();
+            if (i == 0) {
+                lastPosition = root;
+            } else {
+                AbstractIKSegment lastSegment = segments.get(i - 1);
+                lastPosition = lastSegment.position();
+            }
+
+            Vec3 naturalPosition;
+            if (i == segmentCount - 1) {
+                naturalPosition = target;
+            } else {
+                AbstractIKSegment nextSegment = segments.get(i + 1);
+                naturalPosition = nextSegment.position().subtract(nextSegment.getDirectionVector().scale(nextSegment.getLength()));
+            }
+
+            UnaryOperator<Vec3> controlPoint = controlPoints.get(i);
+            Vec3 finalPosition = controlPoint != null ? controlPoint.apply(naturalPosition) : naturalPosition;
+
+            currentSegment.smoothMoveTo(finalPosition);
+            currentSegment.setDirectionVector(finalPosition.subtract(lastPosition));
         }
     }
 

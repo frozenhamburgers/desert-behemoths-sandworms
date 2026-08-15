@@ -6,6 +6,9 @@ import net.jelly.sandworm_mod.SandwormMod;
 import net.jelly.sandworm_mod.block.ModBlockEntities;
 import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.entity.IK.AbstractWormController;
+import net.jelly.sandworm_mod.entity.IK.physics.SurfaceNormalSampler;
+import net.jelly.sandworm_mod.entity.IK.physics.WormControlPoint;
+import net.jelly.sandworm_mod.entity.IK.physics.WormPhysics;
 import net.jelly.sandworm_mod.entity.ModEntities;
 import net.jelly.sandworm_mod.item.ModItems;
 import net.jelly.sandworm_mod.sound.ModSounds;
@@ -27,7 +30,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
@@ -38,14 +40,24 @@ import team.lodestar.lodestone.network.screenshake.PositionedScreenshakePacket;
 import team.lodestar.lodestone.registry.common.LodestonePacketRegistry;
 import team.lodestar.lodestone.systems.easing.Easing;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 
 public class WormChainEntity extends AbstractWormController {
     private static float SPEED_SCALE = 1.3f;
+    // control points are spaced this many segments apart (root-ward of the head) so the body can
+    // sag/conform to terrain between the head and the tail instead of just draping in a straight
+    // geometric line behind wherever the head has been
+    private static final int CONTROL_POINT_SPACING = 10;
+    private static final Vec3 CONTROL_POINT_GRAVITY = new Vec3(0, -0.06, 0);
+    private static final double CONTROL_POINT_MAX_FALL_SPEED = 1.0;
+    private final List<Integer> controlPointIndices = new ArrayList<>();
+    private final List<WormControlPoint> controlPoints = new ArrayList<>();
     private boolean breaching = false;
     private int soundFrequencyCount = 0;
     private static final ParticleEmitterInfo SAND_IMPACT = new ParticleEmitterInfo(ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "sandimpact"));
@@ -90,7 +102,38 @@ public class WormChainEntity extends AbstractWormController {
                     segments.get(i).setDirectionVector(lookAtAggroEntity);
                 }
             }
+            initControlPoints();
         }
+    }
+
+    private void initControlPoints() {
+        controlPointIndices.clear();
+        controlPoints.clear();
+        for (int idx = (segmentCount - 1) - CONTROL_POINT_SPACING; idx > 0; idx -= CONTROL_POINT_SPACING) {
+            controlPointIndices.add(idx);
+        }
+        controlPointIndices.add(0);
+        for (int idx : controlPointIndices) {
+            controlPoints.add(new WormControlPoint(segments.get(idx).position()));
+        }
+    }
+
+    // one perturbation function per control point index, each wrapping a WormControlPoint: given
+    // the live, this-tick natural chain position for that spot (computed inline by
+    // fabrikForwardSegmented as it walks the chain), lets gravity pull it further if it's hanging
+    // in open air (a no-op while tunneling - see WormControlPoint.tick) and returns the result.
+    private Map<Integer, UnaryOperator<Vec3>> getControlPointOps() {
+        Map<Integer, UnaryOperator<Vec3>> ops = new LinkedHashMap<>();
+        for (int k = 0; k < controlPointIndices.size(); k++) {
+            int idx = controlPointIndices.get(k);
+            WormControlPoint controlPoint = controlPoints.get(k);
+            double probeHalfWidth = Math.max(1.0, segments.get(idx).getVisualScale().x / 2.0);
+            ops.put(idx, naturalPosition -> {
+                controlPoint.tick(this.level(), naturalPosition, CONTROL_POINT_GRAVITY, CONTROL_POINT_MAX_FALL_SPEED, probeHalfWidth);
+                return controlPoint.getPosition();
+            });
+        }
+        return ops;
     }
 
     // returns 0 if normal, 1 if freeze ticking
@@ -267,22 +310,6 @@ public class WormChainEntity extends AbstractWormController {
     }
 
 
-    private @Nullable BlockPos findTopY(int x, int z, int topY, int bottomY) {
-        // Start from the top Y value and move downward
-        for (int y = topY; y >= bottomY; y--) {
-            BlockPos pos = new BlockPos(x, y, z);
-            BlockState state = this.level().getBlockState(pos);
-
-            // Check if this block is solid and has air above it
-            if (!state.isAir() && this.level().getBlockState(pos.above()).isAir()) {
-                return new BlockPos(x,y,z);
-            }
-        }
-
-        // If no suitable block is found, return the bottom Y (default to ground level)
-        return new BlockPos(x,bottomY,z);
-    }
-
     private void mountedWormAIBehavior() {
         // if dismount
         if(segments.get(segmentCount - 3).getPassengers().isEmpty()) {
@@ -291,62 +318,18 @@ public class WormChainEntity extends AbstractWormController {
             return;
         }
 
-        // SURFACE NORMAL CALCULATION
-        AABB wormAABB = head.getBoundingBox();
-        int minBX = (int)Math.floor(wormAABB.minX);
-        int maxBX = (int)Math.floor(wormAABB.maxX);
-        int minBZ = (int)Math.floor(wormAABB.minZ);
-        int maxBZ = (int)Math.floor(wormAABB.maxZ);
-        int minBY = (int)Math.floor(wormAABB.minY);
-        int maxBY = (int)Math.floor(wormAABB.maxY);
-
-        List<BlockPos> sampledPositions = new ArrayList<>();
-        sampledPositions.add(findTopY(minBX, minBZ, maxBY, minBY-1)); // Bottom-left
-        sampledPositions.add(findTopY(maxBX, minBZ, maxBY, minBY-1)); // Bottom-right
-        sampledPositions.add(findTopY(minBX, maxBZ, maxBY, minBY-1)); // Top-left
-        sampledPositions.add(findTopY(maxBX, maxBZ, maxBY, minBY-1)); // Top-right
-        sampledPositions.add(findTopY((minBX + maxBX) / 2, (minBZ + maxBZ) / 2, maxBY, minBY-1)); // Center
-
-        Vec3 normal = new Vec3(0,0,0);
-        boolean onSurface = false;
-        for(int i=0; i<4; i++) {
-            if(this.level().getBlockState(sampledPositions.get(i)).isSuffocating(this.level(), sampledPositions.get(i))) {
-                onSurface = true;
-                break;
-            }
-        }
-        if(onSurface) {
-            Vec3 p1 = sampledPositions.get(0).getCenter();
-            Vec3 p2 = sampledPositions.get(1).getCenter();
-            Vec3 p3 = sampledPositions.get(2).getCenter();
-            Vec3 p4 = sampledPositions.get(3).getCenter();
-
-            Vec3 v1 = p4.subtract(p1);
-            Vec3 v2 = p3.subtract(p2);
-
-            normal = v2.cross(v1).normalize();
-        }
-//        System.out.println("normal: " + normal);
+        SurfaceNormalSampler.Sample ground = SurfaceNormalSampler.sampleAABB(this.level(), head.getBoundingBox());
 
         // gravity
         Vec3 gForce = new Vec3(0,-0.016,0);
         // steering
         Vec3 riderForce = new Vec3(0,0,0);
-        if(normal.length() > 0) {
+        if(ground.grounded()) {
             riderForce = rider.getLookAngle().normalize().scale(0.04);
             if(rider.zza > 0) riderForce = riderForce.add(rider.getLookAngle().normalize().scale(0.04));
         }
-        // net force is all forces before normal & friciton are applied
-        Vec3 netForce = new Vec3(0,0,0).add(riderForce).add(gForce);
-        // normal
-        Vec3 normalForce = normal.scale(-netForce.dot(normal));
-        // friction
-        double frictionCoefficient = 0.8; // Example coefficient of friction
-        Vec3 frictionForce = targetV.scale(normalForce.length()).scale(-frictionCoefficient);
-        targetV = targetV.add(netForce).add(normalForce).add(frictionForce);
-        if (targetV.dot(normal) < 0) {
-            targetV = targetV.subtract(normal.scale(targetV.dot(normal))); // Remove downward normal component of velocity
-        }
+        double frictionCoefficient = 0.8;
+        targetV = WormPhysics.resolveGroundVelocity(targetV, riderForce, gForce, ground, frictionCoefficient);
         target = head.position().add(targetV);
 
         // dismount if leave biome for 10+ seconds
@@ -526,9 +509,10 @@ public class WormChainEntity extends AbstractWormController {
 
     @Override
     public void fabrik() {
+        Map<Integer, UnaryOperator<Vec3>> controlPointOps = getControlPointOps();
         int i = 0;
         while(Math.abs(target.subtract(segments.get(segmentCount-1).position()).length()) > tolerance && i <= 10) {
-            fabrikForward();
+            fabrikForwardSegmented(controlPointOps);
             i++;
         }
     }
