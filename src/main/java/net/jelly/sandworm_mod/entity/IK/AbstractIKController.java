@@ -9,9 +9,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.function.UnaryOperator;
 
 public class AbstractIKController extends Entity {
     public float tolerance = 0.01f;
@@ -115,6 +113,20 @@ public class AbstractIKController extends Entity {
     }
 
 
+    /**
+     * Solves the chain head-to-root: the head is set directly to the live AI {@code target}
+     * (unconditional - nothing root-ward of it can ever move it), and every other segment aims
+     * for its "natural" position - rigidly extended {@code length} behind its already-solved
+     * head-ward neighbor - after being run through {@link #adjustSegmentPosition}, whose default
+     * implementation is a no-op (so plain rigid-rope behavior is what you get unless a subclass
+     * opts in to something else).
+     * <p>
+     * Whatever {@link #adjustSegmentPosition} returns is re-projected onto the sphere of radius
+     * {@code nextSegment.getLength()} around the head-ward neighbor before being used, so bond
+     * length is always preserved exactly - an override can only change which direction a bond
+     * points, never its length. Skipping this and using an adjusted position directly would leave
+     * that bond stretched or compressed relative to the rest of the chain, reading as a kink.
+     */
     public void fabrikForward() {
         for (int i = segmentCount - 1; i >= 0; i--) {
             AbstractIKSegment currentSegment = segments.get(i);
@@ -127,57 +139,35 @@ public class AbstractIKController extends Entity {
                 lastPosition = lastSegment.position();
             }
 
-            // head segment
-            if (i == segmentCount - 1) currentSegment.moveTo(target);
-                // not head segment
-            else {
-                AbstractIKSegment nextSegment = segments.get(i + 1);
-                Vec3 nextTail = nextSegment.position().subtract(nextSegment.getDirectionVector().scale(nextSegment.getLength()));
-                currentSegment.smoothMoveTo(nextTail);
-            }
-            currentSegment.setDirectionVector(currentSegment.position().subtract(lastPosition));
-        }
-    }
-
-    /**
-     * Same forward-reaching pass as {@link #fabrikForward()}, but any non-head index present in
-     * {@code controlPoints} gets to perturb its spot in the chain via the supplied function.
-     * Each segment's "natural" position is computed exactly as {@link #fabrikForward()} always
-     * has - rigidly extended off its already-solved head-ward neighbor - and a control point
-     * function receives that live, this-tick natural position and returns the position to
-     * actually use (e.g. nudged down by gravity), rather than being handed a stale position from
-     * a separate pass.
- *
-     * Because the pass still only ever walks head-to-root, and each control point only sees the
-     * natural position already implied by the segment ahead of it, nothing a control point does
-     * can ripple forward into the arc(s) ahead of it, let alone drag on the head itself.
-     */
-    public void fabrikForwardSegmented(Map<Integer, UnaryOperator<Vec3>> controlPoints) {
-        for (int i = segmentCount - 1; i >= 0; i--) {
-            AbstractIKSegment currentSegment = segments.get(i);
-            Vec3 lastPosition;
-            Vec3 root = this.position();
-            if (i == 0) {
-                lastPosition = root;
-            } else {
-                AbstractIKSegment lastSegment = segments.get(i - 1);
-                lastPosition = lastSegment.position();
-            }
-
-            Vec3 naturalPosition;
+            Vec3 finalPosition;
             if (i == segmentCount - 1) {
-                naturalPosition = target;
+                finalPosition = target;
             } else {
                 AbstractIKSegment nextSegment = segments.get(i + 1);
-                naturalPosition = nextSegment.position().subtract(nextSegment.getDirectionVector().scale(nextSegment.getLength()));
+                Vec3 anchor = nextSegment.position();
+                float boneLength = nextSegment.getLength();
+                Vec3 naturalPosition = anchor.subtract(nextSegment.getDirectionVector().scale(boneLength));
+                Vec3 desiredPosition = adjustSegmentPosition(i, naturalPosition);
+                Vec3 aimOffset = desiredPosition.subtract(anchor);
+                finalPosition = aimOffset.lengthSqr() > 1.0E-6
+                        ? anchor.add(aimOffset.normalize().scale(boneLength))
+                        : naturalPosition;
             }
-
-            UnaryOperator<Vec3> controlPoint = controlPoints.get(i);
-            Vec3 finalPosition = controlPoint != null ? controlPoint.apply(naturalPosition) : naturalPosition;
 
             currentSegment.smoothMoveTo(finalPosition);
             currentSegment.setDirectionVector(finalPosition.subtract(lastPosition));
         }
+    }
+
+    /**
+     * Lets a subclass perturb a non-head segment's position during {@link #fabrikForward()} (e.g.
+     * gravity/ground-conforming physics), given the live, this-tick natural position the rigid
+     * chain would otherwise use. The default is a pure passthrough - plain rigid-rope behavior.
+     * The caller re-projects whatever this returns onto the correct bond-length sphere, so an
+     * override is free to return any position; only its direction from the anchor matters.
+     */
+    protected Vec3 adjustSegmentPosition(int i, Vec3 naturalPosition) {
+        return naturalPosition;
     }
 
     public void fabrikBackward() {

@@ -40,24 +40,19 @@ import team.lodestar.lodestone.network.screenshake.PositionedScreenshakePacket;
 import team.lodestar.lodestone.registry.common.LodestonePacketRegistry;
 import team.lodestar.lodestone.systems.easing.Easing;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.UnaryOperator;
 
 import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 
 public class WormChainEntity extends AbstractWormController {
     private static float SPEED_SCALE = 1.3f;
-    // control points are spaced this many segments apart (root-ward of the head) so the body can
-    // sag/conform to terrain between the head and the tail instead of just draping in a straight
-    // geometric line behind wherever the head has been
-    private static final int CONTROL_POINT_SPACING = 10;
-    private static final Vec3 CONTROL_POINT_GRAVITY = new Vec3(0, -0.06, 0);
-    private static final double CONTROL_POINT_MAX_FALL_SPEED = 1.0;
-    private final List<Integer> controlPointIndices = new ArrayList<>();
-    private final List<WormControlPoint> controlPoints = new ArrayList<>();
+    // every non-head segment gets its own gravity/ground-conforming physics point, so the body
+    // can sag/conform to terrain between the head and the tail instead of just draping in a
+    // straight geometric line behind wherever the head has been. Tuned per-bond (~1.75 blocks),
+    // not per-arc, since corrections compound down the chain within a single fabrikForward pass.
+    private static final Vec3 SEGMENT_GRAVITY = new Vec3(0, -0.006, 0);
+    private static final double SEGMENT_MAX_FALL_SPEED = 0.25;
+    private WormControlPoint[] controlPoints;
     private boolean breaching = false;
     private int soundFrequencyCount = 0;
     private static final ParticleEmitterInfo SAND_IMPACT = new ParticleEmitterInfo(ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "sandimpact"));
@@ -107,33 +102,24 @@ public class WormChainEntity extends AbstractWormController {
     }
 
     private void initControlPoints() {
-        controlPointIndices.clear();
-        controlPoints.clear();
-        for (int idx = (segmentCount - 1) - CONTROL_POINT_SPACING; idx > 0; idx -= CONTROL_POINT_SPACING) {
-            controlPointIndices.add(idx);
-        }
-        controlPointIndices.add(0);
-        for (int idx : controlPointIndices) {
-            controlPoints.add(new WormControlPoint(segments.get(idx).position()));
+        controlPoints = new WormControlPoint[segmentCount];
+        for (int i = 0; i < segmentCount - 1; i++) {
+            controlPoints[i] = new WormControlPoint(segments.get(i).position());
         }
     }
 
-    // one perturbation function per control point index, each wrapping a WormControlPoint: given
-    // the live, this-tick natural chain position for that spot (computed inline by
-    // fabrikForwardSegmented as it walks the chain), lets gravity pull it further if it's hanging
-    // in open air (a no-op while tunneling - see WormControlPoint.tick) and returns the result.
-    private Map<Integer, UnaryOperator<Vec3>> getControlPointOps() {
-        Map<Integer, UnaryOperator<Vec3>> ops = new LinkedHashMap<>();
-        for (int k = 0; k < controlPointIndices.size(); k++) {
-            int idx = controlPointIndices.get(k);
-            WormControlPoint controlPoint = controlPoints.get(k);
-            double probeHalfWidth = Math.max(1.0, segments.get(idx).getVisualScale().x / 2.0);
-            ops.put(idx, naturalPosition -> {
-                controlPoint.tick(this.level(), naturalPosition, CONTROL_POINT_GRAVITY, CONTROL_POINT_MAX_FALL_SPEED, probeHalfWidth);
-                return controlPoint.getPosition();
-            });
-        }
-        return ops;
+    // gravity/ground-conforming physics for a single non-head segment, called inline from
+    // fabrikForward() with the live, this-tick natural position for that spot in the chain. Lazily
+    // (re)builds controlPoints if it's missing or stale - segmentCount is restored from NBT before
+    // initWorm() (and thus initControlPoints()) ever gets a chance to run again after a save/
+    // reload, so without this guard controlPoints would still be null the first tick after reload.
+    @Override
+    protected Vec3 adjustSegmentPosition(int i, Vec3 naturalPosition) {
+        if (controlPoints == null || controlPoints.length != segmentCount) initControlPoints();
+        WormControlPoint controlPoint = controlPoints[i];
+        double probeHalfWidth = Math.max(1.0, segments.get(i).getVisualScale().x / 2.0);
+        controlPoint.tick(this.level(), naturalPosition, SEGMENT_GRAVITY, SEGMENT_MAX_FALL_SPEED, probeHalfWidth);
+        return controlPoint.getPosition();
     }
 
     // returns 0 if normal, 1 if freeze ticking
@@ -509,10 +495,9 @@ public class WormChainEntity extends AbstractWormController {
 
     @Override
     public void fabrik() {
-        Map<Integer, UnaryOperator<Vec3>> controlPointOps = getControlPointOps();
         int i = 0;
         while(Math.abs(target.subtract(segments.get(segmentCount-1).position()).length()) > tolerance && i <= 10) {
-            fabrikForwardSegmented(controlPointOps);
+            fabrikForward();
             i++;
         }
     }
