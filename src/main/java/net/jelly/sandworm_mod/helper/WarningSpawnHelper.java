@@ -5,6 +5,7 @@ import net.jelly.sandworm_mod.advancements.AdvancementTriggerRegistry;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSignProvider;
 import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
+import net.jelly.sandworm_mod.entity.IK.worm.WormSegment;
 import net.jelly.sandworm_mod.entity.ModEntities;
 import net.jelly.sandworm_mod.sound.ModSounds;
 import net.minecraft.core.BlockPos;
@@ -37,8 +38,10 @@ public class WarningSpawnHelper {
         List<Player> nearbyPlayers = player.level().getNearbyPlayers(TargetingConditions.forNonCombat(), null,
                 new AABB(player.position().add(200, 500, 200), player.position().subtract(200, 500, 200)));
         nearbyPlayers.forEach(p -> {
-            LodestonePacketRegistry.LODESTONE_CHANNEL.send((PacketDistributor.PLAYER.with(() -> (ServerPlayer) p)),
-                    new ScreenshakePacket(410).setEasing(Easing.SINE_IN_OUT).setIntensity((float)strength));
+            if (!(p.getVehicle() instanceof WormSegment)) {
+                LodestonePacketRegistry.LODESTONE_CHANNEL.send((PacketDistributor.PLAYER.with(() -> (ServerPlayer) p)),
+                        new ScreenshakePacket(410).setEasing(Easing.SINE_IN_OUT).setIntensity((float)strength));
+            }
             player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
                 ws.setStage(stage);
                 ws.setWS(wormsign);
@@ -59,6 +62,7 @@ public class WarningSpawnHelper {
         List<Player> nearbyPlayers = level.getNearbyPlayers(TargetingConditions.forNonCombat(), null,
                 new AABB(pos.add(200, 500, 200), pos.subtract(200, 500, 200)));
         nearbyPlayers.forEach(p -> {
+            if (p.getVehicle() instanceof WormSegment) return;
             LodestonePacketRegistry.LODESTONE_CHANNEL.send((PacketDistributor.PLAYER.with(() -> (ServerPlayer) p)),
                     new ScreenshakePacket(410).setEasing(Easing.SINE_IN_OUT).setIntensity((float)strength));
         });

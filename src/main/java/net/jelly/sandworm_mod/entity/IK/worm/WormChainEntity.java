@@ -180,6 +180,7 @@ public class WormChainEntity extends AbstractWormController {
             // screenshake (packets sent per player)
             for (int i = 0; i < players.size(); i++) {
                 Player thisPlayer = players.get(i);
+                if (thisPlayer.getVehicle() instanceof WormSegment) continue;
                 float dist = thisPlayer.distanceTo(head);
                 if (dist <= 100) {
                     // quadratic
@@ -569,6 +570,7 @@ public class WormChainEntity extends AbstractWormController {
         List<Player> players = (List<Player>) this.level().players();
         // screenshake (packets sent per player)
         players.forEach(player -> {
+            if (player.getVehicle() instanceof WormSegment) return;
             float dist = player.distanceTo(head);
             if (dist <= 100) {
                 LodestonePacketRegistry.LODESTONE_CHANNEL.send((PacketDistributor.PLAYER.with(() -> (ServerPlayer) player)),
