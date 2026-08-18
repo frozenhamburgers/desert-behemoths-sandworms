@@ -69,6 +69,6 @@ public class WormSign {
     }
 
     public void loadNBTData(CompoundTag nbt) {
-        wormSign = nbt.getInt("thirst");
+        wormSign = nbt.getInt("worm_sign");
     }
 }

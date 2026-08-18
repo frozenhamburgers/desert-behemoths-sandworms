@@ -56,7 +56,7 @@ public class WormSignHandler {
                 ws.setStageTimer(0);
                 ws.subWS(2 * spawnWorm);
                 ws.setMultiplier(0);
-                ws.setRespawnTimer(ServerConfigs.RESPAWN_DURATION.get()*40);
+                ws.setRespawnTimer(ServerConfigs.RESPAWN_DURATION.get()*20);
             });
             return;
         }
