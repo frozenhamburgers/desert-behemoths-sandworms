@@ -17,6 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -40,6 +41,7 @@ public class WormSignHandler {
     public static void tickWS(TickEvent.PlayerTickEvent event) {
         int spawnWorm = ServerConfigs.SPAWNWORM_WORMSIGN.get();
         if(event.side == LogicalSide.CLIENT) return;
+        if(event.phase != TickEvent.Phase.END) return;
         Player player = event.player;
 
         // if not worm spawnable biome or underground
@@ -65,7 +67,7 @@ public class WormSignHandler {
         }
 
         player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
-//            System.out.println(ws.getWS());
+            System.out.println(ws.getWS());
             if(!ws.canRespawn()) {
                 ws.decrementRespawnTimer();
                 return;
@@ -153,6 +155,7 @@ public class WormSignHandler {
 
     public static void clearHistory(UUID playerId) {
         JUMP_HISTORY.remove(playerId);
+        LAST_VEHICLE_POS.remove(playerId);
     }
 
     @SubscribeEvent
@@ -231,6 +234,13 @@ public class WormSignHandler {
         return ServerConfigs.isVehicleAllowed(vehicleId);
     }
 
+    // Tracks each rider's vehicle position from the previous tick, since getDeltaMovement()
+    // isn't reliable for rider-controlled vehicles (e.g. a tamed/saddled horse is driven by
+    // its rider's client and the server doesn't populate its velocity the way it does for an
+    // AI-driven vehicle, like an untamed horse bucking). Comparing position across ticks works
+    // regardless of which side is authoritative for the vehicle's movement.
+    private static final Map<UUID, Vec3> LAST_VEHICLE_POS = new HashMap<>();
+
     // Handle wormsign triggering for vehicles
     private static void handleVehicleTrigger(Entity vehicle, Player player, WormSign ws) {
         // Check if vehicle is on solid ground
@@ -238,8 +248,8 @@ public class WormSignHandler {
             return;
         }
 
-        // Check if vehicle is moving (any non-zero velocity)
-        if (vehicle.getDeltaMovement().lengthSqr() < 0.01) {
+        Vec3 lastPos = LAST_VEHICLE_POS.put(player.getUUID(), vehicle.position());
+        if (lastPos == null || vehicle.position().distanceToSqr(lastPos) < 0.01) {
             return;
         }
 

@@ -52,7 +52,7 @@ public class WormSign {
     }
     public void setThisJumpTime(int val) { this.thisJumpTime = val; }
     public void decrementSignTimer() { if(playSignTimer > 0) playSignTimer--; }
-    public void setSignTimer() { playSignTimer = 1100; }
+    public void setSignTimer() { playSignTimer = 800; }
     public int getSignTimer() { return playSignTimer; }
     public int getStage() {return stage; }
     public void setStage(int stage) {this.stage = stage;}
