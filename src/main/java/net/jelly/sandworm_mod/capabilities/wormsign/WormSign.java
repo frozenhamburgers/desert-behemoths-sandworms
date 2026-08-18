@@ -11,6 +11,7 @@ public class WormSign {
     private int stage = 0;
     private int stageTimer = 0;
     private int respawnTimer = 0;
+    private int seismometerGlitchTimer = 0;
 
     // WS
     public int getWS() {
@@ -61,6 +62,12 @@ public class WormSign {
     public boolean canRespawn() {return respawnTimer <= 0; }
     public void setRespawnTimer(int respawnTimer) {this.respawnTimer = respawnTimer; }
     public void decrementRespawnTimer() {this.respawnTimer--; }
+
+    // Seismometer stage-transition glitch window: counts down to 0, ticked every server tick
+    // in WormSignHandler regardless of whether a seismometer is actually being held.
+    public void setSeismometerGlitchTimer(int ticks) {this.seismometerGlitchTimer = ticks; }
+    public void decrementSeismometerGlitchTimer() {if(this.seismometerGlitchTimer > 0) this.seismometerGlitchTimer--; }
+    public boolean isSeismometerGlitching() {return seismometerGlitchTimer > 0; }
 
     public boolean dropStage() {return stageTimer <= 0;}
 

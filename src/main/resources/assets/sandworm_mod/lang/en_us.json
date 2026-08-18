@@ -5,7 +5,8 @@
   "entity.sandworm_mod.worm_segment": "Sandworm Body",
   "item.sandworm_mod.sandworm_tooth": "Sandworm Tooth",
   "block.sandworm_mod.thumper": "Thumper",
-  "item.sandworm_mod.worm_rod": "Maker Hook"
+  "item.sandworm_mod.worm_rod": "Maker Hook",
+  "item.sandworm_mod.seismometer": "Seismometer",
   "msg.sandworm_mod.stage_1": "§eThe sandworm feels you...",
   "msg.sandworm_mod.stage_2": "§cThe sandworm is awakening soon!",
   "msg.sandworm_mod.spawn": "§4IT'S COMING!!!"

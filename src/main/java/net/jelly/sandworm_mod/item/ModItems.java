@@ -17,6 +17,7 @@ public class ModItems { // holds all items in mod
     public static final RegistryObject<Item> WORM_TOOTH = ITEMS.register("sandworm_tooth", () -> new WormToothItem((new Item.Properties()).rarity(Rarity.UNCOMMON)));
     public static final RegistryObject<Item> THUMPER_ITEM = ITEMS.register("thumper", () -> new ThumperItem(ModBlocks.THUMPER.get(), new Item.Properties()));
     public static final RegistryObject<Item> WORM_ROD = ITEMS.register("worm_rod", () -> new WormRodItem(new Item.Properties().durability(64)));
+    public static final RegistryObject<Item> SEISMOMETER = ITEMS.register("seismometer", () -> new SeismometerItem(new Item.Properties().durability(1000)));
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

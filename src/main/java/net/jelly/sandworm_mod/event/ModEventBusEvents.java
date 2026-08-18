@@ -37,6 +37,9 @@ public class ModEventBusEvents {
         else if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS || event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
             event.accept(ModItems.THUMPER_ITEM);
         }
+        else if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+            event.accept(ModItems.SEISMOMETER);
+        }
     }
 
     @SubscribeEvent
