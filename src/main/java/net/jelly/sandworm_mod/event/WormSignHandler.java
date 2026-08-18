@@ -67,7 +67,7 @@ public class WormSignHandler {
         }
 
         player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
-            System.out.println(ws.getWS());
+            System.out.println(ws.getSignTimer());
             if(!ws.canRespawn()) {
                 ws.decrementRespawnTimer();
                 return;
@@ -175,7 +175,7 @@ public class WormSignHandler {
             ws.setStage(1);
             ws.setStageTimer(600);
             ws.setSignTimer();
-            ws.setSeismometerGlitchTimer(60);
+            ws.setSeismometerGlitchTimer(300);
         } else if (ws.getWS() < spawnWorm * 0.8 && (wsAdded) >= spawnWorm * 0.8) {
             LOGGER.info("Sandworm reached stage 2: {}/{}, player: {}", wsAdded, spawnWorm, player.getDisplayName().getString());
             warningScreenshake(player, 0.6, ModSounds.WORM_WARNING_2.get(), ws.getStage(), ws.getWS(),
@@ -183,7 +183,7 @@ public class WormSignHandler {
             ws.setStage(2);
             ws.setStageTimer(600);
             ws.setSignTimer();
-            ws.setSeismometerGlitchTimer(60);
+            ws.setSeismometerGlitchTimer(300);
         }
         ws.addWS(add);
     }

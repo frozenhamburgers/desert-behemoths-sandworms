@@ -53,11 +53,12 @@ public class WormSign {
     }
     public void setThisJumpTime(int val) { this.thisJumpTime = val; }
     public void decrementSignTimer() { if(playSignTimer > 0) playSignTimer--; }
-    public void setSignTimer() { playSignTimer = 800; }
+    public void setSignTimer() { playSignTimer = 700; }
     public int getSignTimer() { return playSignTimer; }
     public int getStage() {return stage; }
     public void setStage(int stage) {this.stage = stage;}
     public void setStageTimer(int timer) {this.stageTimer = timer;}
+    public int getStageTimer() {return this.stageTimer;}
     public void decrementStageTimer() {if(this.stageTimer > 0) this.stageTimer--;}
     public boolean canRespawn() {return respawnTimer <= 0; }
     public void setRespawnTimer(int respawnTimer) {this.respawnTimer = respawnTimer; }
