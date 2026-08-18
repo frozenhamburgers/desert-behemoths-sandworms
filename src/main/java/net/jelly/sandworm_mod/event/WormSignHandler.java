@@ -19,11 +19,14 @@ import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.slf4j.Logger;
+
+import java.util.*;
 
 import static net.jelly.sandworm_mod.helper.BiomeHelper.isDesertBiome;
 import static net.jelly.sandworm_mod.helper.WarningSpawnHelper.spawnWorm;
@@ -62,6 +65,7 @@ public class WormSignHandler {
         }
 
         player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
+//            System.out.println(ws.getWS());
             if(!ws.canRespawn()) {
                 ws.decrementRespawnTimer();
                 return;
@@ -91,28 +95,71 @@ public class WormSignHandler {
         });
     }
 
+    // Rolling window of recent jump intervals, per player.
+    private static final int WINDOW_SIZE = 4;
+    private static final int MIN_VALID_INTERVAL = 6;
+    private static final int MAX_VALID_INTERVAL = 40;
+    private static final Map<UUID, Deque<Integer>> JUMP_HISTORY = new HashMap<>();
+
     @SubscribeEvent
     public static void onPlayerJump(LivingEvent.LivingJumpEvent event) {
-        if(event.getEntity().level().isClientSide()) return;
-        if (!(event.getEntity() instanceof Player)) return;
-        Player player = (Player) event.getEntity();
+        if (event.getEntity().level().isClientSide()) return;
+        if (!(event.getEntity() instanceof Player player)) return;
+
         int softBoots = player.getItemBySlot(EquipmentSlot.FEET).getEnchantmentLevel(Enchantments.FALL_PROTECTION);
         if (!isDesertBiome(player.getServer().getLevel(player.level().dimension()), player.blockPosition())
                 || player.level().getBrightness(LightLayer.SKY, player.blockPosition()) <= 0) return;
 
         player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
-            if (ws.getSignTimer() < 200) {
-                float lastJump = ws.getLastJumpTime();
-                float thisJump = ws.getThisJumpTime();
-                float percentDiff = (Math.abs(lastJump - thisJump)) / ((lastJump + thisJump) / 2f);
-                float similarity = 1 - percentDiff;
-                ws.addMultiplier(similarity * 0.7);
-                incrementWormSign((int) (80 * ws.getMultiplier() * (1-softBoots/16.0)), player, ws);
-                ws.setLastJumpTime(ws.getThisJumpTime());
-                ws.setThisJumpTime(0);
+            if (ws.getSignTimer() >= 200) return;
+
+            int thisInterval = (int) ws.getThisJumpTime();
+            ws.setThisJumpTime(0);
+
+            // Interval too fast/slow to be a genuine cadence attempt: clear the window
+            // and apply a small, bounded penalty instead of letting bad data poison the average.
+            if (thisInterval < MIN_VALID_INTERVAL || thisInterval > MAX_VALID_INTERVAL) {
+                JUMP_HISTORY.computeIfAbsent(player.getUUID(), id -> new ArrayDeque<>()).clear();
+                ws.setMultiplier(Math.max(0f, ws.getMultiplier() - 0.3f));
+                return;
             }
+
+            Deque<Integer> history = JUMP_HISTORY.computeIfAbsent(player.getUUID(), id -> new ArrayDeque<>());
+            history.addLast(thisInterval);
+            if (history.size() > WINDOW_SIZE) history.removeFirst();
+
+            // Need at least two samples before "consistency" means anything.
+            if (history.size() < 2) return;
+
+            double mean = history.stream().mapToInt(Integer::intValue).average().orElse(0);
+            double variance = history.stream().mapToDouble(i -> (i - mean) * (i - mean)).average().orElse(0);
+            double stdDev = Math.sqrt(variance);
+            double coefficientOfVariation = mean == 0 ? 1.0 : stdDev / mean; // guards the old div-by-zero
+
+            // 0 = completely inconsistent, 1 = perfectly rhythmic
+            float regularity = (float) Math.max(0, Math.min(1, 1 - coefficientOfVariation));
+//            System.out.println("regularity: " + regularity);
+
+            // Blend into the existing multiplier rather than overwrite it, so a single
+            // rough jump doesn't erase an otherwise-good streak. Always clamped to [0,1].
+            float newMultiplier = (float) Math.max(0f, Math.min(1f, ws.getMultiplier() * 0.7f + regularity * 0.3f));
+            ws.setMultiplier(newMultiplier);
+
+            int gain = (int) (80 * newMultiplier * (1 - softBoots / 16.0));
+//            System.out.println("gain: " + gain);
+            if (gain > 0) incrementWormSign(gain, player, ws);
         });
     }
+
+    public static void clearHistory(UUID playerId) {
+        JUMP_HISTORY.remove(playerId);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        clearHistory(event.getEntity().getUUID());
+    }
+
 
     private static void incrementWormSign(int add, Player player, WormSign ws) {
         int spawnWorm = ServerConfigs.SPAWNWORM_WORMSIGN.get();
