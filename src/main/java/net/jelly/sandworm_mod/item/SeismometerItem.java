@@ -63,6 +63,12 @@ public class SeismometerItem extends Item {
     }
 
     @Override
+    public int getBarColor(ItemStack stack) {
+        float durabilityFraction = Math.max(0f, (stack.getMaxDamage() - stack.getDamageValue()) / (float) stack.getMaxDamage());
+        return Mth.hsvToRgb((1f - durabilityFraction) / 3.0f, 1.0f, 1.0f);
+    }
+
+    @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean isSelected) {
         super.inventoryTick(stack, level, entity, slot, isSelected);
         if (level.isClientSide() || !(entity instanceof Player player)) return;
