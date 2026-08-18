@@ -2,6 +2,7 @@ package net.jelly.sandworm_mod.item;
 
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSignProvider;
 import net.jelly.sandworm_mod.config.ServerConfigs;
+import net.jelly.sandworm_mod.entity.IK.worm.WormChainEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -9,9 +10,20 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+// Durability bar reads as a live wormsign gauge: it starts empty (0 durability) and fills
+// toward full as wormsign climbs toward a spawn. While wormsign is actively climbing, the
+// needle doesn't track the real value 1:1 - it wobbles randomly around it, with the wobble's
+// amplitude scaling exponentially with how fast wormsign has been rising lately (a light,
+// steady sprint barely shakes the needle; a strong rhythmic jump streak makes it swing wildly).
+// During the ~800 ticks around a stage-up (the same moment the warning sound/screenshake
+// fires), that wobble is replaced by a frantic overload glitch that slams the needle toward
+// random near-full readings, which smoothly relaxes back toward the true reading over the
+// last 200 ticks of the window. If an actual worm is nearby, the gauge overrides everything
+// and glitches as violently as possible regardless of wormsign/stage state.
 public class SeismometerItem extends Item {
     private static final String TAG_DISPLAY = "SeisDisplay";
     private static final String TAG_TARGET = "SeisTarget";
@@ -21,7 +33,8 @@ public class SeismometerItem extends Item {
     private static final String TAG_RECENT_DELTA = "SeisRecentDelta";
 
     // Lerp factor toward the current target each tick - higher = snappier needle movement.
-    private static final float GLITCH_LERP = 0.4f;
+    private static final float GLITCH_LERP = 0.6f;
+    private static final float VIOLENT_LERP = 0.75f;
     private static final float OSCILLATION_LERP = 0.3f;
     private static final float SETTLE_LERP = 0.15f;
 
@@ -31,6 +44,14 @@ public class SeismometerItem extends Item {
     private static final float MAX_OSCILLATION = 0.4f;
     // How sharply the oscillation amplitude ramps up with growth rate - bigger = more exponential-feeling.
     private static final float OSCILLATION_EXP_RATE = 25f;
+
+    // Once fewer than this many ticks remain in the glitch (i.e. WormSignHandler's 800-tick
+    // window is down to its last 200), amplitude smoothly relaxes from full chaos to 0.
+    private static final int FALLOFF_START_TICKS = 200;
+
+    // Same nearby-worm detection box WormSignHandler uses to reset wormsign.
+    private static final double WORM_DETECT_RANGE_XZ = 800;
+    private static final double WORM_DETECT_RANGE_Y = 200;
 
     public SeismometerItem(Properties properties) {
         super(properties);
@@ -68,12 +89,29 @@ public class SeismometerItem extends Item {
                 windowTicks--;
             }
 
-            if (ws.isSeismometerGlitching()) {
+            boolean wormNearby = !level.getEntitiesOfClass(WormChainEntity.class, new AABB(
+                    player.position().add(WORM_DETECT_RANGE_XZ, WORM_DETECT_RANGE_Y, WORM_DETECT_RANGE_XZ),
+                    player.position().subtract(WORM_DETECT_RANGE_XZ, WORM_DETECT_RANGE_Y, WORM_DETECT_RANGE_XZ))).isEmpty();
+
+            if (wormNearby) {
+                // The worm itself is right there - override everything and peg the needle
+                // as violently and rapidly as possible, no falloff, no averaging.
+                if (ticksToNext <= 0) {
+                    target = 1f - ThreadLocalRandom.current().nextFloat() * ThreadLocalRandom.current().nextFloat() * ThreadLocalRandom.current().nextFloat();
+                    ticksToNext = 1 + ThreadLocalRandom.current().nextInt(2);
+                }
+                display = Mth.lerp(VIOLENT_LERP, display, target);
+            } else if (ws.isSeismometerGlitching()) {
+                // Amplitude relaxes smoothly toward the true reading over the last
+                // FALLOFF_START_TICKS of the glitch window, revealing the real measurement.
+                int remaining = ws.getSeismometerGlitchTimer();
+                float falloff = Mth.clamp(remaining / (float) FALLOFF_START_TICKS, 0f, 1f);
                 if (ticksToNext <= 0) {
                     // Skewed toward 1 so the needle keeps slamming back up near full scale
                     // rather than wandering evenly - reads as a meter pegging out, not noise.
-                    target = 1f - ThreadLocalRandom.current().nextFloat() * ThreadLocalRandom.current().nextFloat();
-                    ticksToNext = 3 + ThreadLocalRandom.current().nextInt(5);
+                    float rawSpike = 1f - ThreadLocalRandom.current().nextFloat() * ThreadLocalRandom.current().nextFloat();
+                    target = Mth.lerp(falloff, progress, rawSpike);
+                    ticksToNext = 1 + ThreadLocalRandom.current().nextInt(3);
                 }
                 display = Mth.lerp(GLITCH_LERP, display, target);
             } else if (recentGrowth > 0f) {

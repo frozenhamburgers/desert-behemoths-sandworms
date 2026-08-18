@@ -69,6 +69,7 @@ public class WormSign {
     public void setSeismometerGlitchTimer(int ticks) {this.seismometerGlitchTimer = ticks; }
     public void decrementSeismometerGlitchTimer() {if(this.seismometerGlitchTimer > 0) this.seismometerGlitchTimer--; }
     public boolean isSeismometerGlitching() {return seismometerGlitchTimer > 0; }
+    public int getSeismometerGlitchTimer() {return seismometerGlitchTimer; }
 
     public boolean dropStage() {return stageTimer <= 0;}
 
