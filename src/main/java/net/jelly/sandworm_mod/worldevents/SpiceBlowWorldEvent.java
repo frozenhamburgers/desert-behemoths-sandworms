@@ -32,7 +32,7 @@ public class SpiceBlowWorldEvent extends WorldEventInstance {
     public boolean spawnedEruptBurst = false;
     public int lastSignalBurstAt = Integer.MIN_VALUE;
 
-    private SpiceResidueFx fx;
+    private SpiceResidueFx fx; // post processing shader for spice residue
 
     public SpiceBlowWorldEvent() {
         super(WorldEventRegistry.SPICE_BLOW);
@@ -55,7 +55,7 @@ public class SpiceBlowWorldEvent extends WorldEventInstance {
     }
 
     private int signalDuration() {
-        return (int) (100 + size * 20);
+        return (int) (100 + size * 40);
     }
 
     private int yieldAmount() {
