@@ -1,9 +1,11 @@
 package net.jelly.sandworm_mod.vfx;
 
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.jelly.sandworm_mod.SandwormMod;
 import net.minecraft.client.renderer.EffectInstance;
 import net.minecraft.resources.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 import team.lodestar.lodestone.systems.postprocess.MultiInstancePostProcessor;
 
 public class SpiceEruptionPostProcessor extends MultiInstancePostProcessor<SpiceEruptionFx> {
@@ -32,6 +34,13 @@ public class SpiceEruptionPostProcessor extends MultiInstancePostProcessor<Spice
         super.init();
         if (postChain != null) {
             effectEruption = effects[0];
+            // Bilinear upscale for the low-res raymarch target declared in spice_eruption_post.json
+            // - the JSON has no "bilinear" hook for inter-target color aux bindings, so this has to
+            // be set here, same idiom as SpiceResiduePostProcessor grabbing its own temp target.
+            RenderTarget lowRes = postChain.getTempTarget("eruptionLowRes");
+            if (lowRes != null) {
+                lowRes.setFilterMode(GL11.GL_LINEAR);
+            }
         }
     }
 

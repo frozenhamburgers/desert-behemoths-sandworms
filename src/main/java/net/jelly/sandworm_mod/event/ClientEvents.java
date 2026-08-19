@@ -92,6 +92,5 @@ public class ClientEvents {
             registerRenderer(WorldEventRegistry.WORM_BREACH, new WormBreachRenderer());
             registerRenderer(WorldEventRegistry.SPICE_BLOW, new SpiceBlowRenderer());
         }
-
     }
 }

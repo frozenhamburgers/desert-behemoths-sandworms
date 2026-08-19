@@ -2,7 +2,6 @@
 
 #moj_import <lodestone:common_math.glsl>
 
-uniform sampler2D DiffuseSampler;
 uniform sampler2D MainDepthSampler;
 uniform samplerBuffer DataBuffer;
 uniform int InstanceCount;
@@ -24,6 +23,7 @@ float hash31(vec3 p) {
 	return fract((p.x + p.y) * p.z);
 }
 
+// Trilinear 8-corner value noise, same smoothstep-interpolation style as this mod's 2D noise2D.
 float noise3D(vec3 p) {
 	vec3 i = floor(p);
 	vec3 f = fract(p);
@@ -56,7 +56,7 @@ float fbm3(vec3 p) {
 	return sum;
 }
 
-// far-plane world position for this texCoord.
+// Far-plane world position for this texCoord.
 vec3 getFarWorldPos(vec2 uv) {
 	vec4 clipSpacePosition = vec4(uv * 2.0 - 1.0, 1.0, 1.0);
 	vec4 viewSpacePosition = invProjMat * clipSpacePosition;
@@ -113,7 +113,8 @@ bool intersectColumnBounds(vec3 ro, vec3 rd, vec3 base, float boundRadius, float
 float densityAt(vec3 p, vec3 base, float baseRadius, float topRadius, float height,
 		float seed, float growFrac, float t) {
 	float h = clamp((p.y - base.y) / height, 0.0, 1.0);
-	// The column visibly grows upward over its own early lifetime
+	// The column visibly grows upward over its own early lifetime rather than
+	// popping in fully-formed.
 	if (h > growFrac) return 0.0;
 
 	float colRadius = mix(baseRadius, topRadius, pow(h, 0.7));
@@ -151,8 +152,7 @@ vec3 eruptionColor(vec3 p, vec3 base, float topRadius, float height) {
 }
 
 void main() {
-	vec4 diffuseColor = texture(DiffuseSampler, texCoord);
-	fragColor = diffuseColor;
+	fragColor = vec4(0.0);
 
 	vec3 rayOrigin = cameraPos;
 	vec3 rayDir = normalize(getFarWorldPos(texCoord) - cameraPos);
@@ -164,15 +164,8 @@ void main() {
 		tMaxScene = length(sceneWorldPos - cameraPos);
 	}
 
-	// Cloud accumulates separately from fragColor (which starts as the real background) so the
-	// final blend against the background happens once at the end, after capping cloud opacity -
-	// never fully occludes the screen, even with the camera close to or inside the column (many
-	// consecutive dense samples along a single ray would otherwise saturate alpha to ~1).
-	vec3 cloudColor = vec3(0.0);
-	float cloudAlpha = 0.0;
-
 	for (int instance = 0; instance < InstanceCount; instance++) {
-		if (cloudAlpha > 0.97) break;
+		if (fragColor.a > 0.97) break;
 
 		int idx = instance * 9;
 		vec3 base = fetch3(DataBuffer, idx);
@@ -197,19 +190,19 @@ void main() {
 		float dt = (tExit - tEnter) / float(MAX_STEPS);
 		float t = tEnter;
 		for (int i = 0; i < MAX_STEPS; i++) {
-			if (cloudAlpha > 0.97) break;
+			if (fragColor.a > 0.97) break;
 			vec3 p = rayOrigin + rayDir * t;
 			float dens = densityAt(p, base, baseRadius, topRadius, height, seed, growFrac, age) * fadeOut;
 			if (dens > 0.003) {
 				float stepAlpha = clamp(dens * dt * 0.4, 0.0, 1.0);
 				vec3 stepColor = eruptionColor(p, base, topRadius, height);
-				cloudColor = mix(cloudColor, stepColor, stepAlpha * (1.0 - cloudAlpha));
-				cloudAlpha += (1.0 - cloudAlpha) * stepAlpha;
+				fragColor.rgb = mix(fragColor.rgb, stepColor, stepAlpha * (1.0 - fragColor.a));
+				fragColor.a += (1.0 - fragColor.a) * stepAlpha;
 			}
 			t += dt;
 		}
 	}
 
-	cloudAlpha = min(cloudAlpha, 0.82);
-	fragColor.rgb = mix(fragColor.rgb, cloudColor, cloudAlpha);
+	// Never fully occludes the screen, even with the camera close to or inside the column
+	fragColor.a = min(fragColor.a, 0.82);
 }

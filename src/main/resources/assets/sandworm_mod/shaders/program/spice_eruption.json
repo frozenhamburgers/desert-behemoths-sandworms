@@ -8,7 +8,6 @@
   "fragment": "sandworm_mod:spice_eruption",
   "attributes": [ "Position" ],
   "samplers": [
-    { "name": "DiffuseSampler" },
     { "name": "MainDepthSampler" }
   ],
   "uniforms": [

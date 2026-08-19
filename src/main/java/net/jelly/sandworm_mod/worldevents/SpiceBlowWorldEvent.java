@@ -11,7 +11,12 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import team.lodestar.lodestone.systems.worldevent.WorldEventInstance;
 
-// v0 placeholder: SIGNAL/ERUPT particles are spawned by SpiceBlowRenderer
+// v0 placeholder: SIGNAL/ERUPT particles are spawned by SpiceBlowRenderer (not here - spawning
+// Lodestone world particles from tick() re-enters RenderHandler's particle batching mid-iteration
+// and crashes with a ConcurrentModificationException, see WormBreachRenderer for the safe pattern).
+// RESIDUE registers a multi-instance postprocessing shader that just tints the ground pink.
+// Hand harvesting (depletion grid) is not implemented yet - remainingYield only drains
+// via the RESIDUE lifetime timer for now.
 public class SpiceBlowWorldEvent extends WorldEventInstance {
 
     public enum Phase { SIGNAL, ERUPT, RESIDUE, DEPLETED }

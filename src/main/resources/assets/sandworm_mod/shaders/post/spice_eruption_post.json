@@ -1,17 +1,31 @@
 {
   "targets": [
     "final",
-    "depthMain"
+    "depthMain",
+    { "name": "eruptionLowRes", "width": 480, "height": 270 }
   ],
   "passes": [
     {
       "name": "sandworm_mod:spice_eruption",
       "intarget": "minecraft:main",
-      "outtarget": "final",
+      "outtarget": "eruptionLowRes",
       "auxtargets": [
         {
           "name": "MainDepthSampler",
           "id": "depthMain:depth"
+        }
+      ],
+      "uniforms": [
+      ]
+    },
+    {
+      "name": "sandworm_mod:spice_eruption_composite",
+      "intarget": "minecraft:main",
+      "outtarget": "final",
+      "auxtargets": [
+        {
+          "name": "CloudSampler",
+          "id": "eruptionLowRes"
         }
       ],
       "uniforms": [
