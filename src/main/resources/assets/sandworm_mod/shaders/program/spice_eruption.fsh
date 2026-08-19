@@ -23,7 +23,7 @@ float hash31(vec3 p) {
 	return fract((p.x + p.y) * p.z);
 }
 
-// Trilinear 8-corner value noise, same smoothstep-interpolation style as this mod's 2D noise2D.
+// trilinear 8-corner value noise
 float noise3D(vec3 p) {
 	vec3 i = floor(p);
 	vec3 f = fract(p);
@@ -56,7 +56,7 @@ float fbm3(vec3 p) {
 	return sum;
 }
 
-// Far-plane world position for this texCoord.
+// far plane world position for this texCoord.
 vec3 getFarWorldPos(vec2 uv) {
 	vec4 clipSpacePosition = vec4(uv * 2.0 - 1.0, 1.0, 1.0);
 	vec4 viewSpacePosition = invProjMat * clipSpacePosition;
@@ -65,7 +65,7 @@ vec3 getFarWorldPos(vec2 uv) {
 	return cameraPos + localSpacePosition.xyz;
 }
 
-// Analytic ray intersection against a vertical cylinder (radius `boundRadius`, axis through
+// ray intersection against a vertical cylinder (radius `boundRadius`, axis through
 // base.xz) clipped to the Y-slab [base.y, base.y+height]. O(1) - lets pixels that never touch
 // the column skip the raymarch loop entirely, and bounds the loop's march interval otherwise.
 bool intersectColumnBounds(vec3 ro, vec3 rd, vec3 base, float boundRadius, float height,
@@ -131,7 +131,7 @@ float densityAt(vec3 p, vec3 base, float baseRadius, float topRadius, float heig
 	return radialMask * clamp(n * 1.3 - 0.15, 0.0, 1.0) * topFade;
 }
 
-// Color at world position `p`: brighter/hotter near the column's axis and base, darker/cooler
+// color at world position `p`: brighter/hotter near the column's axis and base, darker/cooler
 // toward the outer radius and top - same purple palette as the residue ground shader for
 // thematic continuity, plus a bright internal-glow core. The core falloff is deliberately wide
 // so most of the volume reads as a glowing purple haze rather than dark indigo - a camera close
@@ -203,6 +203,6 @@ void main() {
 		}
 	}
 
-	// Never fully occludes the screen, even with the camera close to or inside the column
+	// never fully occludes the screen
 	fragColor.a = min(fragColor.a, 0.82);
 }

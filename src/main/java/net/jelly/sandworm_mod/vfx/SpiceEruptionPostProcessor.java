@@ -4,12 +4,20 @@ import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.jelly.sandworm_mod.SandwormMod;
 import net.minecraft.client.renderer.EffectInstance;
+import net.minecraft.client.renderer.PostPass;
 import net.minecraft.resources.ResourceLocation;
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import team.lodestar.lodestone.systems.postprocess.MultiInstancePostProcessor;
 
 public class SpiceEruptionPostProcessor extends MultiInstancePostProcessor<SpiceEruptionFx> {
     public static final SpiceEruptionPostProcessor INSTANCE = new SpiceEruptionPostProcessor();
+
+    // PostChain#updateOrthoMatrix computes ONE shared screen sized ortho matrix and applies it to
+    // every pass, regardless of that pass's own output target size. That's fine for every other
+    // pass here (all screen-sized), but the raymarch pass's own output (eruptionLowRes) is a
+    // fixed 480x270 target. without this fix its fullscreen quad only fills the bottom-left
+    // fraction of that targetg.
     private EffectInstance effectEruption;
 
     @Override
@@ -17,7 +25,6 @@ public class SpiceEruptionPostProcessor extends MultiInstancePostProcessor<Spice
         return ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "spice_eruption_post");
     }
 
-    // Concurrent eruptions are rare and each one is raymarched per-pixel, so keep this low.
     @Override
     protected int getMaxInstances() {
         return 4;
@@ -34,14 +41,29 @@ public class SpiceEruptionPostProcessor extends MultiInstancePostProcessor<Spice
         super.init();
         if (postChain != null) {
             effectEruption = effects[0];
-            // Bilinear upscale for the low-res raymarch target declared in spice_eruption_post.json
-            // - the JSON has no "bilinear" hook for inter-target color aux bindings, so this has to
-            // be set here, same idiom as SpiceResiduePostProcessor grabbing its own temp target.
-            RenderTarget lowRes = postChain.getTempTarget("eruptionLowRes");
-            if (lowRes != null) {
-                lowRes.setFilterMode(GL11.GL_LINEAR);
-            }
+            applyLowResFixups();
         }
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        // ortho matrix back to the shared screen-sized one - reapply the fix after that happens.
+        super.resize(width, height);
+        applyLowResFixups();
+    }
+
+    private void applyLowResFixups() {
+        if (postChain == null) return;
+        RenderTarget lowRes = postChain.getTempTarget("eruptionLowRes");
+        if (lowRes == null) return;
+
+        // bilinear upscale
+        lowRes.setFilterMode(GL11.GL_LINEAR);
+
+        if (postChain.passes.isEmpty()) return;
+        // raymarch pass is declared first in spice_eruption_post.json.
+        PostPass raymarchPass = postChain.passes.get(0);
+        raymarchPass.setOrthoMatrix(new Matrix4f().setOrtho(0.0f, lowRes.width, 0.0f, lowRes.height, 0.1f, 1000.0f));
     }
 
     @Override
