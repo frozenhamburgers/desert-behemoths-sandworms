@@ -2,6 +2,7 @@ package net.jelly.sandworm_mod.event;
 
 import net.jelly.sandworm_mod.SandwormMod;
 import net.jelly.sandworm_mod.advancements.AdvancementTriggerRegistry;
+import net.jelly.sandworm_mod.command.SpiceBlowCommand;
 import net.jelly.sandworm_mod.capabilities.wormsign.WormSignProvider;
 import net.jelly.sandworm_mod.config.ServerConfigs;
 import net.jelly.sandworm_mod.entity.IK.worm.WormHeadSegment;
@@ -33,6 +34,7 @@ public class ForgeEventHandler {
 //        FabrikForwardCommand.register(event.getDispatcher());
 //        FabrikBackwardCommand.register(event.getDispatcher());
 //        WormBreachCommand.register(event.getDispatcher());
+        SpiceBlowCommand.register(event.getDispatcher());
     }
 
     // ATTACH CAPABILITIES

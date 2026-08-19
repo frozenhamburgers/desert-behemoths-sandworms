@@ -12,14 +12,14 @@ import team.lodestar.lodestone.systems.particle.world.type.LodestoneWorldParticl
 
 public class ParticleRegistry {
     public static DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, SandwormMod.MODID);
-    public static RegistryObject<LodestoneWorldParticleType> CRINGE_PARTICLE = PARTICLES.register("cringe", LodestoneWorldParticleType::new);
+    public static RegistryObject<LodestoneWorldParticleType> SMOKE_CLOUD = PARTICLES.register("smoke_cloud", LodestoneWorldParticleType::new);
 
     public static void register(IEventBus eventBus) {
         PARTICLES.register(eventBus);
     }
 
     public static void registerParticleFactory(RegisterParticleProvidersEvent event) {
-        Minecraft.getInstance().particleEngine.register(CRINGE_PARTICLE.get(), LodestoneWorldParticleType.Factory::new);
+        Minecraft.getInstance().particleEngine.register(SMOKE_CLOUD.get(), LodestoneWorldParticleType.Factory::new);
     }
 
 }

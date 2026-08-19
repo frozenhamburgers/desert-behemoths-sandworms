@@ -30,6 +30,7 @@ public class ServerConfigs {
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> VEHICLE_WHITELIST;
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_WARNING_MESSAGES;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_BREACH_SMOKE_PARTICLES;
 
     public static final ForgeConfigSpec.ConfigValue<Integer> WORM_TOOTH_MAX_TIER;
 
@@ -105,6 +106,9 @@ public class ServerConfigs {
 
         ENABLE_WARNING_MESSAGES = BUILDER.comment("Enable warning messages when sandworm is approaching (messages to nearby players)")
                 .define("enable_warning_messages", false);
+
+        ENABLE_BREACH_SMOKE_PARTICLES = BUILDER.comment("Enable the smoke cloud particles spawned when a sandworm breaches or dives beneath the surface. Default true.")
+                .define("enable_breach_smoke_particles", true);
 
         BUILDER.pop();
 

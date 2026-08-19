@@ -546,6 +546,7 @@ public class WormChainEntity extends AbstractWormController {
 
     private int smokeCount = 0;
     private void smokeParticles(Level level, Vec3 pos) {
+        if (!ServerConfigs.ENABLE_BREACH_SMOKE_PARTICLES.get()) return;
         smokeCount++;
         WormBreachWorldEvent breachEvent = new WormBreachWorldEvent().setPosition(pos);
         breachEvent.start(level);

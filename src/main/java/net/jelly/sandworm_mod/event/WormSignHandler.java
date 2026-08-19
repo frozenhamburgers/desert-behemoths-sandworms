@@ -67,7 +67,7 @@ public class WormSignHandler {
         }
 
         player.getCapability(WormSignProvider.WS).ifPresent(ws -> {
-            System.out.println(ws.getSignTimer());
+//            System.out.println(ws.getSignTimer());
             if(!ws.canRespawn()) {
                 ws.decrementRespawnTimer();
                 return;

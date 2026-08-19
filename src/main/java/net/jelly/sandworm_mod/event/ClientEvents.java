@@ -7,6 +7,8 @@ import net.jelly.sandworm_mod.entity.IK.worm.WormSegment;
 import net.jelly.sandworm_mod.registry.client.ParticleRegistry;
 import net.jelly.sandworm_mod.registry.common.WorldEventRegistry;
 import net.jelly.sandworm_mod.vfx.SonicBoomPostProcessor;
+import net.jelly.sandworm_mod.vfx.SpiceResiduePostProcessor;
+import net.jelly.sandworm_mod.worldevents.SpiceBlowRenderer;
 import net.jelly.sandworm_mod.worldevents.WormBreachRenderer;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
@@ -63,6 +65,7 @@ public class ClientEvents {
         public static void onClientSetup(FMLClientSetupEvent event) {
             // register shaders
             PostProcessHandler.addInstance(SonicBoomPostProcessor.INSTANCE);
+            PostProcessHandler.addInstance(SpiceResiduePostProcessor.INSTANCE);
             ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, new EffekAssetLoader(), ResourceLocation.fromNamespaceAndPath(SandwormMod.MODID, "effeks"));
         }
 
@@ -74,6 +77,7 @@ public class ClientEvents {
         @SubscribeEvent
         public static void registerRenderers(FMLClientSetupEvent event) {
             registerRenderer(WorldEventRegistry.WORM_BREACH, new WormBreachRenderer());
+            registerRenderer(WorldEventRegistry.SPICE_BLOW, new SpiceBlowRenderer());
         }
 
         // worm mounting

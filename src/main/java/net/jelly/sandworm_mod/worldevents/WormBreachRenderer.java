@@ -27,7 +27,7 @@ public class WormBreachRenderer extends WorldEventRenderer<WormBreachWorldEvent>
             Consumer<LodestoneWorldParticle> rise = p -> p.setParticleSpeed(p.getParticleSpeed().x, Math.pow(20,(instance.lifetime+2)/-15),p.getParticleSpeed().z);
             // DARK
             for(int i=0; i<36; i++)
-            WorldParticleBuilder.create(ParticleRegistry.CRINGE_PARTICLE)
+            WorldParticleBuilder.create(ParticleRegistry.SMOKE_CLOUD)
                     .enableNoClip()
                     .addRenderActor(rise)
                     .enableForcedSpawn()
@@ -43,7 +43,7 @@ public class WormBreachRenderer extends WorldEventRenderer<WormBreachWorldEvent>
                     .setDiscardFunction(SimpleParticleOptions.ParticleDiscardFunctionType.ENDING_CURVE_INVISIBLE)
                     .spawn(Minecraft.getInstance().level, instance.position.x, instance.position.y, instance.position.z);
             for(int i=0; i<27; i++)
-            WorldParticleBuilder.create(ParticleRegistry.CRINGE_PARTICLE)
+            WorldParticleBuilder.create(ParticleRegistry.SMOKE_CLOUD)
                     .enableNoClip()
                     .addRenderActor(rise)
                     .enableForcedSpawn()
@@ -59,7 +59,7 @@ public class WormBreachRenderer extends WorldEventRenderer<WormBreachWorldEvent>
                     .setDiscardFunction(SimpleParticleOptions.ParticleDiscardFunctionType.ENDING_CURVE_INVISIBLE)
                     .spawn(Minecraft.getInstance().level, instance.position.x, instance.position.y, instance.position.z);
             for(int i=0; i<36; i++)
-            WorldParticleBuilder.create(ParticleRegistry.CRINGE_PARTICLE)
+            WorldParticleBuilder.create(ParticleRegistry.SMOKE_CLOUD)
                     .enableNoClip()
                     .addRenderActor(rise)
                     .enableForcedSpawn()
