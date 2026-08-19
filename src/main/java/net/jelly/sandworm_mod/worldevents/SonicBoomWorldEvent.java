@@ -93,11 +93,6 @@ public class SonicBoomWorldEvent extends WorldEventInstance {
     }
 
     @Override
-    public boolean isClientSynced() {
-        return true;
-    }
-
-    @Override
     public CompoundTag serializeNBT(CompoundTag tag) {
         LOGGER.info("Serializing Sonic Boom World Event, followEntity: {}", followEntity);
         if (followEntity != null) {

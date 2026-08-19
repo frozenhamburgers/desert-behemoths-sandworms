@@ -51,9 +51,4 @@ public class WormBreachWorldEvent extends WorldEventInstance {
         lifetime = tag.getInt("age");
         return super.deserializeNBT(tag);
     }
-
-//    @Override
-//    public boolean isClientSynced() {
-//        return true;
-//    }
 }

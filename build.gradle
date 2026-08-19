@@ -95,8 +95,8 @@ dependencies {
 
     // Curse Maven dependencies
     modImplementation "curse.maven:geckolib-388172:5060416"
-    modRuntimeOnly "curse.maven:lodestone-616457:5460471"
-    modImplementation "curse.maven:lodestone-616457:5460471"
+    modRuntimeOnly "curse.maven:lodestone-616457:6213794"
+    modImplementation "curse.maven:lodestone-616457:6213794"
     modImplementation "curse.maven:architectury-api-419699:5137938"
     modImplementation "curse.maven:aaa-particles-979809:6616719"
 }
