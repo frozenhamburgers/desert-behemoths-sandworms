@@ -53,6 +53,17 @@ public class ClientEvents {
             }
         }
 
+        // Snapshot depth right after terrain (before entities/block entities/translucents) so
+        // SpiceResiduePostProcessor's world-position reconstruction only ever sees blocks - see
+        // SpiceResiduePostProcessor#copyBlockDepthBuffer for why Lodestone's own depthMain target
+        // (populated at AFTER_LEVEL, once the whole scene including entities is drawn) can't be used.
+        @SubscribeEvent
+        public static void onRenderLevelStage(RenderLevelStageEvent event) {
+            if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_CUTOUT_BLOCKS) {
+                SpiceResiduePostProcessor.INSTANCE.copyBlockDepthBuffer();
+            }
+        }
+
     }
 
     // MOD CLIENT EVENTS

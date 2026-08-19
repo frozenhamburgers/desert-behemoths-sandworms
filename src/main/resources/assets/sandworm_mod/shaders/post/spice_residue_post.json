@@ -1,9 +1,8 @@
 {
   "targets": [
     "final",
-    "depthMain",
-    "depthCutout",
-    "colorCutout"
+    "blockDepth",
+    "depthMain"
   ],
   "passes": [
     {
@@ -13,6 +12,10 @@
       "auxtargets": [
         {
           "name": "MainDepthSampler",
+          "id": "blockDepth:depth"
+        },
+        {
+          "name": "SceneDepthSampler",
           "id": "depthMain:depth"
         }
       ],

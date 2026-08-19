@@ -5,6 +5,14 @@
 // Samplers
 uniform sampler2D DiffuseSampler;
 uniform sampler2D MainDepthSampler;
+// Depth of the full current scene (blocks + entities + everything else),
+// captured late - contrasted against MainDepthSampler (blocks only, captured
+// right after terrain) to test whether something is now drawn in front of
+// the ground here, so the mark doesn't paint over it. See
+// SpiceResiduePostProcessor#copyBlockDepthBuffer for how MainDepthSampler is
+// populated, and PostProcessor#copyDepthBuffer (Lodestone base class) for how
+// this one still is.
+uniform sampler2D SceneDepthSampler;
 // Multi-Instance uniforms
 uniform samplerBuffer DataBuffer;
 uniform int InstanceCount;
@@ -19,6 +27,13 @@ uniform float time;
 
 in vec2 texCoord;
 out vec4 fragColor;
+
+// Vertical extent of the effect, in blocks, relative to each instance's center
+// height. Kept small and asymmetric so the mark hugs the surface on uneven
+// terrain without bleeding into caves below or painting anything airborne
+// above (e.g. the sky, or entities standing over/near the patch).
+const float V_RADIUS_UP = 1.5;
+const float V_RADIUS_DOWN = 3.5;
 
 // Cheap hand-written hash, same family as sonic_boom.fsh's rand().
 float hash21(vec2 p) {
@@ -72,6 +87,17 @@ void main() {
 
 	vec3 worldPos = getWorldPos(MainDepthSampler, texCoord, invProjMat, invViewMat, cameraPos);
 
+	// Occlusion test: compare the terrain-only depth against the full current
+	// scene's depth (same pixel). If something is now drawn nearer to the
+	// camera than the ground was, this pixel is covered (by an entity, a
+	// dropped item, translucent geometry, etc.) and the mark shouldn't show
+	// through it. Compared in linear view-space Z so the transition band is a
+	// consistent size in world units regardless of distance from the camera.
+	float blockViewZ = viewSpaceFromDepth(getDepth(MainDepthSampler, texCoord), texCoord, invProjMat).z;
+	float sceneViewZ = viewSpaceFromDepth(getDepth(SceneDepthSampler, texCoord), texCoord, invProjMat).z;
+	float visibility = 1.0 - smoothstep(0.0, 0.25, sceneViewZ - blockViewZ);
+	if (visibility <= 0.001) return;
+
 	vec3 craterColor = vec3(0.35, 0.05, 0.12); // dark rust core
 	vec3 streakColor = vec3(0.62, 0.18, 0.55); // spice purple/magenta rays
 
@@ -83,19 +109,27 @@ void main() {
 		vec2 offset = worldPos.xz - center.xz;
 		float dist = length(offset);
 
-		if (dist <= radius) {
+		// Bound the effect to a vertically-squashed ellipsoid around the
+		// instance's center instead of an infinite vertical column, so it
+		// doesn't seep underground or stain the sky/entities above.
+		float vOffset = worldPos.y - center.y;
+		float vRadius = vOffset >= 0.0 ? V_RADIUS_UP : V_RADIUS_DOWN;
+		float ellipsoidDist = length(vec2(dist / radius, vOffset / vRadius));
+
+		if (dist <= radius && ellipsoidDist <= 1.0) {
 			vec2 seed = center.xz * 0.073; // per-instance variety from world position
 
 			float mask = blastMarkMask(offset, radius, seed);
 
-			// Fade the whole mark out near the outer radius boundary.
-			float radialFalloff = 1.0 - smoothstep(radius * 0.85, radius, dist);
+			// Fade the whole mark out near the ellipsoid boundary (horizontal
+			// or vertical, whichever is reached first).
+			float radialFalloff = 1.0 - smoothstep(0.85, 1.0, ellipsoidDist);
 			mask *= radialFalloff;
 
 			float coreAmount = 1.0 - smoothstep(radius * 0.02, radius * 0.12, dist);
 			vec3 markColor = mix(streakColor, craterColor, coreAmount);
 
-			fragColor.rgb = mix(fragColor.rgb, markColor, mask * 0.6);
+			fragColor.rgb = mix(fragColor.rgb, markColor, mask * 0.6 * visibility);
 		}
 	}
 }

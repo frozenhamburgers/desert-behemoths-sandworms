@@ -9,7 +9,8 @@
   "attributes": [ "Position" ],
   "samplers": [
     { "name": "DiffuseSampler" },
-    { "name": "MainDepthSampler" }
+    { "name": "MainDepthSampler" },
+    { "name": "SceneDepthSampler" }
   ],
   "uniforms": [
     { "name": "DataBuffer", "type": "int", "count": 1, "values": [ 0 ] },
